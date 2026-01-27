@@ -1,5 +1,7 @@
 import Link from "next/link"
 
+/* ================= LAYOUT ================= */
+
 export default function AdminLayout({
   children,
 }: {
@@ -7,7 +9,7 @@ export default function AdminLayout({
 }) {
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      
+
       {/* SIDEBAR */}
       <aside
         style={{
@@ -27,11 +29,13 @@ export default function AdminLayout({
 
           {/* PRODUCTS DROPDOWN */}
           <details>
+
             <summary style={summaryStyle}>
               Products
             </summary>
 
             <div style={subMenuStyle}>
+
               <Link href="/admin/products" style={subLinkStyle}>
                 Product List
               </Link>
@@ -39,6 +43,7 @@ export default function AdminLayout({
               <Link href="/admin/products/new" style={subLinkStyle}>
                 Add Product
               </Link>
+
             </div>
           </details>
 
@@ -66,19 +71,19 @@ export default function AdminLayout({
 
 /* ================= STYLES ================= */
 
-const linkStyle = {
+const linkStyle: React.CSSProperties = {
   color: "white",
   textDecoration: "none",
   fontSize: 15,
 }
 
-const summaryStyle = {
+const summaryStyle: React.CSSProperties = {
   cursor: "pointer",
   fontSize: 15,
   color: "white",
 }
 
-const subMenuStyle = {
+const subMenuStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: 10,
@@ -86,7 +91,7 @@ const subMenuStyle = {
   marginTop: 10,
 }
 
-const subLinkStyle = {
+const subLinkStyle: React.CSSProperties = {
   color: "#ccc",
   textDecoration: "none",
   fontSize: 14,

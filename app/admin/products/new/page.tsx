@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
+import type { CSSProperties } from "react"
 
 /* ================= TYPES ================= */
 
@@ -232,14 +233,14 @@ export default function AddProductPage() {
 
 /* ================= STYLES ================= */
 
-const page = {
+const page: CSSProperties = {
   minHeight: "100vh",
   display: "flex",
   justifyContent: "center",
   paddingTop: 40,
 }
 
-const card = {
+const card: CSSProperties = {
   width: 600,
   background: "white",
   padding: 30,
@@ -247,7 +248,7 @@ const card = {
   boxShadow: "0 0 10px rgba(0,0,0,0.08)"
 }
 
-const input = {
+const input: CSSProperties = {
   width: "100%",
   padding: 12,
   marginTop: 12,
@@ -255,7 +256,7 @@ const input = {
   borderRadius: 6
 }
 
-const uploadBtn = {
+const uploadBtn: CSSProperties = {
   marginTop: 15,
   background: "black",
   color: "white",
@@ -265,14 +266,14 @@ const uploadBtn = {
   cursor: "pointer"
 }
 
-const previewGrid = {
+const previewGrid: CSSProperties = {
   marginTop: 15,
   display: "grid",
   gridTemplateColumns: "repeat(4, 1fr)",
   gap: 10
 }
 
-const previewBox = {
+const previewBox: CSSProperties = {
   position: "relative",
   height: 120,
   background: "#f2f2f2",
@@ -280,13 +281,13 @@ const previewBox = {
   overflow: "hidden"
 }
 
-const previewImg = {
+const previewImg: CSSProperties = {
   width: "100%",
   height: "100%",
   objectFit: "cover"
 }
 
-const mainBadge = {
+const mainBadge: CSSProperties = {
   position: "absolute",
   top: 5,
   left: 5,
@@ -297,7 +298,7 @@ const mainBadge = {
   borderRadius: 4
 }
 
-const removeBtn = {
+const removeBtn: CSSProperties = {
   position: "absolute",
   top: 5,
   right: 5,
@@ -310,7 +311,7 @@ const removeBtn = {
   cursor: "pointer"
 }
 
-const saveBtn = {
+const saveBtn: CSSProperties = {
   marginTop: 25,
   width: "100%",
   padding: 14,

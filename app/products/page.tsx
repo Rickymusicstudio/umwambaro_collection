@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { addToCart } from "@/lib/cart"
+import type { CSSProperties } from "react"
 
 /* ================= TYPES ================= */
 
@@ -112,7 +113,13 @@ export default function ProductsPage() {
   /* ---------------- CART ---------------- */
 
   function handleAdd(product: Product) {
-    addToCart(product)
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image_url: product.images?.[0] || product.image_url,
+    })
+
     setAddedId(product.id)
     setTimeout(() => setAddedId(null), 800)
   }
@@ -126,7 +133,6 @@ export default function ProductsPage() {
 
       <aside style={sidebar}>
 
-        {/* CONDITION */}
         <h3>Condition</h3>
 
         <div
@@ -152,7 +158,6 @@ export default function ProductsPage() {
 
         <hr style={{ margin: "15px 0" }} />
 
-        {/* CATEGORIES */}
         <h3>Categories</h3>
 
         <div
@@ -179,8 +184,6 @@ export default function ProductsPage() {
       <main style={{ flex: 1 }}>
 
         <h1 style={{ fontSize: 28 }}>Products</h1>
-
-        {/* SEARCH + SORT */}
 
         <div style={{ display: "flex", gap: 10, margin: "20px 0" }}>
 
@@ -284,32 +287,47 @@ export default function ProductsPage() {
 
 /* ================= STYLES ================= */
 
-const page = { display: "flex", gap: 30, padding: 40 }
-const sidebar = { width: 220, background: "#fafafa", padding: 20, borderRadius: 12 }
+const page: CSSProperties = { display: "flex", gap: 30, padding: 40 }
 
-const catItem = { padding: "10px 12px", borderRadius: 6, cursor: "pointer" }
-const catActive = { ...catItem, background: "black", color: "white" }
+const sidebar: CSSProperties = {
+  width: 220,
+  background: "#fafafa",
+  padding: 20,
+  borderRadius: 12,
+}
 
-const searchInput = {
+const catItem: CSSProperties = {
+  padding: "10px 12px",
+  borderRadius: 6,
+  cursor: "pointer",
+}
+
+const catActive: CSSProperties = {
+  ...catItem,
+  background: "black",
+  color: "white",
+}
+
+const searchInput: CSSProperties = {
   padding: 10,
   borderRadius: 6,
   border: "1px solid #ccc",
   width: 220,
 }
 
-const gridStyle = {
+const gridStyle: CSSProperties = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
   gap: 30,
 }
 
-const cardStyle = {
+const cardStyle: CSSProperties = {
   border: "2px solid black",
   borderRadius: 18,
   padding: 16,
 }
 
-const imageWrapper = {
+const imageWrapper: CSSProperties = {
   width: "100%",
   height: 260,
   borderRadius: 12,
@@ -318,13 +336,13 @@ const imageWrapper = {
   position: "relative",
 }
 
-const imageStyle = {
+const imageStyle: CSSProperties = {
   width: "100%",
   height: "100%",
   objectFit: "contain",
 }
 
-const mainBadge = {
+const mainBadge: CSSProperties = {
   position: "absolute",
   top: 8,
   left: 8,
@@ -336,7 +354,7 @@ const mainBadge = {
   zIndex: 5,
 }
 
-const btnStyle = {
+const btnStyle: CSSProperties = {
   marginTop: 12,
   width: "100%",
   padding: 12,

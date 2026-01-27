@@ -3,9 +3,9 @@ import { supabaseServer } from "@/lib/supabaseServer"
 
 export async function POST(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = context.params
+  const { id } = await params
 
   if (!id) {
     return new NextResponse("Missing order id", { status: 400 })

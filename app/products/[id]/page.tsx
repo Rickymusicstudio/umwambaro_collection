@@ -83,7 +83,7 @@ export default function ProductPage() {
   async function loadRelated(categoryId: number, productId: string) {
     const { data } = await supabase
       .from("products")
-      .select("id,name,price,image_url")
+      .select("id,name,description,price,image_url,images,category_id")
       .eq("category_id", categoryId)
       .neq("id", productId)
       .limit(4)
@@ -194,8 +194,7 @@ export default function ProductPage() {
                 id: product.id,
                 name: product.name,
                 price: product.price,
-                image: mainImage,
-                quantity: 1,
+                image_url: mainImage,
               })
             }
             className="mt-8 bg-black text-white px-6 py-3 rounded"

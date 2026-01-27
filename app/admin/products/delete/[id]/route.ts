@@ -1,11 +1,12 @@
+import { NextRequest } from "next/server"
 import { redirect } from "next/navigation"
 import { supabaseServer } from "@/lib/supabaseServer"
 
 export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params
+  const { id } = await params
 
   if (!id) {
     return new Response("Missing product id", { status: 400 })
@@ -13,7 +14,7 @@ export async function POST(
 
   const supabase = supabaseServer()
 
-  // ✅ Delete order items first
+  // Delete order items first
   const { error: itemsError } = await supabase
     .from("order_items")
     .delete()
@@ -24,7 +25,7 @@ export async function POST(
     return new Response("Failed deleting order items", { status: 500 })
   }
 
-  // ✅ Then delete product
+  // Then delete product
   const { error } = await supabase
     .from("products")
     .delete()
