@@ -1,34 +1,32 @@
-import { NextResponse } from "next/server";
-import { supabaseServer } from "../../../lib/supabaseServer";
+import { NextRequest, NextResponse } from "next/server"
+import { supabaseServer } from "../../../lib/supabaseServer"
 
-export async function POST(req: Request) {
-  const supabase = await supabaseServer();
+export async function POST(req: NextRequest) {
+  const supabase = await supabaseServer()
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.redirect(
-      new URL("/login", req.url)
-    );
+    return NextResponse.redirect(new URL("/login", req.url))
   }
 
   const { data: cart } = await supabase
     .from("carts")
     .select("*")
     .eq("user_id", user.id)
-    .single();
+    .single()
 
   const { data: items } = await supabase
     .from("cart_items")
     .select("product_id, quantity, products(price)")
-    .eq("cart_id", cart.id);
+    .eq("cart_id", cart.id)
 
   const total = items.reduce(
     (sum, i) => sum + i.quantity * i.products.price,
     0
-  );
+  )
 
   const { data: order } = await supabase
     .from("orders")
@@ -37,7 +35,7 @@ export async function POST(req: Request) {
       total_amount: total,
     })
     .select()
-    .single();
+    .single()
 
   for (const item of items) {
     await supabase.from("order_items").insert({
@@ -45,15 +43,10 @@ export async function POST(req: Request) {
       product_id: item.product_id,
       quantity: item.quantity,
       price: item.products.price,
-    });
+    })
   }
 
-  await supabase
-    .from("cart_items")
-    .delete()
-    .eq("cart_id", cart.id);
+  await supabase.from("cart_items").delete().eq("cart_id", cart.id)
 
-  return NextResponse.redirect(
-    new URL("/orders", req.url)
-  );
+  return NextResponse.redirect(new URL("/orders", req.url))
 }
