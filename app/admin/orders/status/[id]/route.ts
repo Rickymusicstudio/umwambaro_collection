@@ -1,15 +1,14 @@
+import { NextRequest, NextResponse } from "next/server"
 import { supabaseServer } from "@/lib/supabaseServer"
-import { NextResponse } from "next/server"
 
 export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
-    // ✅ await params
-    const { id } = await params
+    const { id } = context.params
 
-    const formData = await req.formData()
+    const formData = await request.formData()
     const status = formData.get("status") as string
 
     if (!status) {
@@ -35,9 +34,8 @@ export async function POST(
     }
 
     return NextResponse.redirect(
-      new URL("/admin/orders", req.url)
+      new URL("/admin/orders", request.url)
     )
-
   } catch (err) {
     console.error(err)
     return NextResponse.json(
