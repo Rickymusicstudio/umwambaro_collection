@@ -15,7 +15,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Navbar />
-        {children}
+
+        {/* Global responsive container */}
+        <main className="container">
+          {children}
+        </main>
+
       </body>
     </html>
   )

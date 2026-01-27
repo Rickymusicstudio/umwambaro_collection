@@ -39,6 +39,8 @@ export default function ProductsPage() {
   const [sort, setSort] = useState("")
   const [addedId, setAddedId] = useState<string | null>(null)
 
+  const [showMobileFilters, setShowMobileFilters] = useState(false)
+
   /* ---------------- LOAD ---------------- */
 
   useEffect(() => {
@@ -73,29 +75,18 @@ export default function ProductsPage() {
     sortValue = sort,
     condition = activeCondition
   ) {
+
     let filtered = [...allProducts]
 
-    if (catId) {
-      filtered = filtered.filter(p => p.category_id === catId)
-    }
-
-    if (condition) {
-      filtered = filtered.filter(p => p.condition === condition)
-    }
-
-    if (text) {
+    if (catId) filtered = filtered.filter(p => p.category_id === catId)
+    if (condition) filtered = filtered.filter(p => p.condition === condition)
+    if (text)
       filtered = filtered.filter(p =>
         p.name.toLowerCase().includes(text.toLowerCase())
       )
-    }
 
-    if (sortValue === "low") {
-      filtered.sort((a, b) => a.price - b.price)
-    }
-
-    if (sortValue === "high") {
-      filtered.sort((a, b) => b.price - a.price)
-    }
+    if (sortValue === "low") filtered.sort((a, b) => a.price - b.price)
+    if (sortValue === "high") filtered.sort((a, b) => b.price - a.price)
 
     setProducts(filtered)
   }
@@ -113,6 +104,7 @@ export default function ProductsPage() {
   /* ---------------- CART ---------------- */
 
   function handleAdd(product: Product) {
+
     addToCart({
       id: product.id,
       name: product.name,
@@ -127,32 +119,90 @@ export default function ProductsPage() {
   /* ================= UI ================= */
 
   return (
-    <div style={page}>
+    <div className="products-page" style={page}>
 
-      {/* ================= SIDEBAR ================= */}
+      {/* ========== MOBILE DRAWER ========== */}
+      {showMobileFilters && (
+        <div className="mobile-sidebar">
 
-      <aside style={sidebar}>
+          <button
+            style={closeBtn}
+            onClick={() => setShowMobileFilters(false)}
+          >
+            Close ✖
+          </button>
+
+          <h3>Condition</h3>
+
+          <div style={activeCondition === null ? catActive : catItem}
+            onClick={() => {
+              selectCondition(null)
+              setShowMobileFilters(false)
+            }}>
+            All
+          </div>
+
+          <div style={activeCondition === "new" ? catActive : catItem}
+            onClick={() => {
+              selectCondition("new")
+              setShowMobileFilters(false)
+            }}>
+            New
+          </div>
+
+          <div style={activeCondition === "used" ? catActive : catItem}
+            onClick={() => {
+              selectCondition("used")
+              setShowMobileFilters(false)
+            }}>
+            Used (Chaguwa)
+          </div>
+
+          <hr style={{ margin: "15px 0" }} />
+
+          <h3>Categories</h3>
+
+          <div style={activeCategory === null ? catActive : catItem}
+            onClick={() => {
+              selectCategory(null)
+              setShowMobileFilters(false)
+            }}>
+            All Products
+          </div>
+
+          {categories.map(cat => (
+            <div
+              key={cat.id}
+              style={activeCategory === cat.id ? catActive : catItem}
+              onClick={() => {
+                selectCategory(cat.id)
+                setShowMobileFilters(false)
+              }}
+            >
+              {cat.name}
+            </div>
+          ))}
+
+        </div>
+      )}
+
+      {/* ========== DESKTOP SIDEBAR ========== */}
+      <aside className="product-sidebar" style={sidebar}>
 
         <h3>Condition</h3>
 
-        <div
-          style={activeCondition === null ? catActive : catItem}
-          onClick={() => selectCondition(null)}
-        >
+        <div style={activeCondition === null ? catActive : catItem}
+          onClick={() => selectCondition(null)}>
           All
         </div>
 
-        <div
-          style={activeCondition === "new" ? catActive : catItem}
-          onClick={() => selectCondition("new")}
-        >
+        <div style={activeCondition === "new" ? catActive : catItem}
+          onClick={() => selectCondition("new")}>
           New
         </div>
 
-        <div
-          style={activeCondition === "used" ? catActive : catItem}
-          onClick={() => selectCondition("used")}
-        >
+        <div style={activeCondition === "used" ? catActive : catItem}
+          onClick={() => selectCondition("used")}>
           Used (Chaguwa)
         </div>
 
@@ -160,10 +210,8 @@ export default function ProductsPage() {
 
         <h3>Categories</h3>
 
-        <div
-          style={activeCategory === null ? catActive : catItem}
-          onClick={() => selectCategory(null)}
-        >
+        <div style={activeCategory === null ? catActive : catItem}
+          onClick={() => selectCategory(null)}>
           All Products
         </div>
 
@@ -179,13 +227,21 @@ export default function ProductsPage() {
 
       </aside>
 
-      {/* ================= MAIN ================= */}
-
+      {/* ========== MAIN ========== */}
       <main style={{ flex: 1 }}>
 
-        <h1 style={{ fontSize: 28 }}>Products</h1>
+        <div style={topBar}>
+          <button
+            className="mobile-filter-btn"
+            onClick={() => setShowMobileFilters(true)}
+          >
+            ☰ Filters
+          </button>
 
-        <div style={{ display: "flex", gap: 10, margin: "20px 0" }}>
+          <h1 style={{ fontSize: 28 }}>Products</h1>
+        </div>
+
+        <div style={filterRow}>
 
           <input
             placeholder="Search product..."
@@ -213,7 +269,6 @@ export default function ProductsPage() {
         </div>
 
         {/* GRID */}
-
         <div style={gridStyle}>
 
           {products.map(p => {
@@ -232,14 +287,14 @@ export default function ProductsPage() {
                       {p.condition === "used" ? "USED" : "NEW"}
                     </div>
 
-                    <img src={mainImg} className="img-main" style={imageStyle} />
+                    <img src={mainImg} style={imageStyle} />
                     <img src={hoverImg} className="img-hover" style={imageStyle} />
 
                   </div>
 
                 </Link>
 
-                <h3 style={{ marginTop: 12 }}>{p.name}</h3>
+                <h3>{p.name}</h3>
                 <p style={{ color: "#555" }}>{p.description}</p>
 
                 <strong>{p.price} RWF</strong>
@@ -262,22 +317,45 @@ export default function ProductsPage() {
 
       </main>
 
-      {/* HOVER EFFECT */}
+      {/* HOVER */}
       <style jsx>{`
         .product-card img {
-          position: absolute;
-          top: 0;
-          left: 0;
-          transition: opacity .3s ease, transform .3s ease;
+          position:absolute;
+          top:0;
+          left:0;
+          transition:.3s;
         }
-        .img-hover { opacity: 0; }
-        .product-card:hover .img-hover {
-          opacity: 1;
-          transform: scale(1.05);
+        .img-hover{opacity:0}
+        .product-card:hover .img-hover{opacity:1}
+        .product-card:hover img:first-child{opacity:0}
+
+        @media(max-width:768px){
+          .product-sidebar{display:none}
+          .products-page{flex-direction:column}
+          .mobile-filter-btn{display:block}
         }
-        .product-card:hover .img-main {
-          opacity: 0;
-          transform: scale(1.05);
+
+        .mobile-filter-btn{
+          display:none;
+          background:black;
+          color:white;
+          padding:8px 14px;
+          border-radius:8px;
+          border:none;
+        }
+
+        .mobile-sidebar{
+          position:fixed;
+          top:0;
+          left:0;
+          width:75%;
+          max-width:280px;
+          height:100vh;
+          background:white;
+          padding:20px;
+          z-index:3000;
+          overflow-y:auto;
+          box-shadow:0 0 0 100vmax rgba(0,0,0,.5);
         }
       `}</style>
 
@@ -287,7 +365,11 @@ export default function ProductsPage() {
 
 /* ================= STYLES ================= */
 
-const page: CSSProperties = { display: "flex", gap: 30, padding: 40 }
+const page: CSSProperties = {
+  display: "flex",
+  gap: 30,
+  padding: 30,
+}
 
 const sidebar: CSSProperties = {
   width: 220,
@@ -308,17 +390,31 @@ const catActive: CSSProperties = {
   color: "white",
 }
 
+const topBar: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+}
+
+const filterRow: CSSProperties = {
+  display: "flex",
+  gap: 10,
+  margin: "20px 0",
+  flexWrap: "wrap",
+}
+
 const searchInput: CSSProperties = {
   padding: 10,
   borderRadius: 6,
   border: "1px solid #ccc",
-  width: 220,
+  width: "100%",
+  maxWidth: 240,
 }
 
 const gridStyle: CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-  gap: 30,
+  gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))",
+  gap: 20,
 }
 
 const cardStyle: CSSProperties = {
@@ -329,11 +425,10 @@ const cardStyle: CSSProperties = {
 
 const imageWrapper: CSSProperties = {
   width: "100%",
-  height: 260,
-  borderRadius: 12,
-  overflow: "hidden",
-  background: "white",
+  height: 220,
   position: "relative",
+  overflow: "hidden",
+  borderRadius: 12,
 }
 
 const imageStyle: CSSProperties = {
@@ -360,7 +455,16 @@ const btnStyle: CSSProperties = {
   padding: 12,
   borderRadius: 10,
   border: "none",
-  fontSize: 15,
-  cursor: "pointer",
   fontWeight: "bold",
+  cursor: "pointer",
+}
+
+const closeBtn: CSSProperties = {
+  width: "100%",
+  padding: 10,
+  background: "black",
+  color: "white",
+  border: "none",
+  borderRadius: 8,
+  marginBottom: 15,
 }
