@@ -15,6 +15,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
 
+    // 🔐 Sign in
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -26,7 +27,7 @@ export default function LoginPage() {
       return;
     }
 
-    // ✅ Get logged-in user
+    // 👤 Get user
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -37,7 +38,7 @@ export default function LoginPage() {
       return;
     }
 
-    // ✅ Get role from profiles table
+    // 📌 Get role
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
@@ -54,7 +55,7 @@ export default function LoginPage() {
 
     // ✅ Role-based redirect
     if (profile?.role === "admin") {
-      router.push("/admin");
+      router.push("/admin/dashboard");
     } else {
       router.push("/products");
     }
