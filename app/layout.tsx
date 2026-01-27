@@ -14,9 +14,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+
         <Navbar />
 
-        {/* Global responsive container */}
+        {/* Public pages container */}
         <main className="container">
           {children}
         </main>
