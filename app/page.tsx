@@ -1,11 +1,5 @@
-import { supabase } from "../lib/supabaseClient";
+import { redirect } from "next/navigation"
 
-export default async function Home() {
-  const { data } = await supabase.from("test").select("*");
-
-  return (
-    <div className="p-10 text-xl">
-      Supabase Connected ✅
-    </div>
-  );
+export default function HomePage() {
+  redirect("/products")
 }
