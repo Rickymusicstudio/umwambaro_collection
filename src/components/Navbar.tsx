@@ -5,6 +5,12 @@ import { useEffect, useState, useRef } from "react"
 import { getCart } from "@/lib/cart"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
+import { Pacifico } from "next/font/google"
+
+const signature = Pacifico({
+  subsets: ["latin"],
+  weight: "400",
+})
 
 export default function Navbar() {
 
@@ -73,17 +79,10 @@ export default function Navbar() {
 
 <header className="desktop-only">
 
-  <Link
-    href="/products"
-    style={{
-      color: "white",
-      fontSize: 20,
-      fontWeight: "bold",
-    }}
-  >
-    UMWAMBARO
-  </Link>
-
+<Link href="/products" className="brand">
+  <span className="brand-main">UMWAMBARO</span>
+  <span className="brand-script">Collections</span>
+</Link>
   <form
     onSubmit={handleSearch}
     style={{
@@ -167,7 +166,7 @@ export default function Navbar() {
           borderRadius: 20,
         }}
       >
-        {count}
+        {count > 99 ? "99+" : count}
       </span>
     )}
   </Link>
@@ -188,9 +187,10 @@ export default function Navbar() {
         ☰
       </button>
 
-      <Link href="/products" className="mobile-logo">
-        umwambaro
-      </Link>
+      <Link href="/products" className="brand">
+  <span className="brand-main">UMWAMBARO</span>
+  <span className="brand-script">Collections</span>
+</Link>
     </div>
 
     <div className="mobile-right">
@@ -205,10 +205,34 @@ export default function Navbar() {
         </Link>
       )}
 
-      <Link href="/cart" className="mobile-link">
-        🛒
-        {count > 0 && <span className="badge">{count}</span>}
-      </Link>
+      {/* ✅ FIXED CART */}
+     <Link href="/cart" className="mobile-cart">
+
+  <span className="cart-icon">
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="9" cy="21" r="1"/>
+      <circle cx="20" cy="21" r="1"/>
+      <path d="M1 1h4l2.6 13h11.4l2-8H6"/>
+    </svg>
+
+    {count > 0 && (
+      <span className="badge">
+        {count > 99 ? "99+" : count}
+      </span>
+    )}
+  </span>
+
+</Link>
+
 
     </div>
 
@@ -293,11 +317,30 @@ export default function Navbar() {
   justify-content:space-between;
   width:100%;
 }
+ .brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
+}
+
+.brand-main{
+  color:white;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.brand-script{
+  font-family:${signature.style.fontFamily};
+  color:#febd69;
+  font-size:18px;
+}
 
 .mobile-right{
   display:flex;
   align-items:center;
   gap:12px;
+  overflow: visible;
 }
 
 .mobile-left{
@@ -325,18 +368,36 @@ export default function Navbar() {
   background:none;
   border:none;
   text-decoration:none;
+}
+
+/* ✅ FIXED CART */
+.mobile-cart{
   position:relative;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  text-decoration:none;
 }
 
 .badge{
   position:absolute;
-  top:-6px;
-  right:-10px;
+  top:-4px;
+  right:-4px;
   background:#febd69;
   color:black;
   font-size:11px;
-  padding:2px 5px;
-  border-radius:50%;
+  min-width:16px;
+  height:16px;
+  padding:0 4px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  line-height:1;
 }
 
 .mobile-search{
@@ -412,6 +473,45 @@ export default function Navbar() {
   .desktop-only{display:none}
   .mobile-only{display:block}
 }
+  .cart-icon{
+  position:relative;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.cart-text{
+  font-size:14px;
+}
+
+.mobile-cart{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:white;
+  text-decoration:none;
+  overflow:visible;
+}
+
+.badge{
+  position:absolute;
+  top:-6px;
+  right:-6px;
+  background:#febd69;
+  color:black;
+  font-size:11px;
+  min-width:16px;
+  height:16px;
+  padding:0 4px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
 
 `}</style>
 

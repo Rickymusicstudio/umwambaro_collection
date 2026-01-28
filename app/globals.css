@@ -52,6 +52,7 @@ textarea {
   margin-right: auto;
   padding-left: 16px;
   padding-right: 16px;
+  overflow: visible;
 }
 
 /* =====================================
@@ -181,4 +182,21 @@ a {
 
 .hidden {
   display: none !important;
+}
+
+/* =====================================
+   CART BADGE FIX
+===================================== */
+
+.mobile-right,
+.mobile-cart,
+.mobile-only,
+.desktop-only {
+  overflow: visible !important;
+}
+
+.badge {
+  position: absolute !important;
+  top: -4px !important;
+  right: -4px !important;
 }
