@@ -2,6 +2,8 @@
 
 import Link from "next/link"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
 
 export default function AdminLayout({
   children,
@@ -10,6 +12,12 @@ export default function AdminLayout({
 }) {
 
   const [open, setOpen] = useState(false)
+  const router = useRouter()
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    router.push("/login")
+  }
 
   return (
 
@@ -56,6 +64,11 @@ export default function AdminLayout({
             Orders
           </Link>
 
+          {/* LOGOUT */}
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+
         </nav>
 
       </aside>
@@ -84,6 +97,8 @@ export default function AdminLayout({
   background:#111;
   color:white;
   padding:20px;
+  display:flex;
+  flex-direction:column;
 }
 
 /* Title */
@@ -96,6 +111,7 @@ export default function AdminLayout({
   display:flex;
   flex-direction:column;
   gap:15px;
+  flex:1;
 }
 
 .sidebar a{
@@ -124,6 +140,21 @@ export default function AdminLayout({
 .submenu a{
   color:#ccc;
   font-size:14px;
+}
+
+/* LOGOUT */
+.logout-btn{
+  margin-top:auto;
+  background:#222;
+  border:none;
+  color:white;
+  padding:10px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.logout-btn:hover{
+  background:#e74c3c;
 }
 
 /* CONTENT */

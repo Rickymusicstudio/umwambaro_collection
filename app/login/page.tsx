@@ -15,8 +15,9 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    // 🔐 Sign in
-    const { error } = await supabase.auth.signInWithPassword({
+    /* ---------------- SIGN IN ---------------- */
+
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -27,10 +28,7 @@ export default function LoginPage() {
       return;
     }
 
-    // 👤 Get user
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = data.user;
 
     if (!user) {
       setLoading(false);
@@ -38,23 +36,26 @@ export default function LoginPage() {
       return;
     }
 
-    // 📌 Get role
+    /* ---------------- GET ROLE FROM users TABLE ---------------- */
+
     const { data: profile, error: profileError } = await supabase
-      .from("profiles")
+      .from("users")
       .select("role")
       .eq("id", user.id)
       .single();
 
     setLoading(false);
 
-    if (profileError) {
-      console.error(profileError);
+    /* If role missing, treat as normal user */
+    if (profileError || !profile?.role) {
+      console.warn("Role not found, redirecting as user");
       router.push("/products");
       return;
     }
 
-    // ✅ Role-based redirect
-    if (profile?.role === "admin") {
+    /* ---------------- ROLE REDIRECT ---------------- */
+
+    if (profile.role === "admin") {
       router.push("/admin/dashboard");
     } else {
       router.push("/products");

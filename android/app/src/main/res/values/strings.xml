@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">UMWAMBARO Collections</string>
+    <string name="title_activity_main">UMWAMBARO Collections</string>
+    <string name="package_name">com.umwambaro.collections</string>
+    <string name="custom_url_scheme">com.umwambaro.collections</string>
+</resources>
