@@ -48,7 +48,7 @@ export default function CheckoutPage() {
       return
     }
 
-    /* CREATE ORDER */
+    /* ================= CREATE ORDER ================= */
 
     const { data: order, error } = await supabase
       .from("orders")
@@ -71,14 +71,14 @@ export default function CheckoutPage() {
       return
     }
 
-    /* SAVE ORDER ITEMS */
+    /* ================= SAVE ORDER ITEMS ================= */
 
-    const items = cart.map(item => ({
-      order_id: order.id,
-      product_id: item.id,
-      price: item.price,
-      quantity: item.quantity,
-    }))
+   const items = cart.map(item => ({
+  order_id: order.id,
+  product_id: item.id,
+  price: item.price,
+  quantity: item.quantity
+}))
 
     const { error: itemsError } = await supabase
       .from("order_items")
@@ -91,7 +91,28 @@ export default function CheckoutPage() {
       return
     }
 
+    /* ================= MARK PRODUCTS AS SOLD ================= */
+
+    for (const item of cart) {
+      const { error: updateError } = await supabase
+        .from("products")
+        .update({ is_active: false })
+        .eq("id", item.id)
+
+      if (updateError) {
+        console.error(updateError)
+        alert("Failed to mark product sold")
+        setLoading(false)
+        return
+      }
+    }
+
+    /* ================= CLEAR CART ================= */
+
     clearCart()
+
+    /* ================= REDIRECT ================= */
+
     router.push("/success")
   }
 

@@ -27,6 +27,10 @@ export default function AddProductPage() {
   const [images, setImages] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
 
+  // ✅ SIZES
+  const [sizesInput, setSizesInput] = useState("") 
+  const [sizeStock, setSizeStock] = useState<Record<string, number>>({})
+
   const [loading, setLoading] = useState(false)
 
   /* ================= LOAD CATEGORIES ================= */
@@ -64,6 +68,32 @@ export default function AddProductPage() {
     setPreviews(prev => prev.filter((_, i) => i !== index))
   }
 
+  /* ================= SIZES ================= */
+
+  function handleSizesChange(value: string) {
+    setSizesInput(value)
+
+    const list = value
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean)
+
+    const stockObj: Record<string, number> = {}
+
+    list.forEach(size => {
+      stockObj[size] = sizeStock[size] ?? 0
+    })
+
+    setSizeStock(stockObj)
+  }
+
+  function updateStock(size: string, value: string) {
+    setSizeStock(prev => ({
+      ...prev,
+      [size]: Number(value)
+    }))
+  }
+
   /* ================= SAVE PRODUCT ================= */
 
   async function handleSave() {
@@ -99,6 +129,11 @@ export default function AddProductPage() {
       uploadedUrls.push(data.publicUrl)
     }
 
+    const sizes = sizesInput
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean)
+
     const { error } = await supabase
       .from("products")
       .insert({
@@ -109,7 +144,9 @@ export default function AddProductPage() {
         image_url: uploadedUrls[0],
         images: uploadedUrls,
         category_id: categoryId,
-        is_active: true
+        is_active: true,
+        sizes: sizes.length ? sizes : null,
+        size_stock: sizes.length ? sizeStock : null
       })
 
     if (error) {
@@ -125,6 +162,8 @@ export default function AddProductPage() {
       setCategoryId("")
       setImages([])
       setPreviews([])
+      setSizesInput("")
+      setSizeStock({})
     }
 
     setLoading(false)
@@ -183,7 +222,37 @@ export default function AddProductPage() {
           <option value="used">Used</option>
         </select>
 
-        {/* UPLOAD */}
+        {/* ================= SIZES ================= */}
+
+        <input
+          placeholder="Sizes (comma separated e.g. 36,37,38,39)"
+          value={sizesInput}
+          onChange={e => handleSizesChange(e.target.value)}
+          style={input}
+        />
+
+        {Object.keys(sizeStock).length > 0 && (
+          <div style={{ marginTop: 10 }}>
+            <strong>Stock Per Size</strong>
+
+            {Object.keys(sizeStock).map(size => (
+              <div key={size} style={{ display: "flex", gap: 10, marginTop: 6 }}>
+                <span style={{ width: 60 }}>{size}</span>
+
+                <input
+                  type="number"
+                  min="0"
+                  value={sizeStock[size]}
+                  onChange={e => updateStock(size, e.target.value)}
+                  style={{ ...input, marginTop: 0 }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ================= UPLOAD ================= */}
+
         <label>
           <input
             type="file"
@@ -195,7 +264,8 @@ export default function AddProductPage() {
           <span style={uploadBtn}>Upload Images</span>
         </label>
 
-        {/* PREVIEW */}
+        {/* ================= PREVIEW ================= */}
+
         <div style={previewGrid}>
           {previews.map((src, i) => (
             <div key={i} style={previewBox}>
@@ -241,7 +311,7 @@ const page: CSSProperties = {
 }
 
 const card: CSSProperties = {
-  width: 600,
+  width: 650,
   background: "white",
   padding: 30,
   borderRadius: 10,

@@ -39,10 +39,10 @@ export default function LoginPage() {
     /* ---------------- GET ROLE FROM users TABLE ---------------- */
 
     const { data: profile, error: profileError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+  .from("profiles")
+  .select("role")
+  .eq("id", user.id)
+  .single();
 
     setLoading(false);
 

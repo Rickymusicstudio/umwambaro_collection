@@ -121,40 +121,28 @@ export default function ProductsPage() {
   return (
     <div className="products-page" style={page}>
 
-      {/* ========== MOBILE DRAWER ========== */}
+      {/* MOBILE DRAWER */}
       {showMobileFilters && (
         <div className="mobile-sidebar">
 
-          <button
-            style={closeBtn}
-            onClick={() => setShowMobileFilters(false)}
-          >
+          <button style={closeBtn} onClick={() => setShowMobileFilters(false)}>
             Close ✖
           </button>
 
           <h3>Condition</h3>
 
           <div style={activeCondition === null ? catActive : catItem}
-            onClick={() => {
-              selectCondition(null)
-              setShowMobileFilters(false)
-            }}>
+            onClick={() => { selectCondition(null); setShowMobileFilters(false) }}>
             All
           </div>
 
           <div style={activeCondition === "new" ? catActive : catItem}
-            onClick={() => {
-              selectCondition("new")
-              setShowMobileFilters(false)
-            }}>
+            onClick={() => { selectCondition("new"); setShowMobileFilters(false) }}>
             New
           </div>
 
           <div style={activeCondition === "used" ? catActive : catItem}
-            onClick={() => {
-              selectCondition("used")
-              setShowMobileFilters(false)
-            }}>
+            onClick={() => { selectCondition("used"); setShowMobileFilters(false) }}>
             Used (Chaguwa)
           </div>
 
@@ -163,22 +151,14 @@ export default function ProductsPage() {
           <h3>Categories</h3>
 
           <div style={activeCategory === null ? catActive : catItem}
-            onClick={() => {
-              selectCategory(null)
-              setShowMobileFilters(false)
-            }}>
+            onClick={() => { selectCategory(null); setShowMobileFilters(false) }}>
             All Products
           </div>
 
           {categories.map(cat => (
-            <div
-              key={cat.id}
+            <div key={cat.id}
               style={activeCategory === cat.id ? catActive : catItem}
-              onClick={() => {
-                selectCategory(cat.id)
-                setShowMobileFilters(false)
-              }}
-            >
+              onClick={() => { selectCategory(cat.id); setShowMobileFilters(false) }}>
               {cat.name}
             </div>
           ))}
@@ -186,60 +166,41 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* ========== DESKTOP SIDEBAR ========== */}
-      <aside className="product-sidebar" style={sidebar}>
+      {/* DESKTOP SIDEBAR */}
+      <aside style={sidebar}>
 
         <h3>Condition</h3>
 
         <div style={activeCondition === null ? catActive : catItem}
-          onClick={() => selectCondition(null)}>
-          All
-        </div>
+          onClick={() => selectCondition(null)}>All</div>
 
         <div style={activeCondition === "new" ? catActive : catItem}
-          onClick={() => selectCondition("new")}>
-          New
-        </div>
+          onClick={() => selectCondition("new")}>New</div>
 
         <div style={activeCondition === "used" ? catActive : catItem}
-          onClick={() => selectCondition("used")}>
-          Used (Chaguwa)
-        </div>
+          onClick={() => selectCondition("used")}>Used (Chaguwa)</div>
 
         <hr style={{ margin: "15px 0" }} />
 
         <h3>Categories</h3>
 
         <div style={activeCategory === null ? catActive : catItem}
-          onClick={() => selectCategory(null)}>
-          All Products
-        </div>
+          onClick={() => selectCategory(null)}>All Products</div>
 
         {categories.map(cat => (
-          <div
-            key={cat.id}
+          <div key={cat.id}
             style={activeCategory === cat.id ? catActive : catItem}
-            onClick={() => selectCategory(cat.id)}
-          >
+            onClick={() => selectCategory(cat.id)}>
             {cat.name}
           </div>
         ))}
 
       </aside>
 
-      {/* ========== MAIN ========== */}
+      {/* MAIN */}
       <main style={{ flex: 1 }}>
 
-        <div style={topBar}>
-          <button
-            className="mobile-filter-btn"
-            onClick={() => setShowMobileFilters(true)}
-          >
-            ☰ Filters
-          </button>
-
-          <h1 style={{ fontSize: 28 }}>Products</h1>
-        </div>
+        <h1 style={{ fontSize: 28 }}>Products</h1>
 
         <div style={filterRow}>
 
@@ -284,7 +245,7 @@ export default function ProductsPage() {
                   <div style={imageWrapper} className="product-card">
 
                     <div style={mainBadge}>
-                      {p.condition === "used" ? "USED" : "NEW"}
+                      {p.condition === "used" ? "CHAGUWA" : "NEW"}
                     </div>
 
                     <img src={mainImg} style={imageStyle} />
@@ -297,8 +258,12 @@ export default function ProductsPage() {
                 <h3>{p.name}</h3>
                 <p style={{ color: "#555" }}>{p.description}</p>
 
-                <strong>{p.price} RWF</strong>
+                {/* PRICE */}
+                <strong style={{ marginTop: "auto", marginBottom: 8 }}>
+                  {p.price} RWF
+                </strong>
 
+                {/* BUTTON */}
                 <button
                   onClick={() => handleAdd(p)}
                   style={{
@@ -317,7 +282,7 @@ export default function ProductsPage() {
 
       </main>
 
-      {/* HOVER */}
+      {/* HOVER EFFECT */}
       <style jsx>{`
         .product-card img {
           position:absolute;
@@ -328,35 +293,6 @@ export default function ProductsPage() {
         .img-hover{opacity:0}
         .product-card:hover .img-hover{opacity:1}
         .product-card:hover img:first-child{opacity:0}
-
-        @media(max-width:768px){
-          .product-sidebar{display:none}
-          .products-page{flex-direction:column}
-          .mobile-filter-btn{display:block}
-        }
-
-        .mobile-filter-btn{
-          display:none;
-          background:black;
-          color:white;
-          padding:8px 14px;
-          border-radius:8px;
-          border:none;
-        }
-
-        .mobile-sidebar{
-          position:fixed;
-          top:0;
-          left:0;
-          width:75%;
-          max-width:280px;
-          height:100vh;
-          background:white;
-          padding:20px;
-          z-index:3000;
-          overflow-y:auto;
-          box-shadow:0 0 0 100vmax rgba(0,0,0,.5);
-        }
       `}</style>
 
     </div>
@@ -390,12 +326,6 @@ const catActive: CSSProperties = {
   color: "white",
 }
 
-const topBar: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 12,
-}
-
 const filterRow: CSSProperties = {
   display: "flex",
   gap: 10,
@@ -421,6 +351,8 @@ const cardStyle: CSSProperties = {
   border: "2px solid black",
   borderRadius: 18,
   padding: 16,
+  display: "flex",
+  flexDirection: "column",
 }
 
 const imageWrapper: CSSProperties = {
@@ -450,7 +382,6 @@ const mainBadge: CSSProperties = {
 }
 
 const btnStyle: CSSProperties = {
-  marginTop: 12,
   width: "100%",
   padding: 12,
   borderRadius: 10,
