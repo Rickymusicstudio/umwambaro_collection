@@ -13,9 +13,6 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState("")
   const [loading, setLoading] = useState(false)
 
-  // ✅ Force payment method
-  const paymentMethod = "cash"
-
   useEffect(() => {
     setCart(getCart())
   }, [])
@@ -48,82 +45,48 @@ export default function CheckoutPage() {
       return
     }
 
-    /* ================= CREATE ORDER ================= */
-
-    const { data: order, error } = await supabase
-      .from("orders")
-      .insert({
+    const res = await fetch("/api/place-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         user_id: user.id,
-        total_amount: total,
-        status: "pending",
+        cart,
         phone,
-        address,
-        payment_method: paymentMethod,
-        payment_status: "unpaid",
+        address
       })
-      .select()
-      .single()
+    })
 
-    if (error) {
-      console.error(error)
-      alert("Failed to create order")
+    const data = await res.json()
+
+    if (!res.ok) {
+      alert(data.error || "Order failed")
       setLoading(false)
       return
     }
 
-    /* ================= SAVE ORDER ITEMS ================= */
-
-   const items = cart.map(item => ({
-  order_id: order.id,
-  product_id: item.id,
-  price: item.price,
-  quantity: item.quantity
-}))
-
-    const { error: itemsError } = await supabase
-      .from("order_items")
-      .insert(items)
-
-    if (itemsError) {
-      console.error(itemsError)
-      alert("Failed to save items")
-      setLoading(false)
-      return
-    }
-
-    /* ================= MARK PRODUCTS AS SOLD ================= */
-
-    for (const item of cart) {
-      const { error: updateError } = await supabase
-        .from("products")
-        .update({ is_active: false })
-        .eq("id", item.id)
-
-      if (updateError) {
-        console.error(updateError)
-        alert("Failed to mark product sold")
-        setLoading(false)
-        return
-      }
-    }
-
-    /* ================= CLEAR CART ================= */
-
+    // ✅ Clear cart
     clearCart()
 
-    /* ================= REDIRECT ================= */
+    // ✅ WhatsApp Click-to-Chat
+    const adminPhone = "250785712246" // CHANGE to your WhatsApp number
 
-    router.push("/success")
+    const message = encodeURIComponent(
+      `Hello, I just placed an order.
+
+Phone: ${phone}
+Address: ${address}
+Total: ${total} RWF`
+    )
+
+    window.location.href = `https://wa.me/${adminPhone}?text=${message}`
   }
 
   return (
     <div style={{ maxWidth: 500, margin: "auto", padding: 24 }}>
-
       <h1 style={{ fontSize: 24, fontWeight: "bold" }}>
         Checkout
       </h1>
 
-      {/* PHONE */}
       <input
         placeholder="Phone number"
         value={phone}
@@ -131,7 +94,6 @@ export default function CheckoutPage() {
         style={input}
       />
 
-      {/* ADDRESS */}
       <textarea
         placeholder="Delivery address"
         value={address}
@@ -139,19 +101,8 @@ export default function CheckoutPage() {
         style={{ ...input, height: 90 }}
       />
 
-      {/* PAYMENT METHOD */}
-      <div style={{ marginTop: 15 }}>
-        <p><b>Payment Method</b></p>
-        <p>Cash on Delivery</p>
-      </div>
-
-      <p style={{ marginTop: 15 }}>
-        Items: {cart.length}
-      </p>
-
-      <p style={{ fontWeight: "bold" }}>
-        Total: {total} RWF
-      </p>
+      <p>Items: {cart.length}</p>
+      <p><b>Total: {total} RWF</b></p>
 
       <button
         disabled={loading}
@@ -160,18 +111,16 @@ export default function CheckoutPage() {
       >
         {loading ? "Placing Order..." : "Place Order"}
       </button>
-
     </div>
   )
 }
-
-/* STYLES */
 
 const input: React.CSSProperties = {
   width: "100%",
   padding: 12,
   marginTop: 12,
   border: "1px solid #ccc",
+  borderRadius: 6
 }
 
 const btn: React.CSSProperties = {
@@ -182,5 +131,5 @@ const btn: React.CSSProperties = {
   width: "100%",
   borderRadius: 8,
   border: "none",
-  cursor: "pointer",
+  cursor: "pointer"
 }

@@ -1,76 +1,69 @@
 import { NextRequest, NextResponse } from "next/server"
-import { supabaseServer } from "../../../lib/supabaseServer"
+import { supabaseServer } from "@/lib/supabaseServer"
 
 export async function POST(req: NextRequest) {
-  const supabase = await supabaseServer()
+  console.log("🚀 PLACE ORDER API HIT")
 
-  // Get logged-in user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  try {
+    const supabase = await supabaseServer()
+    const body = await req.json()
 
-  if (!user) {
-    return NextResponse.redirect(new URL("/login", req.url))
+    console.log("📦 BODY:", body)
+
+    const { user_id, cart, phone, address } = body
+
+    const total = cart.reduce(
+      (sum: number, i: any) => sum + i.price * i.quantity,
+      0
+    )
+
+    console.log("💰 TOTAL:", total)
+
+    const { data: order, error } = await supabase
+      .from("orders")
+      .insert({
+        user_id,
+        total_amount: total,
+        status: "pending",
+        phone,
+        address
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("❌ ORDER ERROR:", error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    console.log("✅ ORDER CREATED:", order.id)
+
+    const message = `🛒 NEW ORDER
+
+Phone: ${phone}
+Address: ${address}
+Total: ${total} RWF
+Order ID: ${order.id}`
+
+    console.log("📨 ABOUT TO CALL WHATSAPP")
+
+    const waRes = await fetch(
+      new URL("/api/whatsapp", req.url),
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      }
+    )
+
+    const waData = await waRes.json()
+
+    console.log("📨 WHATSAPP RESULT:", waData)
+
+    return NextResponse.json({ success: true })
+
+  } catch (err: any) {
+    console.error("🔥 CRASH:", err)
+    return NextResponse.json({ error: err.message }, { status: 500 })
   }
-
-  // Get user's cart
-  const { data: cart } = await supabase
-    .from("carts")
-    .select("*")
-    .eq("user_id", user.id)
-    .single()
-
-  if (!cart) {
-    return new NextResponse("Cart not found", { status: 400 })
-  }
-
-  // Get cart items + product prices
-  const { data: items } = await supabase
-    .from("cart_items")
-    .select("product_id, quantity, products(price)")
-    .eq("cart_id", cart.id)
-
-  const safeItems = items || []
-
-  if (safeItems.length === 0) {
-    return new NextResponse("Cart is empty", { status: 400 })
-  }
-
-  // Calculate total
-  const total = safeItems.reduce(
-    (sum, i) => sum + i.quantity * i.products[0].price,
-    0
-  )
-
-  // Create order
-  const { data: order } = await supabase
-    .from("orders")
-    .insert({
-      user_id: user.id,
-      total_amount: total,
-    })
-    .select()
-    .single()
-
-  if (!order) {
-    return new NextResponse("Order creation failed", { status: 500 })
-  }
-
-  // Insert order items
-  for (const item of safeItems) {
-    await supabase.from("order_items").insert({
-      order_id: order.id,
-      product_id: item.product_id,
-      quantity: item.quantity,
-      price: item.products[0].price,
-    })
-  }
-
-  // Clear cart
-  await supabase
-    .from("cart_items")
-    .delete()
-    .eq("cart_id", cart.id)
-
-  return NextResponse.redirect(new URL("/orders", req.url))
 }
