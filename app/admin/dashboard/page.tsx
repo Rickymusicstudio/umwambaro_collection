@@ -1,12 +1,8 @@
-// DEPLOY TEST 123
-
 "use client"
 export const dynamic = "force-dynamic"
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
-
-/* ================= PAGE ================= */
 
 export default function AdminDashboardPage() {
   const [orders, setOrders] = useState<any[]>([])
@@ -31,14 +27,11 @@ export default function AdminDashboardPage() {
   }
 
   const totalOrders = orders.length
+  const pendingOrders = orders.filter(o => o.status === "pending").length
 
-  const pendingOrders =
-    orders.filter(o => o.status === "pending").length
-
-  const revenue =
-    orders
-      .filter(o => o.status === "paid")
-      .reduce((s, o) => s + o.total_amount, 0)
+  const revenue = orders
+    .filter(o => o.status === "paid")
+    .reduce((s, o) => s + o.total_amount, 0)
 
   const recentOrders = orders.slice(0, 5)
 
@@ -56,9 +49,7 @@ export default function AdminDashboardPage() {
         <StatCard title="Products" value={productsCount} />
       </div>
 
-      <h2 style={{ marginTop: 40, marginBottom: 10 }}>
-        Recent Orders
-      </h2>
+      <h2 style={{ marginTop: 40 }}>Recent Orders</h2>
 
       <table style={table}>
         <thead>
@@ -75,9 +66,7 @@ export default function AdminDashboardPage() {
             <tr key={o.id}>
               <td style={td}>{o.id}</td>
               <td style={td}>{o.total_amount} RWF</td>
-              <td style={td}>
-                <StatusBadge status={o.status} />
-              </td>
+              <td style={td}><StatusBadge status={o.status} /></td>
               <td style={td}>
                 {new Date(o.created_at).toLocaleString()}
               </td>
@@ -90,12 +79,11 @@ export default function AdminDashboardPage() {
   )
 }
 
-/* ================= COMPONENTS ================= */
+/* ---------------- */
 
 function StatCard({ title, value }: { title: string, value: number }) {
   return (
     <div style={card}>
-      confirm
       <p>{title}</p>
       <h2>{value}</h2>
     </div>
@@ -121,7 +109,7 @@ function StatusBadge({ status }: { status: string }) {
   )
 }
 
-/* ================= STYLES ================= */
+/* ---------------- */
 
 const grid: React.CSSProperties = {
   display: "grid",
