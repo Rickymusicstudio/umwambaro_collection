@@ -67,18 +67,8 @@ export default function CheckoutPage() {
     // ✅ Clear cart
     clearCart()
 
-    // ✅ WhatsApp Click-to-Chat
-    const adminPhone = "250785712246" // CHANGE to your WhatsApp number
-
-    const message = encodeURIComponent(
-      `Hello, I just placed an order.
-
-Phone: ${phone}
-Address: ${address}
-Total: ${total} RWF`
-    )
-
-    window.location.href = `https://wa.me/${adminPhone}?text=${message}`
+    alert("Order placed successfully!")
+    router.push("/")
   }
 
   return (

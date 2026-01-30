@@ -1,3 +1,7 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import { supabaseServer } from "@/lib/supabaseServer";
 
 export default async function AdminOrdersPage({
@@ -5,7 +9,7 @@ export default async function AdminOrdersPage({
 }: {
   searchParams: { status?: string; search?: string };
 }) {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
 
   let query = supabase
     .from("orders")
@@ -66,7 +70,10 @@ export default async function AdminOrdersPage({
       <div style={{ display: "flex", gap: 10, margin: "15px 0" }}>
         <FilterButton label="All" href="/admin/orders" />
         <FilterButton label="Pending" href="/admin/orders?status=pending" />
-        <FilterButton label="Awaiting Payment" href="/admin/orders?status=awaiting_payment" />
+        <FilterButton
+          label="Awaiting Payment"
+          href="/admin/orders?status=awaiting_payment"
+        />
         <FilterButton label="Paid" href="/admin/orders?status=paid" />
         <FilterButton label="Delivered" href="/admin/orders?status=delivered" />
         <FilterButton label="Cancelled" href="/admin/orders?status=cancelled" />

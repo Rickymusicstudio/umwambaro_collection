@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { supabaseServer } from "@/lib/supabaseServer"
 
+/*
+  Handles:
+  - Create order
+  - Calculate total
+  - Send WhatsApp to Admin
+*/
+
 export async function POST(req: NextRequest) {
   console.log("🚀 PLACE ORDER API HIT")
 
@@ -12,6 +19,14 @@ export async function POST(req: NextRequest) {
 
     const { user_id, cart, phone, address } = body
 
+    if (!cart || cart.length === 0) {
+      return NextResponse.json(
+        { error: "Cart is empty" },
+        { status: 400 }
+      )
+    }
+
+    // ✅ Calculate total
     const total = cart.reduce(
       (sum: number, i: any) => sum + i.price * i.quantity,
       0
@@ -19,6 +34,7 @@ export async function POST(req: NextRequest) {
 
     console.log("💰 TOTAL:", total)
 
+    // ✅ Create order
     const { data: order, error } = await supabase
       .from("orders")
       .insert({
@@ -33,37 +49,53 @@ export async function POST(req: NextRequest) {
 
     if (error) {
       console.error("❌ ORDER ERROR:", error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
     }
 
     console.log("✅ ORDER CREATED:", order.id)
 
-    const message = `🛒 NEW ORDER
+    // ✅ Build WhatsApp message
+    const message = `
+🛒 NEW ORDER - UMWAMBARO COLLECTIONS
 
-Phone: ${phone}
-Address: ${address}
-Total: ${total} RWF
-Order ID: ${order.id}`
+📞 Phone: ${phone}
+🏠 Address: ${address}
+💰 Total: ${total} RWF
+🆔 Order ID: ${order.id}
+`
 
-    console.log("📨 ABOUT TO CALL WHATSAPP")
+    console.log("📨 SENDING WHATSAPP...")
 
+    // ✅ Call WhatsApp API Route
     const waRes = await fetch(
-      new URL("/api/whatsapp", req.url),
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/whatsapp`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ message })
       }
     )
 
+    console.log("📡 WHATSAPP STATUS:", waRes.status)
+
     const waData = await waRes.json()
+    console.log("📨 WHATSAPP RESPONSE:", waData)
 
-    console.log("📨 WHATSAPP RESULT:", waData)
-
-    return NextResponse.json({ success: true })
+    return NextResponse.json({
+      success: true,
+      order_id: order.id
+    })
 
   } catch (err: any) {
-    console.error("🔥 CRASH:", err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error("🔥 SERVER ERROR:", err)
+    return NextResponse.json(
+      { error: err.message },
+      { status: 500 }
+    )
   }
 }

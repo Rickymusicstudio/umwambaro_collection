@@ -1,8 +1,10 @@
+"use client";
 import { supabaseServer } from "@/lib/supabaseServer";
 import Link from "next/link";
+export const dynamic = "force-dynamic";
 
 export default async function OrdersPage() {
-  const supabase = supabaseServer();
+  const supabase = await supabaseServer();
 
   const {
     data: { user },
