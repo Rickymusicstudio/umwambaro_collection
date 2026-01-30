@@ -26,6 +26,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if (!phone || !address) {
+      return NextResponse.json(
+        { error: "Phone and address required" },
+        { status: 400 }
+      )
+    }
+
     // ✅ Calculate total
     const total = cart.reduce(
       (sum: number, i: any) => sum + i.price * i.quantity,
@@ -63,15 +70,19 @@ export async function POST(req: NextRequest) {
 
 📞 Phone: ${phone}
 🏠 Address: ${address}
+
+Items:
+${cart.map((i: any) => `- ${i.name} x${i.quantity}`).join("\n")}
+
 💰 Total: ${total} RWF
 🆔 Order ID: ${order.id}
 `
 
     console.log("📨 SENDING WHATSAPP...")
 
-    // ✅ Call WhatsApp API Route
+    // ✅ INTERNAL API CALL (NO DOMAIN NEEDED)
     const waRes = await fetch(
-      `${process.env.NEXT_PUBLIC_SITE_URL}/api/whatsapp`,
+      new URL("/api/whatsapp", req.url),
       {
         method: "POST",
         headers: {
@@ -81,9 +92,8 @@ export async function POST(req: NextRequest) {
       }
     )
 
-    console.log("📡 WHATSAPP STATUS:", waRes.status)
-
     const waData = await waRes.json()
+
     console.log("📨 WHATSAPP RESPONSE:", waData)
 
     return NextResponse.json({
