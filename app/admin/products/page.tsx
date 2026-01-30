@@ -1,15 +1,25 @@
-import { supabaseServer } from "@/lib/supabaseServer"
+"use client"
+export const dynamic = "force-dynamic"
+
+import { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabase"
 import Link from "next/link"
 
-/* ================= PAGE ================= */
+export default function AdminProductsPage() {
+  const [products, setProducts] = useState<any[]>([])
 
-export default async function AdminProductsPage() {
-  const supabase = await supabaseServer()
+  useEffect(() => {
+    loadProducts()
+  }, [])
 
-  const { data: products } = await supabase
-    .from("products")
-    .select("id,name,price,image_url")
-    .order("created_at", { ascending: false })
+  async function loadProducts() {
+    const { data } = await supabase
+      .from("products")
+      .select("id,name,price,image_url")
+      .order("created_at", { ascending: false })
+
+    setProducts(data || [])
+  }
 
   return (
     <div style={{ maxWidth: 900 }}>
@@ -33,7 +43,7 @@ export default async function AdminProductsPage() {
       <hr />
 
       {/* PRODUCTS */}
-      {products?.map((p) => (
+      {products.map((p) => (
         <div
           key={p.id}
           style={{
@@ -72,7 +82,7 @@ export default async function AdminProductsPage() {
             Edit
           </Link>
 
-          {/* DELETE (POST FORM) */}
+          {/* DELETE */}
           <form
             action={`/admin/products/delete/${p.id}`}
             method="post"
@@ -92,7 +102,7 @@ export default async function AdminProductsPage() {
         </div>
       ))}
 
-      {products?.length === 0 && (
+      {products.length === 0 && (
         <p style={{ marginTop: 30 }}>No products yet.</p>
       )}
 
