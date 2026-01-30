@@ -1,4 +1,5 @@
 "use client"
+export const dynamic = "force-dynamic"
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
@@ -9,13 +10,11 @@ export default function AdminDashboardPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [productsCount, setProductsCount] = useState(0)
 
-  /* ================= LOAD DATA ================= */
-
   useEffect(() => {
-    loadDashboard()
+    loadData()
   }, [])
 
-  async function loadDashboard() {
+  async function loadData() {
     const { data: ordersData } = await supabase
       .from("orders")
       .select("id,status,total_amount,created_at")
@@ -29,8 +28,6 @@ export default function AdminDashboardPage() {
     setProductsCount(products?.length || 0)
   }
 
-  /* ================= STATS ================= */
-
   const totalOrders = orders.length
 
   const pendingOrders =
@@ -39,11 +36,9 @@ export default function AdminDashboardPage() {
   const revenue =
     orders
       .filter(o => o.status === "paid")
-      .reduce((sum, o) => sum + o.total_amount, 0)
+      .reduce((s, o) => s + o.total_amount, 0)
 
   const recentOrders = orders.slice(0, 5)
-
-  /* ================= UI ================= */
 
   return (
     <div>
@@ -52,8 +47,6 @@ export default function AdminDashboardPage() {
         Dashboard
       </h1>
 
-      {/* ================= STATS ================= */}
-
       <div style={grid}>
         <StatCard title="Total Orders" value={totalOrders} />
         <StatCard title="Pending Orders" value={pendingOrders} />
@@ -61,39 +54,35 @@ export default function AdminDashboardPage() {
         <StatCard title="Products" value={productsCount} />
       </div>
 
-      {/* ================= RECENT ORDERS ================= */}
-
       <h2 style={{ marginTop: 40, marginBottom: 10 }}>
         Recent Orders
       </h2>
 
-      <div style={{ overflowX: "auto" }}>
-        <table style={table}>
-          <thead>
-            <tr>
-              <th style={th}>Order ID</th>
-              <th style={th}>Total</th>
-              <th style={th}>Status</th>
-              <th style={th}>Date</th>
-            </tr>
-          </thead>
+      <table style={table}>
+        <thead>
+          <tr>
+            <th style={th}>Order ID</th>
+            <th style={th}>Total</th>
+            <th style={th}>Status</th>
+            <th style={th}>Date</th>
+          </tr>
+        </thead>
 
-          <tbody>
-            {recentOrders.map((o) => (
-              <tr key={o.id}>
-                <td style={td}>{o.id}</td>
-                <td style={td}>{o.total_amount} RWF</td>
-                <td style={td}>
-                  <StatusBadge status={o.status} />
-                </td>
-                <td style={td}>
-                  {new Date(o.created_at).toLocaleString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        <tbody>
+          {recentOrders.map(o => (
+            <tr key={o.id}>
+              <td style={td}>{o.id}</td>
+              <td style={td}>{o.total_amount} RWF</td>
+              <td style={td}>
+                <StatusBadge status={o.status} />
+              </td>
+              <td style={td}>
+                {new Date(o.created_at).toLocaleString()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
     </div>
   )
@@ -101,38 +90,30 @@ export default function AdminDashboardPage() {
 
 /* ================= COMPONENTS ================= */
 
-function StatCard({
-  title,
-  value
-}: {
-  title: string
-  value: number
-}) {
+function StatCard({ title, value }: { title: string, value: number }) {
   return (
     <div style={card}>
-      <p style={{ color: "#555" }}>{title}</p>
-      <h2 style={{ fontSize: 28 }}>{value}</h2>
+      confirm
+      <p>{title}</p>
+      <h2>{value}</h2>
     </div>
   )
 }
 
 function StatusBadge({ status }: { status: string }) {
-  let color = "#aaa"
+  let color = "#999"
   if (status === "pending") color = "#f59e0b"
   if (status === "paid") color = "#22c55e"
   if (status === "delivered") color = "#3b82f6"
   if (status === "cancelled") color = "#ef4444"
 
   return (
-    <span
-      style={{
-        background: color,
-        color: "white",
-        padding: "4px 10px",
-        borderRadius: 12,
-        fontSize: 13
-      }}
-    >
+    <span style={{
+      background: color,
+      color: "white",
+      padding: "4px 10px",
+      borderRadius: 10
+    }}>
       {status}
     </span>
   )
@@ -142,7 +123,7 @@ function StatusBadge({ status }: { status: string }) {
 
 const grid: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))",
   gap: 20,
   marginTop: 20
 }
@@ -150,24 +131,22 @@ const grid: React.CSSProperties = {
 const card: React.CSSProperties = {
   background: "white",
   padding: 24,
-  borderRadius: 10,
-  boxShadow: "0 2px 6px rgba(0,0,0,0.08)"
+  borderRadius: 10
 }
 
 const table: React.CSSProperties = {
   width: "100%",
   borderCollapse: "collapse",
-  background: "white"
+  marginTop: 10
 }
 
 const th: React.CSSProperties = {
-  padding: 12,
   border: "1px solid #ddd",
-  textAlign: "left",
-  background: "#f8f8f8"
+  padding: 10,
+  background: "#f5f5f5"
 }
 
 const td: React.CSSProperties = {
-  padding: 12,
-  border: "1px solid #eee"
+  border: "1px solid #eee",
+  padding: 10
 }
