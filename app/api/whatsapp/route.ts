@@ -2,7 +2,15 @@ import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
   try {
-    const { message } = await req.json()
+    // ✅ Receive both phone and message
+    const { message, phone } = await req.json()
+
+    if (!phone || !message) {
+      return NextResponse.json(
+        { error: "Phone and message are required" },
+        { status: 400 }
+      )
+    }
 
     const res = await fetch(
       `https://graph.facebook.com/v22.0/${process.env.WHATSAPP_PHONE_ID}/messages`,
@@ -14,7 +22,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           messaging_product: "whatsapp",
-          to: process.env.ADMIN_PHONE,
+          to: phone, // ✅ Now using passed phone
           type: "template",
           template: {
             name: "jaspers_market_order_confirmation_v1",
@@ -35,11 +43,18 @@ export async function POST(req: Request) {
     )
 
     const data = await res.json()
-    console.log("WHATSAPP TEMPLATE RESPONSE:", data)
+    console.log("📨 WHATSAPP TEMPLATE RESPONSE:", data)
+
+    if (!res.ok) {
+      console.error("❌ WHATSAPP FAILED")
+    }
 
     return NextResponse.json(data)
   } catch (err) {
-    console.error(err)
-    return NextResponse.json({ error: "WhatsApp error" }, { status: 500 })
+    console.error("🔥 WHATSAPP ERROR:", err)
+    return NextResponse.json(
+      { error: "WhatsApp error" },
+      { status: 500 }
+    )
   }
 }

@@ -17,6 +17,7 @@ type Product = {
   images: string[] | null
   category_id: number
   condition: string
+  status?: string
 }
 
 type Category = {
@@ -51,7 +52,7 @@ export default function ProductsPage() {
   async function loadProducts() {
     const { data } = await supabase
       .from("products")
-      .select("id,name,description,price,image_url,images,category_id,condition")
+      .select("id,name,description,price,image_url,images,category_id,condition,status")
       .eq("is_active", true)
 
     setProducts(data || [])
@@ -244,8 +245,15 @@ export default function ProductsPage() {
 
                   <div style={imageWrapper} className="product-card">
 
-                    <div style={mainBadge}>
-                      {p.condition === "used" ? "CHAGUWA" : "NEW"}
+                    <div style={{
+                      ...mainBadge,
+                      background: p.status === "sold" ? "red" : "black"
+                    }}>
+                      {p.status === "sold"
+                        ? "SOLD"
+                        : p.condition === "used"
+                        ? "CHAGUWA"
+                        : "NEW"}
                     </div>
 
                     <img src={mainImg} style={imageStyle} />
@@ -265,13 +273,23 @@ export default function ProductsPage() {
 
                 {/* BUTTON */}
                 <button
-                  onClick={() => handleAdd(p)}
+                  onClick={() => p.status !== "sold" && handleAdd(p)}
+                  disabled={p.status === "sold"}
                   style={{
                     ...btnStyle,
-                    background: addedId === p.id ? "#22c55e" : "#f0c36d",
+                    background:
+                      p.status === "sold"
+                        ? "#999"
+                        : addedId === p.id
+                        ? "#22c55e"
+                        : "#f0c36d",
                   }}
                 >
-                  {addedId === p.id ? "Added ✓" : "Add to Cart"}
+                  {p.status === "sold"
+                    ? "SOLD"
+                    : addedId === p.id
+                    ? "Added ✓"
+                    : "Add to Cart"}
                 </button>
 
               </div>

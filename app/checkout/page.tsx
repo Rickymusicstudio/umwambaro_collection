@@ -67,8 +67,11 @@ export default function CheckoutPage() {
     // ✅ Clear cart
     clearCart()
 
-    alert("Order placed successfully!")
-    router.push("/")
+    // ✅ Stop loading
+    setLoading(false)
+
+    // ✅ Redirect to success page
+    router.push("/success")
   }
 
   return (
