@@ -4,9 +4,11 @@ export const dynamic = "force-dynamic"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<any[]>([])
+  const router = useRouter()
 
   useEffect(() => {
     loadProducts()
@@ -19,6 +21,22 @@ export default function AdminProductsPage() {
       .order("created_at", { ascending: false })
 
     setProducts(data || [])
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this product?")) return
+
+    const res = await fetch(
+      `/admin/products/delete/${id}`,
+      { method: "POST" }
+    )
+
+    if (res.ok) {
+      await loadProducts()
+      router.push("/admin/products")
+    } else {
+      alert("Delete failed")
+    }
   }
 
   return (
@@ -83,21 +101,17 @@ export default function AdminProductsPage() {
           </Link>
 
           {/* DELETE */}
-          <form
-            action={`/admin/products/delete/${p.id}`}
-            method="post"
+          <button
+            onClick={() => handleDelete(p.id)}
+            style={{
+              color: "red",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer"
+            }}
           >
-            <button
-              style={{
-                color: "red",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer"
-              }}
-            >
-              Delete
-            </button>
-          </form>
+            Delete
+          </button>
 
         </div>
       ))}

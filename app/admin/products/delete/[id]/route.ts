@@ -6,8 +6,6 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   const supabase = await supabaseServer();
-
-  // 🔥 params must be awaited in new Next.js
   const { id } = await context.params;
 
   if (!id) {
@@ -17,14 +15,28 @@ export async function POST(
     );
   }
 
-  const { error } = await supabase
+  // 1️⃣ Delete order items referencing product
+  const { error: orderItemsError } = await supabase
+    .from("order_items")
+    .delete()
+    .eq("product_id", id);
+
+  if (orderItemsError) {
+    return NextResponse.json(
+      { error: orderItemsError.message },
+      { status: 500 }
+    );
+  }
+
+  // 2️⃣ Delete product
+  const { error: productError } = await supabase
     .from("products")
     .delete()
-    .eq("id", id); // or product_id
+    .eq("id", id);
 
-  if (error) {
+  if (productError) {
     return NextResponse.json(
-      { error: error.message },
+      { error: productError.message },
       { status: 500 }
     );
   }
