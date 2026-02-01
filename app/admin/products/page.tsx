@@ -6,22 +6,40 @@ import { supabase } from "@/lib/supabase"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
+/* ================= TYPES ================= */
+
+type Product = {
+  id: string
+  name: string
+  price: number
+  image_url: string
+  status: string | null
+  is_active: boolean
+}
+
+/* ================= PAGE ================= */
+
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<any[]>([])
+
+  const [products, setProducts] = useState<Product[]>([])
   const router = useRouter()
 
   useEffect(() => {
     loadProducts()
   }, [])
 
+  /* ---------------- LOAD ---------------- */
+
   async function loadProducts() {
     const { data } = await supabase
       .from("products")
-      .select("id,name,price,image_url")
+      .select("id,name,price,image_url,status,is_active")
       .order("created_at", { ascending: false })
 
     setProducts(data || [])
   }
+
+  /* ---------------- DELETE ---------------- */
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this product?")) return
@@ -38,6 +56,30 @@ export default function AdminProductsPage() {
       alert("Delete failed")
     }
   }
+
+  /* ---------------- REPOST ---------------- */
+
+  async function handleRepost(id: string) {
+
+    if (!confirm("Repost this product?")) return
+
+    const { error } = await supabase
+      .from("products")
+      .update({
+        status: null,
+        is_active: true
+      })
+      .eq("id", id)
+
+    if (error) {
+      console.log(error)
+      alert("Repost failed")
+    } else {
+      await loadProducts()
+    }
+  }
+
+  /* ================= UI ================= */
 
   return (
     <div style={{ maxWidth: 900 }}>
@@ -90,6 +132,18 @@ export default function AdminProductsPage() {
           <div style={{ flex: 1 }}>
             <b>{p.name}</b>
             <div>{p.price} RWF</div>
+
+            {p.status === "sold" && (
+              <div style={{ color: "red", fontSize: 12 }}>
+                SOLD
+              </div>
+            )}
+
+            {!p.is_active && (
+              <div style={{ color: "orange", fontSize: 12 }}>
+                HIDDEN
+              </div>
+            )}
           </div>
 
           {/* EDIT */}
@@ -99,6 +153,22 @@ export default function AdminProductsPage() {
           >
             Edit
           </Link>
+
+          {/* REPOST ONLY IF NOT ACTIVE */}
+          {!p.is_active && (
+            <button
+              onClick={() => handleRepost(p.id)}
+              style={{
+                marginRight: 15,
+                color: "green",
+                background: "transparent",
+                border: "none",
+                cursor: "pointer"
+              }}
+            >
+              Repost
+            </button>
+          )}
 
           {/* DELETE */}
           <button

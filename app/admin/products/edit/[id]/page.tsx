@@ -24,6 +24,9 @@ export default function EditProductPage() {
   const [price, setPrice] = useState("")
   const [condition, setCondition] = useState("new")
 
+  // ✅ AUDIENCE
+  const [audience, setAudience] = useState("")
+
   const [categories, setCategories] = useState<Category[]>([])
   const [categoryId, setCategoryId] = useState<number | "">("")
 
@@ -59,13 +62,14 @@ export default function EditProductPage() {
     setPrice(String(data.price))
     setCondition(data.condition)
     setCategoryId(data.category_id)
+    setAudience(data.audience || "")
   }
 
   /* ================= UPDATE ================= */
 
   async function handleUpdate() {
 
-    if (!name || !price || !categoryId) {
+    if (!name || !price || !categoryId || !audience) {
       alert("Missing fields")
       return
     }
@@ -80,6 +84,7 @@ export default function EditProductPage() {
         price: Number(price),
         condition,
         category_id: categoryId,
+        audience, // ✅ SAVE
       })
       .eq("id", id)
 
@@ -123,6 +128,19 @@ export default function EditProductPage() {
           placeholder="Price"
           style={input}
         />
+
+        {/* ✅ AUDIENCE */}
+        <select
+          value={audience}
+          onChange={e => setAudience(e.target.value)}
+          style={input}
+        >
+          <option value="">Select Audience</option>
+          <option value="men">Men</option>
+          <option value="women">Women</option>
+          <option value="kids">Kids</option>
+          <option value="sport">Sport</option>
+        </select>
 
         <select
           value={categoryId}

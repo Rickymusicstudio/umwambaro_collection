@@ -1,5 +1,6 @@
 import "./globals.css"
 import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 
 export const metadata = {
   title: "UMWAMBARO",
@@ -17,10 +18,11 @@ export default function RootLayout({
 
         <Navbar />
 
-        {/* Public pages container */}
         <main className="container">
           {children}
         </main>
+
+        <Footer />
 
       </body>
     </html>
