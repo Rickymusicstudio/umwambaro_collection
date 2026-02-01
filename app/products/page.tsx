@@ -18,6 +18,7 @@ type Product = {
   category_id: number
   condition: string
   status?: string
+  audience?: string | null
 }
 
 type Category = {
@@ -35,6 +36,7 @@ export default function ProductsPage() {
 
   const [activeCategory, setActiveCategory] = useState<number | null>(null)
   const [activeCondition, setActiveCondition] = useState<string | null>(null)
+  const [activeAudience, setActiveAudience] = useState<string | null>(null)
 
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState("")
@@ -52,7 +54,7 @@ export default function ProductsPage() {
   async function loadProducts() {
     const { data } = await supabase
       .from("products")
-      .select("id,name,description,price,image_url,images,category_id,condition,status")
+      .select("id,name,description,price,image_url,images,category_id,condition,status,audience")
       .eq("is_active", true)
 
     setProducts(data || [])
@@ -74,13 +76,16 @@ export default function ProductsPage() {
     catId = activeCategory,
     text = search,
     sortValue = sort,
-    condition = activeCondition
+    condition = activeCondition,
+    audience = activeAudience
   ) {
 
     let filtered = [...allProducts]
 
     if (catId) filtered = filtered.filter(p => p.category_id === catId)
     if (condition) filtered = filtered.filter(p => p.condition === condition)
+    if (audience) filtered = filtered.filter(p => p.audience === audience)
+
     if (text)
       filtered = filtered.filter(p =>
         p.name.toLowerCase().includes(text.toLowerCase())
@@ -100,6 +105,11 @@ export default function ProductsPage() {
   function selectCondition(value: string | null) {
     setActiveCondition(value)
     applyFilters(activeCategory, search, sort, value)
+  }
+
+  function selectAudience(value: string | null) {
+    setActiveAudience(value)
+    applyFilters(activeCategory, search, sort, activeCondition, value)
   }
 
   /* ---------------- CART ---------------- */
@@ -129,6 +139,35 @@ export default function ProductsPage() {
           <button style={closeBtn} onClick={() => setShowMobileFilters(false)}>
             Close ✖
           </button>
+
+          <h3>Audience</h3>
+
+          <div style={activeAudience === null ? catActive : catItem}
+            onClick={() => { selectAudience(null); setShowMobileFilters(false) }}>
+            All
+          </div>
+
+          <div style={activeAudience === "men" ? catActive : catItem}
+            onClick={() => { selectAudience("men"); setShowMobileFilters(false) }}>
+            Men
+          </div>
+
+          <div style={activeAudience === "women" ? catActive : catItem}
+            onClick={() => { selectAudience("women"); setShowMobileFilters(false) }}>
+            Women
+          </div>
+
+          <div style={activeAudience === "kids" ? catActive : catItem}
+            onClick={() => { selectAudience("kids"); setShowMobileFilters(false) }}>
+            Kids
+          </div>
+
+          <div style={activeAudience === "sport" ? catActive : catItem}
+            onClick={() => { selectAudience("sport"); setShowMobileFilters(false) }}>
+            Sport
+          </div>
+
+          <hr style={{ margin: "15px 0" }} />
 
           <h3>Condition</h3>
 
@@ -169,6 +208,25 @@ export default function ProductsPage() {
 
       {/* DESKTOP SIDEBAR */}
       <aside style={sidebar}>
+
+        <h3>Audience</h3>
+
+        <div style={activeAudience === null ? catActive : catItem}
+          onClick={() => selectAudience(null)}>All</div>
+
+        <div style={activeAudience === "men" ? catActive : catItem}
+          onClick={() => selectAudience("men")}>Men</div>
+
+        <div style={activeAudience === "women" ? catActive : catItem}
+          onClick={() => selectAudience("women")}>Women</div>
+
+        <div style={activeAudience === "kids" ? catActive : catItem}
+          onClick={() => selectAudience("kids")}>Kids</div>
+
+        <div style={activeAudience === "sport" ? catActive : catItem}
+          onClick={() => selectAudience("sport")}>Sport</div>
+
+        <hr style={{ margin: "15px 0" }} />
 
         <h3>Condition</h3>
 
@@ -266,12 +324,10 @@ export default function ProductsPage() {
                 <h3>{p.name}</h3>
                 <p style={{ color: "#555" }}>{p.description}</p>
 
-                {/* PRICE */}
                 <strong style={{ marginTop: "auto", marginBottom: 8 }}>
                   {p.price} RWF
                 </strong>
 
-                {/* BUTTON */}
                 <button
                   onClick={() => p.status !== "sold" && handleAdd(p)}
                   disabled={p.status === "sold"}

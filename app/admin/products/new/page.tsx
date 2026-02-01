@@ -21,6 +21,9 @@ export default function AddProductPage() {
 
   const [condition, setCondition] = useState("new")
 
+  // ✅ AUDIENCE
+  const [audience, setAudience] = useState("")
+
   const [categories, setCategories] = useState<Category[]>([])
   const [categoryId, setCategoryId] = useState<number | "">("")
 
@@ -98,7 +101,7 @@ export default function AddProductPage() {
 
   async function handleSave() {
 
-    if (!name || !price || !categoryId || images.length === 0) {
+    if (!name || !price || !categoryId || !audience || images.length === 0) {
       alert("Fill all fields and upload images")
       return
     }
@@ -141,6 +144,7 @@ export default function AddProductPage() {
         description,
         price: Number(price),
         condition,
+        audience, // ✅ SAVE
         image_url: uploadedUrls[0],
         images: uploadedUrls,
         category_id: categoryId,
@@ -159,6 +163,7 @@ export default function AddProductPage() {
       setDescription("")
       setPrice("")
       setCondition("new")
+      setAudience("")
       setCategoryId("")
       setImages([])
       setPreviews([])
@@ -199,6 +204,19 @@ export default function AddProductPage() {
           onChange={e => setPrice(e.target.value)}
           style={input}
         />
+
+        {/* ✅ AUDIENCE */}
+        <select
+          value={audience}
+          onChange={e => setAudience(e.target.value)}
+          style={input}
+        >
+          <option value="">Select Audience</option>
+          <option value="men">Men</option>
+          <option value="women">Women</option>
+          <option value="kids">Kids</option>
+          <option value="sport">Sport</option>
+        </select>
 
         <select
           value={categoryId}
