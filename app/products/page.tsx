@@ -13,6 +13,7 @@ type Product = {
   name: string
   description: string
   price: number
+  sizes: string[] | null     // ✅ ADDED
   image_url: string
   images: string[] | null
   category_id: number
@@ -54,7 +55,7 @@ export default function ProductsPage() {
   async function loadProducts() {
     const { data } = await supabase
       .from("products")
-      .select("id,name,description,price,image_url,images,category_id,condition,status,audience")
+      .select("id,name,description,price,sizes,image_url,images,category_id,condition,status,audience")
       .eq("is_active", true)
 
     setProducts(data || [])
@@ -131,80 +132,6 @@ export default function ProductsPage() {
 
   return (
     <div className="products-page" style={page}>
-
-      {/* MOBILE DRAWER */}
-      {showMobileFilters && (
-        <div className="mobile-sidebar">
-
-          <button style={closeBtn} onClick={() => setShowMobileFilters(false)}>
-            Close ✖
-          </button>
-
-          <h3>Audience</h3>
-
-          <div style={activeAudience === null ? catActive : catItem}
-            onClick={() => { selectAudience(null); setShowMobileFilters(false) }}>
-            All
-          </div>
-
-          <div style={activeAudience === "men" ? catActive : catItem}
-            onClick={() => { selectAudience("men"); setShowMobileFilters(false) }}>
-            Men
-          </div>
-
-          <div style={activeAudience === "women" ? catActive : catItem}
-            onClick={() => { selectAudience("women"); setShowMobileFilters(false) }}>
-            Women
-          </div>
-
-          <div style={activeAudience === "kids" ? catActive : catItem}
-            onClick={() => { selectAudience("kids"); setShowMobileFilters(false) }}>
-            Kids
-          </div>
-
-          <div style={activeAudience === "sport" ? catActive : catItem}
-            onClick={() => { selectAudience("sport"); setShowMobileFilters(false) }}>
-            Sport
-          </div>
-
-          <hr style={{ margin: "15px 0" }} />
-
-          <h3>Condition</h3>
-
-          <div style={activeCondition === null ? catActive : catItem}
-            onClick={() => { selectCondition(null); setShowMobileFilters(false) }}>
-            All
-          </div>
-
-          <div style={activeCondition === "new" ? catActive : catItem}
-            onClick={() => { selectCondition("new"); setShowMobileFilters(false) }}>
-            New
-          </div>
-
-          <div style={activeCondition === "used" ? catActive : catItem}
-            onClick={() => { selectCondition("used"); setShowMobileFilters(false) }}>
-            Used (Chaguwa)
-          </div>
-
-          <hr style={{ margin: "15px 0" }} />
-
-          <h3>Categories</h3>
-
-          <div style={activeCategory === null ? catActive : catItem}
-            onClick={() => { selectCategory(null); setShowMobileFilters(false) }}>
-            All Products
-          </div>
-
-          {categories.map(cat => (
-            <div key={cat.id}
-              style={activeCategory === cat.id ? catActive : catItem}
-              onClick={() => { selectCategory(cat.id); setShowMobileFilters(false) }}>
-              {cat.name}
-            </div>
-          ))}
-
-        </div>
-      )}
 
       {/* DESKTOP SIDEBAR */}
       <aside style={sidebar}>
@@ -322,6 +249,14 @@ export default function ProductsPage() {
                 </Link>
 
                 <h3>{p.name}</h3>
+
+                {/* ✅ SIZE */}
+                {p.sizes && p.sizes.length > 0 && (
+                  <span style={sizeBadge}>
+                    Size: {p.sizes.join(", ")}
+                  </span>
+                )}
+
                 <p style={{ color: "#555" }}>{p.description}</p>
 
                 <strong style={{ marginTop: "auto", marginBottom: 8 }}>
@@ -374,6 +309,15 @@ export default function ProductsPage() {
 }
 
 /* ================= STYLES ================= */
+
+const sizeBadge: CSSProperties = {
+  fontSize: 12,
+  background: "#eee",
+  padding: "3px 8px",
+  borderRadius: 6,
+  width: "fit-content",
+  marginBottom: 6,
+}
 
 const page: CSSProperties = {
   display: "flex",
@@ -462,14 +406,4 @@ const btnStyle: CSSProperties = {
   border: "none",
   fontWeight: "bold",
   cursor: "pointer",
-}
-
-const closeBtn: CSSProperties = {
-  width: "100%",
-  padding: 10,
-  background: "black",
-  color: "white",
-  border: "none",
-  borderRadius: 8,
-  marginBottom: 15,
 }
