@@ -1,6 +1,7 @@
 import "./globals.css"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
+import Navbar from "../src/components/Navbar"
+import Footer from "../src/components/Footer"
+import MobileBottomNav from "../src/components/MobileBottomNav"
 
 export const metadata = {
   title: "UMWAMBARO",
@@ -23,6 +24,9 @@ export default function RootLayout({
         </main>
 
         <Footer />
+
+        {/* Mobile Bottom Nav */}
+        <MobileBottomNav />
 
       </body>
     </html>

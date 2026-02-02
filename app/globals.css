@@ -200,3 +200,44 @@ a {
   top: -4px !important;
   right: -4px !important;
 }
+/* =====================================
+   HIDE FOOTER ON MOBILE
+===================================== */
+
+@media (max-width: 768px) {
+  footer {
+    display: none !important;
+  }
+}
+
+/* =====================================
+   MOBILE BOTTOM NAV
+===================================== */
+
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: #0f172a;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 9999;
+  border-top: 1px solid #1f2933;
+}
+
+/* Hide bottom nav on desktop */
+@media (min-width: 769px) {
+  .mobile-bottom-nav {
+    display: none;
+  }
+}
+
+/* Space so content not hidden behind nav */
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 70px;
+  }
+}

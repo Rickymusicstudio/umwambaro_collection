@@ -13,7 +13,7 @@ type Product = {
   name: string
   description: string
   price: number
-  sizes: string[] | null     // ✅ ADDED
+  sizes: string[] | null
   image_url: string
   images: string[] | null
   category_id: number
@@ -42,8 +42,6 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("")
   const [sort, setSort] = useState("")
   const [addedId, setAddedId] = useState<string | null>(null)
-
-  const [showMobileFilters, setShowMobileFilters] = useState(false)
 
   /* ---------------- LOAD ---------------- */
 
@@ -216,7 +214,7 @@ export default function ProductsPage() {
         </div>
 
         {/* GRID */}
-        <div style={gridStyle}>
+        <div className="products-grid" style={gridStyle}>
 
           {products.map(p => {
 
@@ -250,7 +248,6 @@ export default function ProductsPage() {
 
                 <h3>{p.name}</h3>
 
-                {/* ✅ SIZE */}
                 {p.sizes && p.sizes.length > 0 && (
                   <span style={sizeBadge}>
                     Size: {p.sizes.join(", ")}
@@ -291,7 +288,7 @@ export default function ProductsPage() {
 
       </main>
 
-      {/* HOVER EFFECT */}
+      {/* HOVER + MOBILE GRID */}
       <style jsx>{`
         .product-card img {
           position:absolute;
@@ -302,6 +299,13 @@ export default function ProductsPage() {
         .img-hover{opacity:0}
         .product-card:hover .img-hover{opacity:1}
         .product-card:hover img:first-child{opacity:0}
+
+        /* ✅ MOBILE ONLY */
+        @media (max-width: 640px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
       `}</style>
 
     </div>

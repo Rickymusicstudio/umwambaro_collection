@@ -1,26 +1,56 @@
-import { supabaseServer } from "@/lib/supabaseServer";
+"use client"
 
-export default async function OrderDetailsPage({
+import React, { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabase"
+
+type OrderItem = {
+  id: string
+  price: number
+  quantity: number
+  products: {
+    name: string
+    image_url: string
+  }[]
+}
+
+type Order = {
+  id: string
+  status: string
+  payment_status: string
+  total_amount: number
+  phone: string
+  address: string
+  created_at: string
+  order_items: OrderItem[]
+}
+
+export default function OrderDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>
 }) {
-  const supabase = supabaseServer();
 
-  // ✅ Get logged-in user
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { id } = React.use(params)
 
-  if (!user) {
-    return <p className="p-10">Please login.</p>;
-  }
+  const [order, setOrder] = useState<Order | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  // ✅ Fetch order + items + product info
-  const { data: order, error } = await supabase
-    .from("orders")
-    .select(
-      `
+  useEffect(() => {
+    loadOrder()
+  }, [])
+
+  async function loadOrder() {
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      setLoading(false)
+      return
+    }
+
+    const { data, error } = await supabase
+      .from("orders")
+      .select(`
         id,
         status,
         payment_status,
@@ -33,19 +63,24 @@ export default async function OrderDetailsPage({
           price,
           quantity,
           products (
-            title,
+            name,
             image_url
           )
         )
-      `
-    )
-    .eq("id", params.id)
-    .eq("user_id", user.id)
-    .single();
+      `)
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single()
 
-  if (error || !order) {
-    return <p className="p-10">Order not found.</p>;
+    if (!error) {
+      setOrder(data)
+    }
+
+    setLoading(false)
   }
+
+  if (loading) return <p className="p-10">Loading...</p>
+  if (!order) return <p className="p-10">Order not found.</p>
 
   return (
     <div className="p-10 max-w-4xl mx-auto">
@@ -54,38 +89,15 @@ export default async function OrderDetailsPage({
         Order Details
       </h1>
 
-      {/* ORDER META */}
+      {/* META */}
       <div className="mb-6 space-y-2 border p-4 rounded">
-
         <p><b>Order ID:</b> {order.id}</p>
-
-        <p>
-          <b>Status:</b>{" "}
-          <span
-            className={`px-2 py-1 rounded text-white ${
-              order.status === "Pending"
-                ? "bg-yellow-500"
-                : order.status === "Delivered"
-                ? "bg-green-600"
-                : order.status === "Cancelled"
-                ? "bg-red-600"
-                : "bg-gray-500"
-            }`}
-          >
-            {order.status}
-          </span>
-        </p>
-
+        <p><b>Status:</b> {order.status}</p>
         <p><b>Payment:</b> {order.payment_status}</p>
         <p><b>Total:</b> {order.total_amount} RWF</p>
         <p><b>Phone:</b> {order.phone}</p>
         <p><b>Address:</b> {order.address}</p>
-
-        <p>
-          <b>Date:</b>{" "}
-          {new Date(order.created_at).toLocaleString()}
-        </p>
-
+        <p><b>Date:</b> {new Date(order.created_at).toLocaleString()}</p>
       </div>
 
       {/* ITEMS */}
@@ -93,57 +105,36 @@ export default async function OrderDetailsPage({
         Items
       </h2>
 
-      {order.order_items.length === 0 && (
-        <p>No items found.</p>
-      )}
+      {order.order_items.map(item => (
+        <div
+          key={item.id}
+          className="flex items-center gap-4 border-b py-4"
+        >
 
-      {order.order_items.length > 0 && (
-        <table className="w-full border-collapse">
+          <img
+            src={
+              item.products?.[0]?.image_url ||
+              "/placeholder.png"
+            }
+            className="w-16 h-16 object-cover rounded"
+          />
 
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-2">Product</th>
-              <th className="text-center">Price</th>
-              <th className="text-center">Qty</th>
-              <th className="text-center">Subtotal</th>
-            </tr>
-          </thead>
+          <div className="flex-1">
+            <p className="font-semibold">
+              {item.products?.[0]?.name}
+            </p>
+            <p>{item.price} RWF</p>
+          </div>
 
-          <tbody>
-            {order.order_items.map((item: any) => (
-              <tr key={item.id} className="border-b">
+          <div>Qty: {item.quantity}</div>
 
-                <td className="py-3 flex items-center gap-3">
-                  <img
-                    src={
-                      item.products?.image_url ||
-                      "/placeholder.png"
-                    }
-                    className="w-12 h-12 object-cover rounded"
-                    alt=""
-                  />
-                  {item.products?.title}
-                </td>
+          <div className="font-semibold">
+            {item.price * item.quantity} RWF
+          </div>
 
-                <td className="text-center">
-                  {item.price} RWF
-                </td>
-
-                <td className="text-center">
-                  {item.quantity}
-                </td>
-
-                <td className="text-center">
-                  {item.price * item.quantity} RWF
-                </td>
-
-              </tr>
-            ))}
-          </tbody>
-
-        </table>
-      )}
+        </div>
+      ))}
 
     </div>
-  );
+  )
 }
