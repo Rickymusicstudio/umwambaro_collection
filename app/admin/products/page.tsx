@@ -133,7 +133,7 @@ export default function AdminProductsPage() {
             <b>{p.name}</b>
             <div>{p.price} RWF</div>
 
-            {p.status === "sold" && (
+            {p.status?.toLowerCase() === "sold" && (
               <div style={{ color: "red", fontSize: 12 }}>
                 SOLD
               </div>
@@ -154,8 +154,8 @@ export default function AdminProductsPage() {
             Edit
           </Link>
 
-          {/* REPOST ONLY IF NOT ACTIVE */}
-          {!p.is_active && (
+          {/* REPOST */}
+          {(p.status?.toLowerCase() === "sold" || !p.is_active) && (
             <button
               onClick={() => handleRepost(p.id)}
               style={{
