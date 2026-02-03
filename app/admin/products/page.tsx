@@ -22,6 +22,10 @@ type Product = {
 export default function AdminProductsPage() {
 
   const [products, setProducts] = useState<Product[]>([])
+  const [filter, setFilter] = useState<
+    "all" | "active" | "sold" | "hidden"
+  >("all")
+
   const router = useRouter()
 
   useEffect(() => {
@@ -79,6 +83,18 @@ export default function AdminProductsPage() {
     }
   }
 
+  /* ---------------- FILTER ---------------- */
+
+  const filteredProducts = products.filter((p) => {
+    const isSold = p.status?.toLowerCase() === "sold"
+    const isHidden = !p.is_active
+
+    if (filter === "active") return !isSold && !isHidden
+    if (filter === "sold") return isSold
+    if (filter === "hidden") return isHidden
+    return true
+  })
+
   /* ================= UI ================= */
 
   return (
@@ -90,7 +106,7 @@ export default function AdminProductsPage() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 20
+          marginBottom: 15
         }}
       >
         <h1>Product List</h1>
@@ -100,96 +116,144 @@ export default function AdminProductsPage() {
         </Link>
       </div>
 
+      {/* FILTER TABS */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 15 }}>
+        {["all","active","sold","hidden"].map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f as any)}
+            style={{
+              padding: "6px 14px",
+              borderRadius: 20,
+              border: "1px solid #ddd",
+              background: filter === f ? "black" : "white",
+              color: filter === f ? "white" : "black",
+              cursor: "pointer"
+            }}
+          >
+            {f.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
       <hr />
 
       {/* PRODUCTS */}
-      {products.map((p) => (
-        <div
-          key={p.id}
-          style={{
-            background: "white",
-            padding: 15,
-            borderRadius: 10,
-            marginTop: 15,
-            display: "flex",
-            alignItems: "center",
-            gap: 15
-          }}
-        >
+      {filteredProducts.map((p) => {
 
-          {/* IMAGE */}
-          <img
-            src={p.image_url || "/placeholder.png"}
+        const isSold = p.status?.toLowerCase() === "sold"
+        const isHidden = !p.is_active
+
+        return (
+          <div
+            key={p.id}
             style={{
-              width: 70,
-              height: 70,
-              objectFit: "cover",
-              borderRadius: 8
+              background: "white",
+              padding: 15,
+              borderRadius: 10,
+              marginTop: 15,
+              display: "flex",
+              alignItems: "center",
+              gap: 15
             }}
-          />
-
-          {/* INFO */}
-          <div style={{ flex: 1 }}>
-            <b>{p.name}</b>
-            <div>{p.price} RWF</div>
-
-            {p.status?.toLowerCase() === "sold" && (
-              <div style={{ color: "red", fontSize: 12 }}>
-                SOLD
-              </div>
-            )}
-
-            {!p.is_active && (
-              <div style={{ color: "orange", fontSize: 12 }}>
-                HIDDEN
-              </div>
-            )}
-          </div>
-
-          {/* EDIT */}
-          <Link
-            href={`/admin/products/edit/${p.id}`}
-            style={{ marginRight: 15 }}
           >
-            Edit
-          </Link>
 
-          {/* REPOST */}
-          {(p.status?.toLowerCase() === "sold" || !p.is_active) && (
-            <button
-              onClick={() => handleRepost(p.id)}
+            {/* IMAGE */}
+            <img
+              src={p.image_url || "/placeholder.png"}
               style={{
-                marginRight: 15,
-                color: "green",
+                width: 70,
+                height: 70,
+                objectFit: "cover",
+                borderRadius: 8
+              }}
+            />
+
+            {/* INFO */}
+            <div style={{ flex: 1 }}>
+              <b>{p.name}</b>
+              <div>{p.price} RWF</div>
+
+              <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+                {isSold && <Badge color="#ef4444">SOLD</Badge>}
+                {isHidden && <Badge color="#f97316">HIDDEN</Badge>}
+                {!isSold && !isHidden && (
+                  <Badge color="#22c55e">ACTIVE</Badge>
+                )}
+              </div>
+            </div>
+
+            {/* EDIT */}
+            <Link
+              href={`/admin/products/edit/${p.id}`}
+              style={{ marginRight: 15 }}
+            >
+              Edit
+            </Link>
+
+            {/* REPOST */}
+            {(isSold || isHidden) && (
+              <button
+                onClick={() => handleRepost(p.id)}
+                style={{
+                  marginRight: 15,
+                  color: "green",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer"
+                }}
+              >
+                Repost
+              </button>
+            )}
+
+            {/* DELETE */}
+            <button
+              onClick={() => handleDelete(p.id)}
+              style={{
+                color: "red",
                 background: "transparent",
                 border: "none",
                 cursor: "pointer"
               }}
             >
-              Repost
+              Delete
             </button>
-          )}
 
-          {/* DELETE */}
-          <button
-            onClick={() => handleDelete(p.id)}
-            style={{
-              color: "red",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer"
-            }}
-          >
-            Delete
-          </button>
+          </div>
+        )
+      })}
 
-        </div>
-      ))}
-
-      {products.length === 0 && (
-        <p style={{ marginTop: 30 }}>No products yet.</p>
+      {filteredProducts.length === 0 && (
+        <p style={{ marginTop: 30 }}>
+          No products found.
+        </p>
       )}
 
     </div>
+  )
+}
+
+/* ================= SMALL BADGE COMPONENT ================= */
+
+function Badge({
+  children,
+  color
+}: {
+  children: React.ReactNode
+  color: string
+}) {
+  return (
+    <span
+      style={{
+        background: color,
+        color: "white",
+        padding: "2px 10px",
+        fontSize: 11,
+        borderRadius: 20
+      }}
+    >
+      {children}
+    </span>
   )
 }
