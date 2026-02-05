@@ -147,7 +147,7 @@ a {
   text-decoration: none;
 }
 
-/* ✅ FORCE NAVBAR LINKS WHITE */
+/* Force navbar links white */
 
 .desktop-only a,
 .mobile-only a,
@@ -200,13 +200,25 @@ a {
   top: -4px !important;
   right: -4px !important;
 }
+
 /* =====================================
-   HIDE FOOTER ON MOBILE
+   FOOTER (VISIBLE ON MOBILE)
 ===================================== */
+
+footer {
+  background: white;
+  color: black;
+}
+
+footer a {
+  color: black;
+}
+
+/* Space so footer not hidden by bottom nav */
 
 @media (max-width: 768px) {
   footer {
-    display: none !important;
+    margin-bottom: 70px;
   }
 }
 
@@ -229,6 +241,7 @@ a {
 }
 
 /* Hide bottom nav on desktop */
+
 @media (min-width: 769px) {
   .mobile-bottom-nav {
     display: none;
@@ -236,6 +249,7 @@ a {
 }
 
 /* Space so content not hidden behind nav */
+
 @media (max-width: 768px) {
   body {
     padding-bottom: 70px;

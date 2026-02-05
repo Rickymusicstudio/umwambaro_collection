@@ -221,6 +221,9 @@ export default function ProductsPage() {
             const mainImg = p.images?.[0] || p.image_url
             const hoverImg = p.images?.[1] || mainImg
 
+            const isReserved = p.status === "reserved"
+            const isSold = p.status === "sold"
+
             return (
               <div key={p.id} style={cardStyle}>
 
@@ -230,10 +233,16 @@ export default function ProductsPage() {
 
                     <div style={{
                       ...mainBadge,
-                      background: p.status === "sold" ? "red" : "black"
+                      background: isSold
+                        ? "red"
+                        : isReserved
+                        ? "#2563eb"
+                        : "black"
                     }}>
-                      {p.status === "sold"
+                      {isSold
                         ? "SOLD"
+                        : isReserved
+                        ? "RESERVED"
                         : p.condition === "used"
                         ? "CHAGUWA"
                         : "NEW"}
@@ -261,20 +270,26 @@ export default function ProductsPage() {
                 </strong>
 
                 <button
-                  onClick={() => p.status !== "sold" && handleAdd(p)}
-                  disabled={p.status === "sold"}
+                  onClick={() =>
+                    !isSold && !isReserved && handleAdd(p)
+                  }
+                  disabled={isSold || isReserved}
                   style={{
                     ...btnStyle,
                     background:
-                      p.status === "sold"
+                      isSold
                         ? "#999"
+                        : isReserved
+                        ? "#93c5fd"
                         : addedId === p.id
                         ? "#22c55e"
                         : "#f0c36d",
                   }}
                 >
-                  {p.status === "sold"
+                  {isSold
                     ? "SOLD"
+                    : isReserved
+                    ? "RESERVED"
                     : addedId === p.id
                     ? "Added ✓"
                     : "Add to Cart"}
@@ -300,12 +315,11 @@ export default function ProductsPage() {
         .product-card:hover .img-hover{opacity:1}
         .product-card:hover img:first-child{opacity:0}
 
-        /* ✅ MOBILE ONLY */
         @media (max-width: 640px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
+          .products-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
       `}</style>
 
     </div>

@@ -1,30 +1,31 @@
 export default function Footer() {
   return (
     <footer style={footerStyle}>
-
       <div style={container}>
 
-        <div>
-          <h3 style={title}>
-  UMWAMBARO{" "}
-  <span style={{ color: "#febd69" }}>Collections</span>
-</h3>
+        <span>
+          © {new Date().getFullYear()} UMWAMBARO Collections
+        </span>
 
-          <p>Quality clothing for Men, Women, Kids & Sport</p>
-        </div>
+        <span style={divider}>|</span>
 
-        <div>
-          <h4 style={subtitle}>Contact</h4>
-          <p>Email: umwambarocollections@gmail.com</p>
-          <p>Phone: +250785712246</p>
-        </div>
+        <span>
+          Quality clothing for Men, Women, Kids & Sport
+        </span>
+
+        <span style={divider}>|</span>
+
+        <span>
+          Email: umwambarocollections@gmail.com
+        </span>
+
+        <span style={divider}>|</span>
+
+        <span>
+          Phone: +250785712246
+        </span>
 
       </div>
-
-      <div style={bottom}>
-        © {new Date().getFullYear()} UMWAMBARO Collections. All rights reserved.
-      </div>
-
     </footer>
   )
 }
@@ -32,32 +33,24 @@ export default function Footer() {
 /* ================= STYLES ================= */
 
 const footerStyle = {
-  background: "#131921",
-  color: "white",
-  marginTop: 60,
+  background: "white",
+  color: "#111",
+  borderTop: "1px solid #e5e7eb",
+  fontSize: 14,
 }
 
 const container = {
-  maxWidth: 1100,
+  maxWidth: 1200,
   margin: "auto",
-  padding: "40px 20px",
+  padding: "16px",
   display: "flex",
   flexWrap: "wrap" as const,
-  justifyContent: "space-between",
-  gap: 30,
-}
-
-const title = {
-  marginBottom: 10,
-}
-
-const subtitle = {
-  marginBottom: 10,
-}
-
-const bottom = {
-  borderTop: "1px solid #333",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: 8,
   textAlign: "center" as const,
-  padding: "15px",
-  fontSize: 14,
+}
+
+const divider = {
+  opacity: 0.5,
 }
