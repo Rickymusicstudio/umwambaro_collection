@@ -15,6 +15,8 @@ type Product = {
   image_url: string
   status: string | null
   is_active: boolean
+  paid: boolean | null
+  paid_amount: number | null
 }
 
 /* ================= PAGE ================= */
@@ -23,7 +25,7 @@ export default function AdminProductsPage() {
 
   const [products, setProducts] = useState<Product[]>([])
   const [filter, setFilter] = useState<
-    "all" | "active" | "sold" | "hidden"
+    "all" | "active" | "sold" | "hidden" | "paid"
   >("all")
 
   const router = useRouter()
@@ -37,7 +39,7 @@ export default function AdminProductsPage() {
   async function loadProducts() {
     const { data } = await supabase
       .from("products")
-      .select("id,name,price,image_url,status,is_active")
+      .select("id,name,price,image_url,status,is_active,paid,paid_amount")
       .order("created_at", { ascending: false })
 
     setProducts(data || [])
@@ -71,7 +73,9 @@ export default function AdminProductsPage() {
       .from("products")
       .update({
         status: null,
-        is_active: true
+        is_active: true,
+        paid: false,
+        paid_amount: null
       })
       .eq("id", id)
 
@@ -83,15 +87,80 @@ export default function AdminProductsPage() {
     }
   }
 
+  /* ---------------- MARK PAID ---------------- */
+
+  async function handleMarkPaid(id: string) {
+
+    const amount = prompt("Enter amount paid:")
+
+    if (!amount) return
+    if (isNaN(Number(amount))) {
+      alert("Invalid amount")
+      return
+    }
+
+    const { error } = await supabase
+      .from("products")
+      .update({
+        paid: true,
+        paid_amount: Number(amount),
+        status: "sold",
+        is_active: false,
+        paid_at: new Date().toISOString()
+      })
+      .eq("id", id)
+
+    if (error) {
+      console.log(error)
+      alert("Failed to mark paid")
+    } else {
+      await loadProducts()
+    }
+  }
+
+  /* ---------------- EDIT PAID AMOUNT ---------------- */
+
+  async function handleEditAmount(id: string, current: number | null) {
+
+    const amount = prompt(
+      "Enter new paid amount:",
+      String(current ?? "")
+    )
+
+    if (!amount) return
+    if (isNaN(Number(amount))) {
+      alert("Invalid amount")
+      return
+    }
+
+    const { error } = await supabase
+      .from("products")
+      .update({
+        paid_amount: Number(amount)
+      })
+      .eq("id", id)
+
+    if (error) {
+      console.log(error)
+      alert("Update failed")
+    } else {
+      await loadProducts()
+    }
+  }
+
   /* ---------------- FILTER ---------------- */
 
   const filteredProducts = products.filter((p) => {
+
     const isSold = p.status?.toLowerCase() === "sold"
     const isHidden = !p.is_active
+    const isPaid = p.paid === true
 
     if (filter === "active") return !isSold && !isHidden
     if (filter === "sold") return isSold
     if (filter === "hidden") return isHidden
+    if (filter === "paid") return isPaid
+
     return true
   })
 
@@ -118,7 +187,7 @@ export default function AdminProductsPage() {
 
       {/* FILTER TABS */}
       <div style={{ display: "flex", gap: 10, marginBottom: 15 }}>
-        {["all","active","sold","hidden"].map((f) => (
+        {["all","active","sold","hidden","paid"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f as any)}
@@ -143,6 +212,7 @@ export default function AdminProductsPage() {
 
         const isSold = p.status?.toLowerCase() === "sold"
         const isHidden = !p.is_active
+        const isPaid = p.paid === true
 
         return (
           <div
@@ -175,9 +245,37 @@ export default function AdminProductsPage() {
               <div>{p.price} RWF</div>
 
               <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-                {isSold && <Badge color="#ef4444">SOLD</Badge>}
+
+                {isPaid && (
+                  <>
+                    <Badge color="#16a34a">
+                      PAID ({p.paid_amount} RWF)
+                    </Badge>
+
+                    <button
+                      onClick={() =>
+                        handleEditAmount(p.id, p.paid_amount)
+                      }
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        color: "#2563eb",
+                        cursor: "pointer",
+                        fontSize: 12
+                      }}
+                    >
+                      Edit Amount
+                    </button>
+                  </>
+                )}
+
+                {!isPaid && isSold && (
+                  <Badge color="#ef4444">SOLD</Badge>
+                )}
+
                 {isHidden && <Badge color="#f97316">HIDDEN</Badge>}
-                {!isSold && !isHidden && (
+
+                {!isSold && !isHidden && !isPaid && (
                   <Badge color="#22c55e">ACTIVE</Badge>
                 )}
               </div>
@@ -191,8 +289,24 @@ export default function AdminProductsPage() {
               Edit
             </Link>
 
+            {/* MARK PAID */}
+            {!isPaid && (
+              <button
+                onClick={() => handleMarkPaid(p.id)}
+                style={{
+                  marginRight: 15,
+                  color: "#2563eb",
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer"
+                }}
+              >
+                Mark Paid
+              </button>
+            )}
+
             {/* REPOST */}
-            {(isSold || isHidden) && (
+            {(isSold || isHidden || isPaid) && (
               <button
                 onClick={() => handleRepost(p.id)}
                 style={{
@@ -234,7 +348,7 @@ export default function AdminProductsPage() {
   )
 }
 
-/* ================= SMALL BADGE COMPONENT ================= */
+/* ================= BADGE ================= */
 
 function Badge({
   children,

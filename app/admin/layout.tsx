@@ -64,6 +64,11 @@ export default function AdminLayout({
             Orders
           </Link>
 
+          {/* ✅ ACCOUNTING */}
+          <Link href="/admin/accounting" onClick={() => setOpen(false)}>
+            Accounting
+          </Link>
+
           {/* LOGOUT */}
           <button className="logout-btn" onClick={handleLogout}>
             Logout
