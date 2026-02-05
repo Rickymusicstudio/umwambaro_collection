@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
 export default function CheckoutPage() {
+
   const router = useRouter()
 
   const [cart, setCart] = useState<any[]>([])
@@ -23,6 +24,7 @@ export default function CheckoutPage() {
   )
 
   async function placeOrder() {
+
     if (cart.length === 0) {
       alert("Cart is empty")
       return
@@ -45,6 +47,7 @@ export default function CheckoutPage() {
       return
     }
 
+    // ✅ PLACE ORDER
     const res = await fetch("/api/place-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -64,18 +67,29 @@ export default function CheckoutPage() {
       return
     }
 
+    // ✅ CREATE ADMIN NOTIFICATION
+    await supabase
+      .from("notifications")
+      .insert({
+        user_role: "admin",
+        title: "New Order",
+        message: `New order placed. Items: ${cart.length}, Total: ${total} RWF`,
+        link: "/admin/orders"
+      })
+
     // ✅ Clear cart
     clearCart()
 
     // ✅ Stop loading
     setLoading(false)
 
-    // ✅ Redirect to success page
+    // ✅ Redirect
     router.push("/success")
   }
 
   return (
     <div style={{ maxWidth: 500, margin: "auto", padding: 24 }}>
+
       <h1 style={{ fontSize: 24, fontWeight: "bold" }}>
         Checkout
       </h1>
@@ -104,9 +118,12 @@ export default function CheckoutPage() {
       >
         {loading ? "Placing Order..." : "Place Order"}
       </button>
+
     </div>
   )
 }
+
+/* ================= STYLES ================= */
 
 const input: React.CSSProperties = {
   width: "100%",

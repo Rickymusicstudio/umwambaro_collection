@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
+import AdminNotifications from "@/components/AdminNotifications"   // ✅ NEW
 
 export default function AdminLayout({
   children,
@@ -29,7 +30,11 @@ export default function AdminLayout({
       {/* MOBILE TOP BAR */}
       <div className="admin-mobile-top">
         <button onClick={() => setOpen(true)}>☰</button>
+
         <span>Admin Panel</span>
+
+        {/* 🔔 NOTIFICATIONS */}
+        <AdminNotifications />
       </div>
 
       {/* OVERLAY */}
@@ -64,7 +69,6 @@ export default function AdminLayout({
             Orders
           </Link>
 
-          {/* ✅ ACCOUNTING */}
           <Link href="/admin/accounting" onClick={() => setOpen(false)}>
             Accounting
           </Link>
