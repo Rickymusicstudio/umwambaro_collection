@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
-import AdminNotifications from "@/components/AdminNotifications"   // ✅ NEW
+import AdminNotifications from "@/components/AdminNotifications"
 
 export default function AdminLayout({
   children,
@@ -23,17 +23,14 @@ export default function AdminLayout({
   return (
 
   /* OFFSET BELOW MAIN NAVBAR */
-  <div className="admin-offset">
+  <div className="admin-offset admin-full">
 
     <div className="admin-wrapper">
 
       {/* MOBILE TOP BAR */}
       <div className="admin-mobile-top">
         <button onClick={() => setOpen(true)}>☰</button>
-
         <span>Admin Panel</span>
-
-        {/* 🔔 NOTIFICATIONS */}
         <AdminNotifications />
       </div>
 
@@ -46,7 +43,6 @@ export default function AdminLayout({
         <h2>Admin Panel</h2>
 
         <nav>
-
           <Link href="/admin/dashboard" onClick={() => setOpen(false)}>
             Dashboard
           </Link>
@@ -77,7 +73,6 @@ export default function AdminLayout({
           <button className="logout-btn" onClick={handleLogout}>
             Logout
           </button>
-
         </nav>
 
       </aside>
@@ -89,6 +84,13 @@ export default function AdminLayout({
 
 <style jsx>{`
 
+/* REMOVE ANY LEFT GAPS */
+.admin-full{
+  margin:0;
+  padding:0;
+  width:100%;
+}
+
 /* OFFSET UNDER MAIN NAVBAR */
 .admin-offset{
   margin-top:60px;
@@ -98,6 +100,8 @@ export default function AdminLayout({
 .admin-wrapper{
   display:flex;
   min-height:calc(100vh - 60px);
+  margin:0;
+  padding:0;
 }
 
 /* SIDEBAR */
@@ -108,6 +112,7 @@ export default function AdminLayout({
   padding:20px;
   display:flex;
   flex-direction:column;
+  margin:0;
 }
 
 /* Title */

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "325795862751",
+    "project_id": "umwambarocollections-eabdd",
+    "storage_bucket": "umwambarocollections-eabdd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325795862751:android:abf0f2285d43f458d0316a",
+        "android_client_info": {
+          "package_name": "com.umwambaro.collections"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0NhK7KpnT8iXe6LdolTYOJCH-qsz2OtE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

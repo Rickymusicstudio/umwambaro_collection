@@ -13,6 +13,8 @@ type Product = {
   purchase_price: number | null
   paid_amount: number | null
   paid_at: string | null
+  debt: number | null
+  is_debt: boolean | null
 }
 
 /* ================= PAGE ================= */
@@ -30,10 +32,18 @@ export default function AccountingPage() {
   /* ---------------- LOAD ---------------- */
 
   async function loadPaidProducts() {
-
     const { data } = await supabase
       .from("products")
-      .select("id,name,price,purchase_price,paid_amount,paid_at")
+      .select(`
+        id,
+        name,
+        price,
+        purchase_price,
+        paid_amount,
+        paid_at,
+        debt,
+        is_debt
+      `)
       .eq("paid", true)
       .order("paid_at", { ascending: false })
 
@@ -44,7 +54,6 @@ export default function AccountingPage() {
   /* ---------------- UPDATE PURCHASE PRICE ---------------- */
 
   async function savePurchasePrice(id: string, value: string) {
-
     if (isNaN(Number(value))) {
       alert("Invalid purchase price")
       return
@@ -60,8 +69,42 @@ export default function AccountingPage() {
       .eq("id", id)
 
     if (error) {
-      console.log(error)
       alert("Failed to save")
+    } else {
+      await loadPaidProducts()
+    }
+
+    setSavingId(null)
+  }
+
+  /* ---------------- PAY DEBT ---------------- */
+
+  async function payDebt(product: Product, amount: string) {
+
+    const pay = Number(amount)
+
+    if (isNaN(pay) || pay <= 0) {
+      alert("Invalid amount")
+      return
+    }
+
+    const currentPaid = product.paid_amount || 0
+    const newPaid = currentPaid + pay
+    const newDebt = Math.max(product.price - newPaid, 0)
+
+    setSavingId(product.id)
+
+    const { error } = await supabase
+      .from("products")
+      .update({
+        paid_amount: newPaid,
+        debt: newDebt,
+        is_debt: newDebt > 0
+      })
+      .eq("id", product.id)
+
+    if (error) {
+      alert("Failed to update payment")
     } else {
       await loadPaidProducts()
     }
@@ -71,7 +114,7 @@ export default function AccountingPage() {
 
   /* ---------------- TOTALS ---------------- */
 
-  const totalSales = rows.reduce(
+  const totalCashReceived = rows.reduce(
     (sum, p) => sum + (p.paid_amount || 0),
     0
   )
@@ -81,7 +124,12 @@ export default function AccountingPage() {
     0
   )
 
-  const profit = totalSales - totalPurchases
+  const totalDebt = rows.reduce(
+    (sum, p) => sum + (p.debt || 0),
+    0
+  )
+
+  const profit = totalCashReceived - totalPurchases
 
   /* ================= UI ================= */
 
@@ -91,15 +139,16 @@ export default function AccountingPage() {
       <h1>Accounting</h1>
 
       <div style={{ display: "flex", gap: 30, marginTop: 10 }}>
-        <strong>Total Sales: {totalSales.toLocaleString()} RWF</strong>
+        <strong>Cash Received: {totalCashReceived.toLocaleString()} RWF</strong>
         <strong>Total Purchases: {totalPurchases.toLocaleString()} RWF</strong>
-        <strong>Profit: {profit.toLocaleString()} RWF</strong>
+        <strong>Outstanding Ideni: {totalDebt.toLocaleString()} RWF</strong>
+        <strong>Profit (Cash): {profit.toLocaleString()} RWF</strong>
       </div>
 
       {loading && <p>Loading...</p>}
 
       {!loading && rows.length === 0 && (
-        <p>No paid products yet.</p>
+        <p>No sales yet.</p>
       )}
 
       {!loading && rows.length > 0 && (
@@ -120,6 +169,8 @@ export default function AccountingPage() {
                 <Th>Listed Price</Th>
                 <Th>Purchase Price</Th>
                 <Th>Paid Amount</Th>
+                <Th>Debt</Th>
+                <Th>Pay Ideni</Th>
                 <Th>Paid Date</Th>
               </tr>
             </thead>
@@ -127,7 +178,6 @@ export default function AccountingPage() {
             <tbody>
 
               {rows.map((p, index) => (
-
                 <tr key={p.id}>
 
                   <Td>{p.name}</Td>
@@ -136,9 +186,7 @@ export default function AccountingPage() {
 
                   {/* PURCHASE INPUT */}
                   <Td>
-
                     <div style={{ display: "flex", gap: 6 }}>
-
                       <input
                         type="number"
                         defaultValue={p.purchase_price ?? ""}
@@ -151,7 +199,6 @@ export default function AccountingPage() {
                         }}
                         id={`pp-${index}`}
                       />
-
                       <button
                         onClick={() => {
                           const el = document.getElementById(
@@ -161,21 +208,49 @@ export default function AccountingPage() {
                           savePurchasePrice(p.id, el.value)
                         }}
                         disabled={savingId === p.id}
-                        style={{
-                          padding: "4px 8px",
-                          fontSize: 12,
-                          cursor: "pointer"
-                        }}
                       >
                         {savingId === p.id ? "Saving..." : "Save"}
                       </button>
-
                     </div>
-
                   </Td>
 
                   <Td>
-                    {p.paid_amount?.toLocaleString()} RWF
+                    {(p.paid_amount || 0).toLocaleString()} RWF
+                  </Td>
+
+                  <Td>
+                    {(p.debt || 0).toLocaleString()} RWF
+                  </Td>
+
+                  {/* PAY DEBT */}
+                  <Td>
+                    {p.debt && p.debt > 0 && (
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <input
+                          type="number"
+                          placeholder="Amount"
+                          style={{
+                            width: 90,
+                            padding: 4,
+                            border: "1px solid #ccc",
+                            borderRadius: 4
+                          }}
+                          id={`pay-${index}`}
+                        />
+                        <button
+                          onClick={() => {
+                            const el = document.getElementById(
+                              `pay-${index}`
+                            ) as HTMLInputElement
+
+                            payDebt(p, el.value)
+                          }}
+                          disabled={savingId === p.id}
+                        >
+                          Pay
+                        </button>
+                      </div>
+                    )}
                   </Td>
 
                   <Td>
@@ -185,7 +260,6 @@ export default function AccountingPage() {
                   </Td>
 
                 </tr>
-
               ))}
 
             </tbody>

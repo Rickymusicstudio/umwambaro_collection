@@ -19,7 +19,8 @@ export default function RootLayout({
 
         <Navbar />
 
-        <main className="container" style={{ minHeight: "80vh" }}>
+        {/* Remove container so admin can be full width */}
+        <main style={{ minHeight: "80vh" }}>
           {children}
         </main>
 

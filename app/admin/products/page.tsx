@@ -6,8 +6,6 @@ import { supabase } from "@/lib/supabase"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-/* ================= TYPES ================= */
-
 type Product = {
   id: string
   name: string
@@ -17,15 +15,17 @@ type Product = {
   is_active: boolean
   paid: boolean | null
   paid_amount: number | null
+  debt: number | null
+  is_debt: boolean | null
+  credit_customer: string | null
+  credit_phone: string | null
 }
-
-/* ================= PAGE ================= */
 
 export default function AdminProductsPage() {
 
   const [products, setProducts] = useState<Product[]>([])
   const [filter, setFilter] = useState<
-    "all" | "active" | "sold" | "hidden" | "paid"
+    "all" | "active" | "sold" | "hidden" | "paid" | "ideni"
   >("all")
 
   const router = useRouter()
@@ -34,12 +34,23 @@ export default function AdminProductsPage() {
     loadProducts()
   }, [])
 
-  /* ---------------- LOAD ---------------- */
-
   async function loadProducts() {
     const { data } = await supabase
       .from("products")
-      .select("id,name,price,image_url,status,is_active,paid,paid_amount")
+      .select(`
+        id,
+        name,
+        price,
+        image_url,
+        status,
+        is_active,
+        paid,
+        paid_amount,
+        debt,
+        is_debt,
+        credit_customer,
+        credit_phone
+      `)
       .order("created_at", { ascending: false })
 
     setProducts(data || [])
@@ -50,10 +61,9 @@ export default function AdminProductsPage() {
   async function handleDelete(id: string) {
     if (!confirm("Delete this product?")) return
 
-    const res = await fetch(
-      `/admin/products/delete/${id}`,
-      { method: "POST" }
-    )
+    const res = await fetch(`/admin/products/delete/${id}`, {
+      method: "POST"
+    })
 
     if (res.ok) {
       await loadProducts()
@@ -75,12 +85,15 @@ export default function AdminProductsPage() {
         status: null,
         is_active: true,
         paid: false,
-        paid_amount: null
+        paid_amount: null,
+        debt: 0,
+        is_debt: false,
+        credit_customer: null,
+        credit_phone: null
       })
       .eq("id", id)
 
     if (error) {
-      console.log(error)
       alert("Repost failed")
     } else {
       await loadProducts()
@@ -89,60 +102,57 @@ export default function AdminProductsPage() {
 
   /* ---------------- MARK PAID ---------------- */
 
-  async function handleMarkPaid(id: string) {
-
-    const amount = prompt("Enter amount paid:")
-
-    if (!amount) return
-    if (isNaN(Number(amount))) {
-      alert("Invalid amount")
-      return
-    }
+  async function handleMarkPaid(product: Product) {
 
     const { error } = await supabase
       .from("products")
       .update({
         paid: true,
-        paid_amount: Number(amount),
+        paid_amount: product.price,
+        debt: 0,
+        is_debt: false,
+        credit_customer: null,
+        credit_phone: null,
         status: "sold",
         is_active: false,
         paid_at: new Date().toISOString()
       })
-      .eq("id", id)
+      .eq("id", product.id)
 
     if (error) {
-      console.log(error)
       alert("Failed to mark paid")
     } else {
       await loadProducts()
     }
   }
 
-  /* ---------------- EDIT PAID AMOUNT ---------------- */
+  /* ---------------- MARK AS IDENI ---------------- */
 
-  async function handleEditAmount(id: string, current: number | null) {
+  async function handleMarkIdeni(product: Product) {
 
-    const amount = prompt(
-      "Enter new paid amount:",
-      String(current ?? "")
-    )
+    const name = prompt("Customer name:")
+    if (!name) return
 
-    if (!amount) return
-    if (isNaN(Number(amount))) {
-      alert("Invalid amount")
-      return
-    }
+    const phone = prompt("Customer phone:")
+    if (!phone) return
 
     const { error } = await supabase
       .from("products")
       .update({
-        paid_amount: Number(amount)
+        paid: true,
+        paid_amount: 0,
+        debt: product.price,
+        is_debt: true,
+        credit_customer: name,
+        credit_phone: phone,
+        status: "sold",
+        is_active: false,
+        paid_at: new Date().toISOString()
       })
-      .eq("id", id)
+      .eq("id", product.id)
 
     if (error) {
-      console.log(error)
-      alert("Update failed")
+      alert("Failed to mark as ideni")
     } else {
       await loadProducts()
     }
@@ -155,29 +165,26 @@ export default function AdminProductsPage() {
     const isSold = p.status?.toLowerCase() === "sold"
     const isHidden = !p.is_active
     const isPaid = p.paid === true
+    const isIdeni = p.is_debt === true
 
     if (filter === "active") return !isSold && !isHidden
     if (filter === "sold") return isSold
     if (filter === "hidden") return isHidden
-    if (filter === "paid") return isPaid
+    if (filter === "paid") return isPaid && !isIdeni
+    if (filter === "ideni") return isIdeni
 
     return true
   })
 
-  /* ================= UI ================= */
-
   return (
     <div style={{ maxWidth: 900 }}>
 
-      {/* HEADER */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 15
-        }}
-      >
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 15
+      }}>
         <h1>Product List</h1>
 
         <Link href="/admin/products/new">
@@ -185,9 +192,9 @@ export default function AdminProductsPage() {
         </Link>
       </div>
 
-      {/* FILTER TABS */}
+      {/* FILTERS */}
       <div style={{ display: "flex", gap: 10, marginBottom: 15 }}>
-        {["all","active","sold","hidden","paid"].map((f) => (
+        {["all","active","sold","hidden","paid","ideni"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f as any)}
@@ -207,7 +214,6 @@ export default function AdminProductsPage() {
 
       <hr />
 
-      {/* PRODUCTS */}
       {filteredProducts.map((p) => {
 
         const isSold = p.status?.toLowerCase() === "sold"
@@ -228,7 +234,6 @@ export default function AdminProductsPage() {
             }}
           >
 
-            {/* IMAGE */}
             <img
               src={p.image_url || "/placeholder.png"}
               style={{
@@ -239,38 +244,20 @@ export default function AdminProductsPage() {
               }}
             />
 
-            {/* INFO */}
             <div style={{ flex: 1 }}>
               <b>{p.name}</b>
               <div>{p.price} RWF</div>
 
               <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
 
-                {isPaid && (
-                  <>
-                    <Badge color="#16a34a">
-                      PAID ({p.paid_amount} RWF)
-                    </Badge>
-
-                    <button
-                      onClick={() =>
-                        handleEditAmount(p.id, p.paid_amount)
-                      }
-                      style={{
-                        background: "transparent",
-                        border: "none",
-                        color: "#2563eb",
-                        cursor: "pointer",
-                        fontSize: 12
-                      }}
-                    >
-                      Edit Amount
-                    </button>
-                  </>
+                {isPaid && !p.is_debt && (
+                  <Badge color="#16a34a">PAID</Badge>
                 )}
 
-                {!isPaid && isSold && (
-                  <Badge color="#ef4444">SOLD</Badge>
+                {p.is_debt && (
+                  <Badge color="#f59e0b">
+                    IDENI ({p.credit_customer})
+                  </Badge>
                 )}
 
                 {isHidden && <Badge color="#f97316">HIDDEN</Badge>}
@@ -281,7 +268,6 @@ export default function AdminProductsPage() {
               </div>
             </div>
 
-            {/* EDIT */}
             <Link
               href={`/admin/products/edit/${p.id}`}
               style={{ marginRight: 15 }}
@@ -289,23 +275,36 @@ export default function AdminProductsPage() {
               Edit
             </Link>
 
-            {/* MARK PAID */}
             {!isPaid && (
-              <button
-                onClick={() => handleMarkPaid(p.id)}
-                style={{
-                  marginRight: 15,
-                  color: "#2563eb",
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer"
-                }}
-              >
-                Mark Paid
-              </button>
+              <>
+                <button
+                  onClick={() => handleMarkPaid(p)}
+                  style={{
+                    marginRight: 10,
+                    color: "#2563eb",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer"
+                  }}
+                >
+                  Mark Paid
+                </button>
+
+                <button
+                  onClick={() => handleMarkIdeni(p)}
+                  style={{
+                    marginRight: 15,
+                    color: "#f59e0b",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer"
+                  }}
+                >
+                  Sell on Ideni
+                </button>
+              </>
             )}
 
-            {/* REPOST */}
             {(isSold || isHidden || isPaid) && (
               <button
                 onClick={() => handleRepost(p.id)}
@@ -321,7 +320,6 @@ export default function AdminProductsPage() {
               </button>
             )}
 
-            {/* DELETE */}
             <button
               onClick={() => handleDelete(p.id)}
               style={{
@@ -347,8 +345,6 @@ export default function AdminProductsPage() {
     </div>
   )
 }
-
-/* ================= BADGE ================= */
 
 function Badge({
   children,
