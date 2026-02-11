@@ -3,6 +3,7 @@ export type CartItem = {
   name: string
   price: number
   image_url: string
+  size?: string | null   // ✅ added
   quantity: number
 }
 
@@ -37,10 +38,14 @@ export function addToCart(product: {
   name: string
   price: number
   image_url: string
+  size?: string | null   // ✅ added
 }) {
   const cart = getCart()
 
-  const existing = cart.find(i => i.id === product.id)
+  // 🔥 important: identify by id + size
+  const existing = cart.find(
+    i => i.id === product.id && i.size === product.size
+  )
 
   if (existing) {
     existing.quantity += 1
@@ -50,6 +55,7 @@ export function addToCart(product: {
       name: product.name,
       price: product.price,
       image_url: product.image_url,
+      size: product.size ?? null,   // ✅ store size
       quantity: 1,
     })
   }
@@ -59,9 +65,12 @@ export function addToCart(product: {
 
 /* ---------------- UPDATE ---------------- */
 
-export function updateQuantity(id: string, qty: number) {
+export function updateQuantity(id: string, size: string | null, qty: number) {
   const cart = getCart()
-  const item = cart.find(i => i.id === id)
+
+  const item = cart.find(
+    i => i.id === id && i.size === size
+  )
 
   if (item) {
     item.quantity = Math.max(1, qty)
@@ -72,8 +81,12 @@ export function updateQuantity(id: string, qty: number) {
 
 /* ---------------- REMOVE ---------------- */
 
-export function removeFromCart(id: string) {
-  save(getCart().filter(i => i.id !== id))
+export function removeFromCart(id: string, size: string | null) {
+  save(
+    getCart().filter(
+      i => !(i.id === id && i.size === size)
+    )
+  )
 }
 
 /* ---------------- CLEAR ---------------- */

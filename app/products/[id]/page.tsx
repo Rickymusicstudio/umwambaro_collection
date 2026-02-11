@@ -18,6 +18,16 @@ type Product = {
   category_id: number
   sizes: string[] | null
   size_stock: Record<string, number> | null
+  status?: string
+}
+
+type RelatedProduct = {
+  id: string
+  name: string
+  price: number
+  image_url: string | null
+  images: string[] | null
+  status?: string
 }
 
 type Review = {
@@ -35,12 +45,10 @@ export default function ProductPage() {
 
   const [product, setProduct] = useState<Product | null>(null)
   const [mainImage, setMainImage] = useState("")
-  const [related, setRelated] = useState<Product[]>([])
+  const [related, setRelated] = useState<RelatedProduct[]>([])
   const [reviews, setReviews] = useState<Review[]>([])
-
   const [selectedSize, setSelectedSize] = useState<string | null>(null)
 
-  /* Fullscreen viewer */
   const [showViewer, setShowViewer] = useState(false)
   const [zoomed, setZoomed] = useState(false)
 
@@ -49,7 +57,6 @@ export default function ProductPage() {
     fetchReviews()
   }, [])
 
-  /* Auto select first size */
   useEffect(() => {
     if (product?.sizes?.length) {
       setSelectedSize(product.sizes[0])
@@ -61,13 +68,13 @@ export default function ProductPage() {
   async function fetchProduct() {
     const { data } = await supabase
       .from("products")
-      .select("id,name,description,price,image_url,images,category_id,sizes,size_stock")
+      .select("id,name,description,price,image_url,images,category_id,sizes,size_stock,status")
       .eq("id", id)
       .single()
 
     if (!data) return
 
-    setProduct(data)
+    setProduct(data as Product)
 
     if (data.images?.length) setMainImage(data.images[0])
     else if (data.image_url) setMainImage(data.image_url)
@@ -78,12 +85,13 @@ export default function ProductPage() {
   async function loadRelated(categoryId: number, productId: string) {
     const { data } = await supabase
       .from("products")
-      .select("id,name,price,image_url,images")
+      .select("id,name,price,image_url,images,status")
       .eq("category_id", categoryId)
       .neq("id", productId)
+      .not("status", "in", '("sold","reserved")')
       .limit(4)
 
-    setRelated(data || [])
+    setRelated((data as RelatedProduct[]) || [])
   }
 
   /* ---------------- REVIEWS ---------------- */
@@ -94,7 +102,7 @@ export default function ProductPage() {
       .select("id,rating,comment")
       .eq("product_id", id)
 
-    setReviews(data || [])
+    setReviews((data as Review[]) || [])
   }
 
   const avgRating =
@@ -106,15 +114,17 @@ export default function ProductPage() {
 
   if (!product) return <p className="p-6">Loading...</p>
 
+  const isSold = product.status === "sold"
+  const isReserved = product.status === "reserved"
+
   /* ================= UI ================= */
 
   return (
     <div className="max-w-6xl mx-auto p-4">
 
-      {/* ========== FULLSCREEN VIEWER ========== */}
+      {/* FULLSCREEN VIEWER */}
       {showViewer && (
         <div className="viewer">
-
           <button
             className="close-btn"
             onClick={() => {
@@ -130,23 +140,18 @@ export default function ProductPage() {
             onDoubleClick={() => setZoomed(!zoomed)}
             className={`viewer-img ${zoomed ? "zoomed" : ""}`}
           />
-
         </div>
       )}
 
       <div className="grid md:grid-cols-2 gap-8">
 
-        {/* ========== GALLERY ========== */}
+        {/* GALLERY */}
         <div>
-
           <div
             className="main-img-box"
             onClick={() => setShowViewer(true)}
           >
-            <img
-              src={mainImage}
-              className="main-img"
-            />
+            <img src={mainImage} className="main-img" />
           </div>
 
           <div className="thumbs">
@@ -159,13 +164,28 @@ export default function ProductPage() {
               />
             ))}
           </div>
-
         </div>
 
-        {/* ========== INFO ========== */}
+        {/* INFO */}
         <div>
 
           <h1 className="text-3xl font-bold">{product.name}</h1>
+
+          {(isSold || isReserved) && (
+            <div
+              style={{
+                marginTop: 10,
+                padding: "6px 12px",
+                background: isSold ? "red" : "#2563eb",
+                color: "white",
+                borderRadius: 6,
+                display: "inline-block",
+                fontSize: 12
+              }}
+            >
+              {isSold ? "SOLD" : "RESERVED"}
+            </div>
+          )}
 
           <div className="mt-2">
             {"★".repeat(avgRating)}
@@ -182,15 +202,11 @@ export default function ProductPage() {
           {/* SIZE */}
           {product.sizes && (
             <div className="mt-6">
-
               <p className="font-semibold mb-2">Select Size</p>
 
               <div className="flex gap-2 flex-wrap">
                 {product.sizes.map(size => {
-
-                  const stock =
-                    product.size_stock?.[size] ?? 999
-
+                  const stock = product.size_stock?.[size] ?? 999
                   const disabled = stock === 0
 
                   return (
@@ -208,12 +224,15 @@ export default function ProductPage() {
                   )
                 })}
               </div>
-
             </div>
           )}
 
+          {/* ADD TO CART */}
           <button
+            disabled={isSold || isReserved}
             onClick={() =>
+              !isSold &&
+              !isReserved &&
               addToCart({
                 id: product.id,
                 name: product.name,
@@ -223,24 +242,36 @@ export default function ProductPage() {
               })
             }
             className="add-btn"
+            style={{
+              background: isSold
+                ? "#999"
+                : isReserved
+                ? "#3b82f6"
+                : "black",
+              cursor:
+                isSold || isReserved
+                  ? "not-allowed"
+                  : "pointer"
+            }}
           >
-            Add to Cart
+            {isSold
+              ? "SOLD"
+              : isReserved
+              ? "RESERVED"
+              : "Add to Cart"}
           </button>
 
         </div>
-
       </div>
 
-      {/* ========== RELATED ========== */}
+      {/* RELATED PRODUCTS */}
       {related.length > 0 && (
         <div className="mt-16">
-
           <h2 className="text-2xl font-bold mb-4">
             Related Products
           </h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
             {related.map(p => (
               <Link
                 key={p.id}
@@ -251,20 +282,16 @@ export default function ProductPage() {
                   src={p.images?.[0] || p.image_url || "/placeholder.png"}
                   className="w-full h-40 object-contain"
                 />
-
                 <h3 className="mt-2">{p.name}</h3>
                 <p className="font-bold">{p.price} RWF</p>
               </Link>
             ))}
-
           </div>
-
         </div>
       )}
 
-      {/* ================= STYLES ================= */}
+      {/* STYLES */}
       <style jsx>{`
-
         .main-img-box{
           width:100%;
           height:350px;
@@ -276,20 +303,17 @@ export default function ProductPage() {
           background:white;
           cursor:pointer;
         }
-
         .main-img{
           max-width:100%;
           max-height:100%;
           object-fit:contain;
         }
-
         .thumbs{
           display:flex;
           gap:10px;
           margin-top:10px;
           flex-wrap:wrap;
         }
-
         .thumb{
           width:70px;
           height:70px;
@@ -298,40 +322,31 @@ export default function ProductPage() {
           border-radius:6px;
           cursor:pointer;
         }
-
         .thumb.active{
           border:2px solid black;
         }
-
         .size-btn{
           padding:8px 14px;
           border:1px solid #ccc;
           border-radius:6px;
           background:white;
         }
-
         .size-btn.active{
           background:black;
           color:white;
         }
-
         .size-btn.disabled{
           background:#eee;
           color:#999;
         }
-
         .add-btn{
           margin-top:30px;
-          background:black;
           color:white;
           padding:14px;
           width:100%;
           border-radius:8px;
           border:none;
         }
-
-        /* ===== FULLSCREEN VIEWER ===== */
-
         .viewer{
           position:fixed;
           inset:0;
@@ -341,19 +356,15 @@ export default function ProductPage() {
           justify-content:center;
           align-items:center;
         }
-
         .viewer-img{
           max-width:100%;
           max-height:100%;
           object-fit:contain;
           transition:transform .3s;
-          touch-action:pinch-zoom;
         }
-
         .viewer-img.zoomed{
           transform:scale(2);
         }
-
         .close-btn{
           position:absolute;
           top:20px;
@@ -364,13 +375,6 @@ export default function ProductPage() {
           font-size:18px;
           border-radius:6px;
         }
-
-        @media(max-width:768px){
-          .main-img-box{
-            height:280px;
-          }
-        }
-
       `}</style>
 
     </div>
