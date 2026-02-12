@@ -12,6 +12,7 @@ type CartItem = {
   name: string
   price: number
   image_url: string
+  size?: string | null
   quantity: number
 }
 
@@ -44,7 +45,7 @@ export default function CartPage() {
 
       {cart.map((item) => (
         <div
-          key={item.id}
+          key={`${item.id}-${item.size ?? "nosize"}`}
           style={{
             display: "flex",
             gap: 20,
@@ -53,7 +54,6 @@ export default function CartPage() {
             padding: "20px 0",
           }}
         >
-
           {/* IMAGE */}
           <img
             src={item.image_url || "/placeholder.png"}
@@ -70,12 +70,22 @@ export default function CartPage() {
             <h2 style={{ fontWeight: "bold" }}>{item.name}</h2>
             <p>{item.price} RWF</p>
 
+            {item.size && (
+              <p style={{ fontSize: 14, opacity: 0.7 }}>
+                Size: {item.size}
+              </p>
+            )}
+
             <input
               type="number"
               min={1}
               value={item.quantity ?? 1}
               onChange={(e) => {
-                updateQuantity(item.id, Number(e.target.value))
+                updateQuantity(
+                  item.id,
+                  item.size ?? null,
+                  Number(e.target.value)
+                )
                 refresh()
               }}
               style={{
@@ -89,7 +99,7 @@ export default function CartPage() {
           {/* REMOVE */}
           <button
             onClick={() => {
-              removeFromCart(item.id)
+              removeFromCart(item.id, item.size ?? null)
               refresh()
             }}
             style={{
@@ -101,7 +111,6 @@ export default function CartPage() {
           >
             Remove
           </button>
-
         </div>
       ))}
 

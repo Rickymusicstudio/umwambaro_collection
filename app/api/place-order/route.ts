@@ -5,6 +5,7 @@ import { supabaseServer } from "@/lib/supabaseServer"
   Handles:
   - Create order
   - Calculate total
+  - Reserve products (NOT sell)
   - Send WhatsApp to Admin
   - Send WhatsApp to Customer
 */
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     console.log("💰 TOTAL:", total)
 
-    // Create order
+    // ✅ Create order
     const { data: order, error } = await supabase
       .from("orders")
       .insert({
@@ -82,23 +83,21 @@ export async function POST(req: NextRequest) {
 
     console.log("✅ ORDER CREATED:", order.id)
 
-    // ✅ MARK PRODUCTS AS SOLD
+    // ✅ MARK PRODUCTS AS RESERVED (NOT SOLD)
     for (const item of cart) {
       await supabase
         .from("products")
         .update({
-          status: "sold",
-          sold_at: new Date().toISOString()
+          status: "reserved"
         })
         .eq("id", item.id)
     }
 
-    // Build item list
+    // Build item list text
     const itemsText = cart
       .map((i: any) => `${i.name} (${i.price} RWF x${i.quantity})`)
       .join(", ")
 
-    // Shared message
     const message =
       `NEW ORDER | ` +
       `Client Phone: ${phone} | ` +
@@ -110,7 +109,7 @@ export async function POST(req: NextRequest) {
 
     console.log("📨 SENDING ADMIN WHATSAPP...")
 
-    // ✅ ADMIN MESSAGE
+    // Send to Admin
     await fetch(new URL("/api/whatsapp", req.url), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -122,7 +121,7 @@ export async function POST(req: NextRequest) {
 
     console.log("📨 SENDING CUSTOMER WHATSAPP...")
 
-    // ✅ CUSTOMER MESSAGE
+    // Send to Customer
     await fetch(new URL("/api/whatsapp", req.url), {
       method: "POST",
       headers: { "Content-Type": "application/json" },

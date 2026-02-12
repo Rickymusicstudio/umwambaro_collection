@@ -25,7 +25,7 @@ export default function AdminProductsPage() {
 
   const [products, setProducts] = useState<Product[]>([])
   const [filter, setFilter] = useState<
-    "all" | "active" | "sold" | "hidden" | "paid" | "ideni"
+    "all" | "active" | "reserved" | "sold" | "hidden" | "paid" | "ideni"
   >("all")
 
   const router = useRouter()
@@ -37,20 +37,7 @@ export default function AdminProductsPage() {
   async function loadProducts() {
     const { data } = await supabase
       .from("products")
-      .select(`
-        id,
-        name,
-        price,
-        image_url,
-        status,
-        is_active,
-        paid,
-        paid_amount,
-        debt,
-        is_debt,
-        credit_customer,
-        credit_phone
-      `)
+      .select("*")
       .order("created_at", { ascending: false })
 
     setProducts(data || [])
@@ -82,14 +69,15 @@ export default function AdminProductsPage() {
     const { error } = await supabase
       .from("products")
       .update({
-        status: null,
+        status: "available",
         is_active: true,
         paid: false,
         paid_amount: null,
         debt: 0,
         is_debt: false,
         credit_customer: null,
-        credit_phone: null
+        credit_phone: null,
+        sold_at: null
       })
       .eq("id", id)
 
@@ -114,8 +102,8 @@ export default function AdminProductsPage() {
         credit_customer: null,
         credit_phone: null,
         status: "sold",
-        is_active: false,
-        paid_at: new Date().toISOString()
+        is_active: true, // 👈 STAY VISIBLE FOR 1 HOUR
+        sold_at: new Date().toISOString()
       })
       .eq("id", product.id)
 
@@ -146,8 +134,8 @@ export default function AdminProductsPage() {
         credit_customer: name,
         credit_phone: phone,
         status: "sold",
-        is_active: false,
-        paid_at: new Date().toISOString()
+        is_active: true, // 👈 ALSO STAY VISIBLE
+        sold_at: new Date().toISOString()
       })
       .eq("id", product.id)
 
@@ -162,12 +150,14 @@ export default function AdminProductsPage() {
 
   const filteredProducts = products.filter((p) => {
 
-    const isSold = p.status?.toLowerCase() === "sold"
+    const isSold = p.status === "sold"
+    const isReserved = p.status === "reserved"
     const isHidden = !p.is_active
     const isPaid = p.paid === true
     const isIdeni = p.is_debt === true
 
-    if (filter === "active") return !isSold && !isHidden
+    if (filter === "active") return p.status === "available"
+    if (filter === "reserved") return isReserved
     if (filter === "sold") return isSold
     if (filter === "hidden") return isHidden
     if (filter === "paid") return isPaid && !isIdeni
@@ -194,7 +184,7 @@ export default function AdminProductsPage() {
 
       {/* FILTERS */}
       <div style={{ display: "flex", gap: 10, marginBottom: 15 }}>
-        {["all","active","sold","hidden","paid","ideni"].map((f) => (
+        {["all","active","reserved","sold","hidden","paid","ideni"].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f as any)}
@@ -216,7 +206,8 @@ export default function AdminProductsPage() {
 
       {filteredProducts.map((p) => {
 
-        const isSold = p.status?.toLowerCase() === "sold"
+        const isSold = p.status === "sold"
+        const isReserved = p.status === "reserved"
         const isHidden = !p.is_active
         const isPaid = p.paid === true
 
@@ -250,8 +241,16 @@ export default function AdminProductsPage() {
 
               <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
 
-                {isPaid && !p.is_debt && (
-                  <Badge color="#16a34a">PAID</Badge>
+                {p.status === "available" && (
+                  <Badge color="#22c55e">ACTIVE</Badge>
+                )}
+
+                {isReserved && (
+                  <Badge color="#2563eb">RESERVED</Badge>
+                )}
+
+                {isSold && (
+                  <Badge color="#ef4444">SOLD</Badge>
                 )}
 
                 {p.is_debt && (
@@ -262,9 +261,6 @@ export default function AdminProductsPage() {
 
                 {isHidden && <Badge color="#f97316">HIDDEN</Badge>}
 
-                {!isSold && !isHidden && !isPaid && (
-                  <Badge color="#22c55e">ACTIVE</Badge>
-                )}
               </div>
             </div>
 
@@ -279,26 +275,14 @@ export default function AdminProductsPage() {
               <>
                 <button
                   onClick={() => handleMarkPaid(p)}
-                  style={{
-                    marginRight: 10,
-                    color: "#2563eb",
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer"
-                  }}
+                  style={btnBlue}
                 >
                   Mark Paid
                 </button>
 
                 <button
                   onClick={() => handleMarkIdeni(p)}
-                  style={{
-                    marginRight: 15,
-                    color: "#f59e0b",
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer"
-                  }}
+                  style={btnOrange}
                 >
                   Sell on Ideni
                 </button>
@@ -308,13 +292,7 @@ export default function AdminProductsPage() {
             {(isSold || isHidden || isPaid) && (
               <button
                 onClick={() => handleRepost(p.id)}
-                style={{
-                  marginRight: 15,
-                  color: "green",
-                  background: "transparent",
-                  border: "none",
-                  cursor: "pointer"
-                }}
+                style={btnGreen}
               >
                 Repost
               </button>
@@ -322,12 +300,7 @@ export default function AdminProductsPage() {
 
             <button
               onClick={() => handleDelete(p.id)}
-              style={{
-                color: "red",
-                background: "transparent",
-                border: "none",
-                cursor: "pointer"
-              }}
+              style={btnRed}
             >
               Delete
             </button>
@@ -366,4 +339,35 @@ function Badge({
       {children}
     </span>
   )
+}
+
+const btnBlue = {
+  marginRight: 10,
+  color: "#2563eb",
+  background: "transparent",
+  border: "none",
+  cursor: "pointer"
+}
+
+const btnOrange = {
+  marginRight: 15,
+  color: "#f59e0b",
+  background: "transparent",
+  border: "none",
+  cursor: "pointer"
+}
+
+const btnGreen = {
+  marginRight: 15,
+  color: "green",
+  background: "transparent",
+  border: "none",
+  cursor: "pointer"
+}
+
+const btnRed = {
+  color: "red",
+  background: "transparent",
+  border: "none",
+  cursor: "pointer"
 }
