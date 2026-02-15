@@ -43,8 +43,6 @@ export default function AdminProductsPage() {
     setProducts(data || [])
   }
 
-  /* ---------------- DELETE ---------------- */
-
   async function handleDelete(id: string) {
     if (!confirm("Delete this product?")) return
 
@@ -60,10 +58,7 @@ export default function AdminProductsPage() {
     }
   }
 
-  /* ---------------- REPOST ---------------- */
-
   async function handleRepost(id: string) {
-
     if (!confirm("Repost this product?")) return
 
     const { error } = await supabase
@@ -81,14 +76,9 @@ export default function AdminProductsPage() {
       })
       .eq("id", id)
 
-    if (error) {
-      alert("Repost failed")
-    } else {
-      await loadProducts()
-    }
+    if (error) alert("Repost failed")
+    else await loadProducts()
   }
-
-  /* ---------------- MARK PAID ---------------- */
 
   async function handleMarkPaid(product: Product) {
 
@@ -102,19 +92,14 @@ export default function AdminProductsPage() {
         credit_customer: null,
         credit_phone: null,
         status: "sold",
-        is_active: true, // 👈 STAY VISIBLE FOR 1 HOUR
+        is_active: true,
         sold_at: new Date().toISOString()
       })
       .eq("id", product.id)
 
-    if (error) {
-      alert("Failed to mark paid")
-    } else {
-      await loadProducts()
-    }
+    if (error) alert("Failed to mark paid")
+    else await loadProducts()
   }
-
-  /* ---------------- MARK AS IDENI ---------------- */
 
   async function handleMarkIdeni(product: Product) {
 
@@ -134,19 +119,14 @@ export default function AdminProductsPage() {
         credit_customer: name,
         credit_phone: phone,
         status: "sold",
-        is_active: true, // 👈 ALSO STAY VISIBLE
+        is_active: true,
         sold_at: new Date().toISOString()
       })
       .eq("id", product.id)
 
-    if (error) {
-      alert("Failed to mark as ideni")
-    } else {
-      await loadProducts()
-    }
+    if (error) alert("Failed to mark as ideni")
+    else await loadProducts()
   }
-
-  /* ---------------- FILTER ---------------- */
 
   const filteredProducts = products.filter((p) => {
 
@@ -167,14 +147,19 @@ export default function AdminProductsPage() {
   })
 
   return (
-    <div style={{ maxWidth: 900 }}>
+    <div style={{ maxWidth: 900, width: "100%" }}>
 
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 15
-      }}>
+      {/* HEADER */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 15,
+          flexWrap: "wrap",
+          gap: 10
+        }}
+      >
         <h1>Product List</h1>
 
         <Link href="/admin/products/new">
@@ -183,7 +168,15 @@ export default function AdminProductsPage() {
       </div>
 
       {/* FILTERS */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 15 }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 10,
+          marginBottom: 15,
+          overflowX: "auto",
+          paddingBottom: 5
+        }}
+      >
         {["all","active","reserved","sold","hidden","paid","ideni"].map((f) => (
           <button
             key={f}
@@ -194,7 +187,9 @@ export default function AdminProductsPage() {
               border: "1px solid #ddd",
               background: filter === f ? "black" : "white",
               color: filter === f ? "white" : "black",
-              cursor: "pointer"
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              flex: "0 0 auto"
             }}
           >
             {f.toUpperCase()}
@@ -220,8 +215,9 @@ export default function AdminProductsPage() {
               borderRadius: 10,
               marginTop: 15,
               display: "flex",
-              alignItems: "center",
-              gap: 15
+              gap: 15,
+              flexWrap: "wrap",
+              alignItems: "flex-start"
             }}
           >
 
@@ -235,11 +231,11 @@ export default function AdminProductsPage() {
               }}
             />
 
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 160 }}>
               <b>{p.name}</b>
               <div>{p.price} RWF</div>
 
-              <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+              <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
 
                 {p.status === "available" && (
                   <Badge color="#22c55e">ACTIVE</Badge>
@@ -264,46 +260,40 @@ export default function AdminProductsPage() {
               </div>
             </div>
 
-            <Link
-              href={`/admin/products/edit/${p.id}`}
-              style={{ marginRight: 15 }}
+            {/* ACTIONS */}
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                flexWrap: "wrap"
+              }}
             >
-              Edit
-            </Link>
+              <Link href={`/admin/products/edit/${p.id}`}>
+                Edit
+              </Link>
 
-            {!isPaid && (
-              <>
-                <button
-                  onClick={() => handleMarkPaid(p)}
-                  style={btnBlue}
-                >
-                  Mark Paid
+              {!isPaid && (
+                <>
+                  <button onClick={() => handleMarkPaid(p)} style={btnBlue}>
+                    Mark Paid
+                  </button>
+
+                  <button onClick={() => handleMarkIdeni(p)} style={btnOrange}>
+                    Sell on Ideni
+                  </button>
+                </>
+              )}
+
+              {(isSold || isHidden || isPaid) && (
+                <button onClick={() => handleRepost(p.id)} style={btnGreen}>
+                  Repost
                 </button>
+              )}
 
-                <button
-                  onClick={() => handleMarkIdeni(p)}
-                  style={btnOrange}
-                >
-                  Sell on Ideni
-                </button>
-              </>
-            )}
-
-            {(isSold || isHidden || isPaid) && (
-              <button
-                onClick={() => handleRepost(p.id)}
-                style={btnGreen}
-              >
-                Repost
+              <button onClick={() => handleDelete(p.id)} style={btnRed}>
+                Delete
               </button>
-            )}
-
-            <button
-              onClick={() => handleDelete(p.id)}
-              style={btnRed}
-            >
-              Delete
-            </button>
+            </div>
 
           </div>
         )
@@ -342,7 +332,6 @@ function Badge({
 }
 
 const btnBlue = {
-  marginRight: 10,
   color: "#2563eb",
   background: "transparent",
   border: "none",
@@ -350,7 +339,6 @@ const btnBlue = {
 }
 
 const btnOrange = {
-  marginRight: 15,
   color: "#f59e0b",
   background: "transparent",
   border: "none",
@@ -358,7 +346,6 @@ const btnOrange = {
 }
 
 const btnGreen = {
-  marginRight: 15,
   color: "green",
   background: "transparent",
   border: "none",

@@ -9,11 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@capacitor-firebase/messaging": "^8.0.1",
     "@capacitor/android": "^8.0.2",
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.0.2",
     "@capacitor/core": "^8.0.2",
+    "@capacitor/push-notifications": "^8.0.1",
     "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.91.1",
