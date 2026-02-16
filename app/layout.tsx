@@ -2,6 +2,7 @@
 
 import "./globals.css"
 import { useEffect } from "react"
+import { Capacitor } from "@capacitor/core"
 import { PushNotifications } from "@capacitor/push-notifications"
 
 import Navbar from "../src/components/Navbar"
@@ -17,6 +18,12 @@ export default function RootLayout({
   useEffect(() => {
 
     async function initPush() {
+
+      // ✅ Skip push on web
+      if (Capacitor.getPlatform() === "web") {
+        console.log("Push not supported on web")
+        return
+      }
 
       try {
 

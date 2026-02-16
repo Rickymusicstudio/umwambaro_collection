@@ -43,8 +43,6 @@ export default function ProductsPage() {
   const [sort, setSort] = useState("")
   const [addedId, setAddedId] = useState<string | null>(null)
 
-  /* ---------------- LOAD ---------------- */
-
   useEffect(() => {
     loadProducts()
     loadCategories()
@@ -68,8 +66,6 @@ export default function ProductsPage() {
 
     setCategories(data || [])
   }
-
-  /* ---------------- FILTER ---------------- */
 
   function applyFilters(
     catId = activeCategory,
@@ -111,8 +107,6 @@ export default function ProductsPage() {
     applyFilters(activeCategory, search, sort, activeCondition, value)
   }
 
-  /* ---------------- CART ---------------- */
-
   function handleAdd(product: Product) {
 
     addToCart({
@@ -126,14 +120,10 @@ export default function ProductsPage() {
     setTimeout(() => setAddedId(null), 800)
   }
 
-  /* ================= UI ================= */
-
   return (
     <div className="products-page" style={page}>
 
-      {/* DESKTOP SIDEBAR */}
       <aside style={sidebar}>
-
         <h3>Audience</h3>
 
         <div style={activeAudience === null ? catActive : catItem}
@@ -178,10 +168,8 @@ export default function ProductsPage() {
             {cat.name}
           </div>
         ))}
-
       </aside>
 
-      {/* MAIN */}
       <main style={{ flex: 1 }}>
 
         <h1 style={{ fontSize: 28 }}>Products</h1>
@@ -213,7 +201,6 @@ export default function ProductsPage() {
 
         </div>
 
-        {/* GRID */}
         <div className="products-grid" style={gridStyle}>
 
           {products.map(p => {
@@ -228,16 +215,12 @@ export default function ProductsPage() {
               <div key={p.id} style={cardStyle}>
 
                 <Link href={`/products/${p.id}`}>
-
                   <div style={imageWrapper} className="product-card">
 
                     <div style={{
                       ...mainBadge,
-                      background: isSold
-                        ? "red"
-                        : isReserved
-                        ? "#2563eb"
-                        : "black"
+                      background: isSold || isReserved ? "red" : "black",
+                      color: isReserved ? "black" : "white"
                     }}>
                       {isSold
                         ? "SOLD"
@@ -252,7 +235,6 @@ export default function ProductsPage() {
                     <img src={hoverImg} className="img-hover" style={imageStyle} />
 
                   </div>
-
                 </Link>
 
                 <h3>{p.name}</h3>
@@ -280,10 +262,11 @@ export default function ProductsPage() {
                       isSold
                         ? "#999"
                         : isReserved
-                        ? "#93c5fd"
+                        ? "red"
                         : addedId === p.id
                         ? "#22c55e"
                         : "#f0c36d",
+                    color: isReserved ? "black" : "black",
                   }}
                 >
                   {isSold
@@ -303,7 +286,6 @@ export default function ProductsPage() {
 
       </main>
 
-      {/* HOVER + MOBILE GRID */}
       <style jsx>{`
         .product-card img {
           position:absolute;
@@ -409,8 +391,6 @@ const mainBadge: CSSProperties = {
   position: "absolute",
   top: 8,
   left: 8,
-  background: "black",
-  color: "white",
   fontSize: 11,
   padding: "3px 7px",
   borderRadius: 4,
