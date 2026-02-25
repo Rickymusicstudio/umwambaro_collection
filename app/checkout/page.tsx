@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { getCart, clearCart } from "@/lib/cart"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+import { FaWhatsapp } from "react-icons/fa"
 
 export default function CheckoutPage() {
 
@@ -47,7 +48,7 @@ export default function CheckoutPage() {
       return
     }
 
-    // ✅ PLACE ORDER
+    // ✅ PLACE ORDER (save to DB)
     const res = await fetch("/api/place-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -67,7 +68,7 @@ export default function CheckoutPage() {
       return
     }
 
-    // ✅ CREATE ADMIN NOTIFICATION
+    // ✅ ADMIN NOTIFICATION
     await supabase
       .from("notifications")
       .insert({
@@ -77,22 +78,42 @@ export default function CheckoutPage() {
         link: "/admin/orders"
       })
 
+    /* ================= WHATSAPP FLOW ================= */
+
+    const itemsText = cart
+      .map(
+        (i: any) =>
+          `• ${i.name} x${i.quantity} — ${i.price * i.quantity} RWF`
+      )
+      .join("%0A")
+
+    const message =
+      `Hello UMWAMBARO,%0A%0A` +
+      `I placed an order:%0A` +
+      `${itemsText}%0A%0A` +
+      `Total: ${total} RWF%0A` +
+      `Phone: ${phone}%0A` +
+      `Address: ${address}%0A%0A` +
+      `Order ID: ${data.order_id}`
+
+    // ⚠️ PUT YOUR REAL WHATSAPP NUMBER
+    const whatsappNumber = "250785712246"
+
     // ✅ Clear cart
     clearCart()
 
-    // ✅ Stop loading
     setLoading(false)
 
-    // ✅ Redirect
-    router.push("/success")
+    // ✅ Open WhatsApp
+    window.location.href = `https://wa.me/${whatsappNumber}?text=${message}`
   }
 
   return (
     <div style={{ maxWidth: 500, margin: "auto", padding: 24 }}>
 
-      <h1 style={{ fontSize: 24, fontWeight: "bold" }}>
-        Checkout
-      </h1>
+     <h1 style={{ fontSize: 24, fontWeight: "bold" }}>
+  Checkout — Pay on Delivery
+</h1>
 
       <input
         placeholder="Phone number"
@@ -111,13 +132,27 @@ export default function CheckoutPage() {
       <p>Items: {cart.length}</p>
       <p><b>Total: {total} RWF</b></p>
 
-      <button
-        disabled={loading}
-        onClick={placeOrder}
-        style={btn}
-      >
-        {loading ? "Placing Order..." : "Place Order"}
-      </button>
+  <button
+  disabled={loading}
+  onClick={placeOrder}
+  style={whatsappBtn}
+>
+  {loading ? (
+    "Opening WhatsApp..."
+  ) : (
+    <span
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 10
+      }}
+    >
+      <FaWhatsapp size={20} color="white" />
+      Place Order via WhatsApp
+    </span>
+  )}
+</button>
 
     </div>
   )
@@ -142,4 +177,17 @@ const btn: React.CSSProperties = {
   borderRadius: 8,
   border: "none",
   cursor: "pointer"
+}
+
+const whatsappBtn: React.CSSProperties = {
+  marginTop: 20,
+  background: "#25D366",
+  color: "white",
+  padding: 14,
+  width: "100%",
+  borderRadius: 10,
+  border: "none",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontSize: 16
 }
