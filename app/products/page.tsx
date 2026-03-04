@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase"
 import { addToCart } from "@/lib/cart"
 import type { CSSProperties } from "react"
 
+/* ================= TYPES ================= */
+
 type Product = {
   id: string
   name: string
@@ -25,6 +27,8 @@ type Category = {
   id: number
   name: string
 }
+
+/* ================= PAGE ================= */
 
 export default function ProductsPage(){
 
@@ -110,14 +114,14 @@ export default function ProductsPage(){
 
     const discount=product.discount||0
 
-    const price=discount
+    const finalPrice=discount
       ?Math.round(product.price-(product.price*discount)/100)
       :product.price
 
     addToCart({
       id:product.id,
       name:product.name,
-      price,
+      price:finalPrice,
       image_url:product.images?.[0]||product.image_url
     })
 
@@ -234,6 +238,17 @@ export default function ProductsPage(){
 
             <div style={imageWrapper} className="product-card">
 
+              {/* CONDITION BADGE */}
+
+              <div style={{
+                ...mainBadge,
+                background:p.condition==="used"?"black":"#16a34a"
+              }}>
+                {p.condition==="used"?"CHAGUWA":"NEW"}
+              </div>
+
+              {/* DISCOUNT BADGE */}
+
               {discount>0&&(
                 <div style={discountBadge}>
                   -{discount}%
@@ -279,7 +294,10 @@ export default function ProductsPage(){
 
           <button
           onClick={()=>handleAdd(p)}
-          style={btnStyle}
+          style={{
+            ...btnStyle,
+            background:addedId===p.id?"#22c55e":"#f0c36d"
+          }}
           >
             {addedId===p.id?"Added ✓":"Add to Cart"}
           </button>
@@ -310,11 +328,9 @@ transition:.3s;
 .product-card:hover img:first-child{opacity:0}
 
 @media (max-width:640px){
-
 .products-grid{
 grid-template-columns:repeat(2,1fr)!important
 }
-
 }
 
 `}</style>
@@ -323,18 +339,7 @@ grid-template-columns:repeat(2,1fr)!important
 
 )}
 
-const discountBadge:CSSProperties={
-position:"absolute",
-top:8,
-right:8,
-background:"#e11d48",
-color:"white",
-fontWeight:"bold",
-fontSize:12,
-padding:"4px 8px",
-borderRadius:6,
-zIndex:6
-}
+/* ================= STYLES ================= */
 
 const sizeBadge:CSSProperties={
 fontSize:12,
@@ -413,12 +418,35 @@ height:"100%",
 objectFit:"contain"
 }
 
+const mainBadge:CSSProperties={
+position:"absolute",
+top:8,
+left:8,
+fontSize:11,
+padding:"3px 7px",
+borderRadius:4,
+color:"white",
+zIndex:5
+}
+
+const discountBadge:CSSProperties={
+position:"absolute",
+top:8,
+right:8,
+background:"#e11d48",
+color:"white",
+fontWeight:"bold",
+fontSize:12,
+padding:"4px 8px",
+borderRadius:6,
+zIndex:6
+}
+
 const btnStyle:CSSProperties={
 width:"100%",
 padding:12,
 borderRadius:10,
 border:"none",
 fontWeight:"bold",
-cursor:"pointer",
-background:"#f0c36d"
+cursor:"pointer"
 }
