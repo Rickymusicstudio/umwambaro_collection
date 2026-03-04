@@ -6,13 +6,12 @@ import { supabase } from "@/lib/supabase"
 import { addToCart } from "@/lib/cart"
 import type { CSSProperties } from "react"
 
-/* ================= TYPES ================= */
-
 type Product = {
   id: string
   name: string
   description: string
   price: number
+  discount: number | null
   sizes: string[] | null
   image_url: string
   images: string[] | null
@@ -27,381 +26,399 @@ type Category = {
   name: string
 }
 
-/* ================= PAGE ================= */
+export default function ProductsPage(){
 
-export default function ProductsPage() {
+  const [products,setProducts]=useState<Product[]>([])
+  const [allProducts,setAllProducts]=useState<Product[]>([])
+  const [categories,setCategories]=useState<Category[]>([])
 
-  const [products, setProducts] = useState<Product[]>([])
-  const [allProducts, setAllProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
+  const [activeCategory,setActiveCategory]=useState<number|null>(null)
+  const [activeCondition,setActiveCondition]=useState<string|null>(null)
+  const [activeAudience,setActiveAudience]=useState<string|null>(null)
 
-  const [activeCategory, setActiveCategory] = useState<number | null>(null)
-  const [activeCondition, setActiveCondition] = useState<string | null>(null)
-  const [activeAudience, setActiveAudience] = useState<string | null>(null)
+  const [search,setSearch]=useState("")
+  const [sort,setSort]=useState("")
+  const [addedId,setAddedId]=useState<string|null>(null)
 
-  const [search, setSearch] = useState("")
-  const [sort, setSort] = useState("")
-  const [addedId, setAddedId] = useState<string | null>(null)
-
-  useEffect(() => {
+  useEffect(()=>{
     loadProducts()
     loadCategories()
-  }, [])
+  },[])
 
-  async function loadProducts() {
-    const { data } = await supabase
+  async function loadProducts(){
+
+    const {data}=await supabase
       .from("products")
-      .select("id,name,description,price,sizes,image_url,images,category_id,condition,status,audience")
-      .eq("is_active", true)
+      .select("*")
+      .eq("is_active",true)
 
-    setProducts(data || [])
-    setAllProducts(data || [])
+    setProducts(data||[])
+    setAllProducts(data||[])
   }
 
-  async function loadCategories() {
-    const { data } = await supabase
+  async function loadCategories(){
+
+    const {data}=await supabase
       .from("categories")
       .select("*")
       .order("name")
 
-    setCategories(data || [])
+    setCategories(data||[])
   }
 
   function applyFilters(
-    catId = activeCategory,
-    text = search,
-    sortValue = sort,
-    condition = activeCondition,
-    audience = activeAudience
-  ) {
+    catId=activeCategory,
+    text=search,
+    sortValue=sort,
+    condition=activeCondition,
+    audience=activeAudience
+  ){
 
-    let filtered = [...allProducts]
+    let filtered=[...allProducts]
 
-    if (catId) filtered = filtered.filter(p => p.category_id === catId)
-    if (condition) filtered = filtered.filter(p => p.condition === condition)
-    if (audience) filtered = filtered.filter(p => p.audience === audience)
+    if(catId) filtered=filtered.filter(p=>p.category_id===catId)
+    if(condition) filtered=filtered.filter(p=>p.condition===condition)
+    if(audience) filtered=filtered.filter(p=>p.audience===audience)
 
-    if (text)
-      filtered = filtered.filter(p =>
+    if(text)
+      filtered=filtered.filter(p=>
         p.name.toLowerCase().includes(text.toLowerCase())
       )
 
-    if (sortValue === "low") filtered.sort((a, b) => a.price - b.price)
-    if (sortValue === "high") filtered.sort((a, b) => b.price - a.price)
+    if(sortValue==="low") filtered.sort((a,b)=>a.price-b.price)
+    if(sortValue==="high") filtered.sort((a,b)=>b.price-a.price)
 
     setProducts(filtered)
   }
 
-  function selectCategory(id: number | null) {
+  function selectCategory(id:number|null){
     setActiveCategory(id)
     applyFilters(id)
   }
 
-  function selectCondition(value: string | null) {
+  function selectCondition(value:string|null){
     setActiveCondition(value)
-    applyFilters(activeCategory, search, sort, value)
+    applyFilters(activeCategory,search,sort,value)
   }
 
-  function selectAudience(value: string | null) {
+  function selectAudience(value:string|null){
     setActiveAudience(value)
-    applyFilters(activeCategory, search, sort, activeCondition, value)
+    applyFilters(activeCategory,search,sort,activeCondition,value)
   }
 
-  function handleAdd(product: Product) {
+  function handleAdd(product:Product){
+
+    const discount=product.discount||0
+
+    const price=discount
+      ?Math.round(product.price-(product.price*discount)/100)
+      :product.price
 
     addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image_url: product.images?.[0] || product.image_url,
+      id:product.id,
+      name:product.name,
+      price,
+      image_url:product.images?.[0]||product.image_url
     })
 
     setAddedId(product.id)
-    setTimeout(() => setAddedId(null), 800)
+    setTimeout(()=>setAddedId(null),800)
   }
 
-  return (
-    <div className="products-page" style={page}>
+  return(
 
-      <aside style={sidebar}>
-        <h3>Audience</h3>
+  <div style={page}>
 
-        <div style={activeAudience === null ? catActive : catItem}
-          onClick={() => selectAudience(null)}>All</div>
+    {/* SIDEBAR */}
 
-        <div style={activeAudience === "men" ? catActive : catItem}
-          onClick={() => selectAudience("men")}>Men</div>
+    <aside style={sidebar}>
 
-        <div style={activeAudience === "women" ? catActive : catItem}
-          onClick={() => selectAudience("women")}>Women</div>
+      <h3>Audience</h3>
 
-        <div style={activeAudience === "kids" ? catActive : catItem}
-          onClick={() => selectAudience("kids")}>Kids</div>
+      <div style={activeAudience===null?catActive:catItem}
+      onClick={()=>selectAudience(null)}>All</div>
 
-        <div style={activeAudience === "sport" ? catActive : catItem}
-          onClick={() => selectAudience("sport")}>Sport</div>
+      <div style={activeAudience==="men"?catActive:catItem}
+      onClick={()=>selectAudience("men")}>Men</div>
 
-        <hr style={{ margin: "15px 0" }} />
+      <div style={activeAudience==="women"?catActive:catItem}
+      onClick={()=>selectAudience("women")}>Women</div>
 
-        <h3>Condition</h3>
+      <div style={activeAudience==="kids"?catActive:catItem}
+      onClick={()=>selectAudience("kids")}>Kids</div>
 
-        <div style={activeCondition === null ? catActive : catItem}
-          onClick={() => selectCondition(null)}>All</div>
+      <div style={activeAudience==="sport"?catActive:catItem}
+      onClick={()=>selectAudience("sport")}>Sport</div>
 
-        <div style={activeCondition === "new" ? catActive : catItem}
-          onClick={() => selectCondition("new")}>New</div>
+      <hr style={{margin:"15px 0"}}/>
 
-        <div style={activeCondition === "used" ? catActive : catItem}
-          onClick={() => selectCondition("used")}>Used (Chaguwa)</div>
+      <h3>Condition</h3>
 
-        <hr style={{ margin: "15px 0" }} />
+      <div style={activeCondition===null?catActive:catItem}
+      onClick={()=>selectCondition(null)}>All</div>
 
-        <h3>Categories</h3>
+      <div style={activeCondition==="new"?catActive:catItem}
+      onClick={()=>selectCondition("new")}>New</div>
 
-        <div style={activeCategory === null ? catActive : catItem}
-          onClick={() => selectCategory(null)}>All Products</div>
+      <div style={activeCondition==="used"?catActive:catItem}
+      onClick={()=>selectCondition("used")}>Used (Chaguwa)</div>
 
-        {categories.map(cat => (
-          <div key={cat.id}
-            style={activeCategory === cat.id ? catActive : catItem}
-            onClick={() => selectCategory(cat.id)}>
-            {cat.name}
-          </div>
-        ))}
-      </aside>
+      <hr style={{margin:"15px 0"}}/>
 
-      <main style={{ flex: 1 }}>
+      <h3>Categories</h3>
 
-        <h1 style={{ fontSize: 28 }}>Products</h1>
+      <div style={activeCategory===null?catActive:catItem}
+      onClick={()=>selectCategory(null)}>All Products</div>
 
-        <div style={filterRow}>
-
-          <input
-            placeholder="Search product..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value)
-              applyFilters(activeCategory, e.target.value)
-            }}
-            style={searchInput}
-          />
-
-          <select
-            value={sort}
-            onChange={(e) => {
-              setSort(e.target.value)
-              applyFilters(activeCategory, search, e.target.value)
-            }}
-            style={searchInput}
-          >
-            <option value="">Sort</option>
-            <option value="low">Price: Low → High</option>
-            <option value="high">Price: High → Low</option>
-          </select>
-
+      {categories.map(cat=>(
+        <div key={cat.id}
+        style={activeCategory===cat.id?catActive:catItem}
+        onClick={()=>selectCategory(cat.id)}>
+        {cat.name}
         </div>
+      ))}
 
-        <div className="products-grid" style={gridStyle}>
+    </aside>
 
-          {products.map(p => {
+    {/* PRODUCTS */}
 
-            const mainImg = p.images?.[0] || p.image_url
-            const hoverImg = p.images?.[1] || mainImg
+    <main style={{flex:1}}>
 
-            const isReserved = p.status === "reserved"
-            const isSold = p.status === "sold"
+      <h1 style={{fontSize:28}}>Products</h1>
 
-            return (
-              <div key={p.id} style={cardStyle}>
+      <div style={filterRow}>
 
-                <Link href={`/products/${p.id}`}>
-                  <div style={imageWrapper} className="product-card">
+        <input
+        placeholder="Search product..."
+        value={search}
+        onChange={(e)=>{
+          setSearch(e.target.value)
+          applyFilters(activeCategory,e.target.value)
+        }}
+        style={searchInput}
+        />
 
-                    <div style={{
-                      ...mainBadge,
-                      background: isSold || isReserved ? "red" : "black",
-                      color: isReserved ? "black" : "white"
-                    }}>
-                      {isSold
-                        ? "SOLD"
-                        : isReserved
-                        ? "RESERVED"
-                        : p.condition === "used"
-                        ? "CHAGUWA"
-                        : "NEW"}
-                    </div>
+        <select
+        value={sort}
+        onChange={(e)=>{
+          setSort(e.target.value)
+          applyFilters(activeCategory,search,e.target.value)
+        }}
+        style={searchInput}
+        >
+          <option value="">Sort</option>
+          <option value="low">Price: Low → High</option>
+          <option value="high">Price: High → Low</option>
+        </select>
 
-                    <img src={mainImg} style={imageStyle} />
-                    <img src={hoverImg} className="img-hover" style={imageStyle} />
+      </div>
 
-                  </div>
-                </Link>
+      <div className="products-grid" style={gridStyle}>
 
-                <h3>{p.name}</h3>
+      {products.map(p=>{
 
-                {p.sizes && p.sizes.length > 0 && (
-                  <span style={sizeBadge}>
-                    Size: {p.sizes.join(", ")}
-                  </span>
-                )}
+        const discount=p.discount||0
 
-                <p style={{ color: "#555" }}>{p.description}</p>
+        const finalPrice=discount
+          ?Math.round(p.price-(p.price*discount)/100)
+          :p.price
 
-                <strong style={{ marginTop: "auto", marginBottom: 8 }}>
-                  {p.price} RWF
-                </strong>
+        const mainImg=p.images?.[0]||p.image_url
+        const hoverImg=p.images?.[1]||mainImg
 
-                <button
-                  onClick={() =>
-                    !isSold && !isReserved && handleAdd(p)
-                  }
-                  disabled={isSold || isReserved}
-                  style={{
-                    ...btnStyle,
-                    background:
-                      isSold
-                        ? "#999"
-                        : isReserved
-                        ? "red"
-                        : addedId === p.id
-                        ? "#22c55e"
-                        : "#f0c36d",
-                    color: isReserved ? "black" : "black",
-                  }}
-                >
-                  {isSold
-                    ? "SOLD"
-                    : isReserved
-                    ? "RESERVED"
-                    : addedId === p.id
-                    ? "Added ✓"
-                    : "Add to Cart"}
-                </button>
+        return(
 
+        <div key={p.id} style={cardStyle}>
+
+          <Link href={`/products/${p.id}`}>
+
+            <div style={imageWrapper} className="product-card">
+
+              {discount>0&&(
+                <div style={discountBadge}>
+                  -{discount}%
+                </div>
+              )}
+
+              <img src={mainImg} style={imageStyle}/>
+              <img src={hoverImg} className="img-hover" style={imageStyle}/>
+
+            </div>
+
+          </Link>
+
+          <h3>{p.name}</h3>
+
+          {p.sizes&&(
+            <span style={sizeBadge}>
+              Size: {p.sizes.join(", ")}
+            </span>
+          )}
+
+          <p style={{color:"#555"}}>
+            {p.description}
+          </p>
+
+          <div style={{marginTop:"auto",marginBottom:8}}>
+
+            {discount>0&&(
+              <div style={{
+                textDecoration:"line-through",
+                color:"#888",
+                fontSize:13
+              }}>
+                {p.price} RWF
               </div>
-            )
-          })}
+            )}
+
+            <strong>
+              {finalPrice} RWF
+            </strong>
+
+          </div>
+
+          <button
+          onClick={()=>handleAdd(p)}
+          style={btnStyle}
+          >
+            {addedId===p.id?"Added ✓":"Add to Cart"}
+          </button>
 
         </div>
 
-      </main>
+        )
 
-      <style jsx>{`
-        .product-card img {
-          position:absolute;
-          top:0;
-          left:0;
-          transition:.3s;
-        }
-        .img-hover{opacity:0}
-        .product-card:hover .img-hover{opacity:1}
-        .product-card:hover img:first-child{opacity:0}
+      })}
 
-        @media (max-width: 640px) {
-          .products-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
-      `}</style>
+      </div>
 
-    </div>
-  )
+    </main>
+
+<style jsx>{`
+
+.product-card img{
+position:absolute;
+top:0;
+left:0;
+transition:.3s;
 }
 
-/* ================= STYLES ================= */
+.img-hover{opacity:0}
 
-const sizeBadge: CSSProperties = {
-  fontSize: 12,
-  background: "#eee",
-  padding: "3px 8px",
-  borderRadius: 6,
-  width: "fit-content",
-  marginBottom: 6,
+.product-card:hover .img-hover{opacity:1}
+
+.product-card:hover img:first-child{opacity:0}
+
+@media (max-width:640px){
+
+.products-grid{
+grid-template-columns:repeat(2,1fr)!important
 }
 
-const page: CSSProperties = {
-  display: "flex",
-  gap: 30,
-  padding: 30,
 }
 
-const sidebar: CSSProperties = {
-  width: 220,
-  background: "#fafafa",
-  padding: 20,
-  borderRadius: 12,
+`}</style>
+
+  </div>
+
+)}
+
+const discountBadge:CSSProperties={
+position:"absolute",
+top:8,
+right:8,
+background:"#e11d48",
+color:"white",
+fontWeight:"bold",
+fontSize:12,
+padding:"4px 8px",
+borderRadius:6,
+zIndex:6
 }
 
-const catItem: CSSProperties = {
-  padding: "10px 12px",
-  borderRadius: 6,
-  cursor: "pointer",
+const sizeBadge:CSSProperties={
+fontSize:12,
+background:"#eee",
+padding:"3px 8px",
+borderRadius:6,
+marginBottom:6,
+width:"fit-content"
 }
 
-const catActive: CSSProperties = {
-  ...catItem,
-  background: "black",
-  color: "white",
+const page:CSSProperties={
+display:"flex",
+gap:30,
+padding:30
 }
 
-const filterRow: CSSProperties = {
-  display: "flex",
-  gap: 10,
-  margin: "20px 0",
-  flexWrap: "wrap",
+const sidebar:CSSProperties={
+width:220,
+background:"#fafafa",
+padding:20,
+borderRadius:12
 }
 
-const searchInput: CSSProperties = {
-  padding: 10,
-  borderRadius: 6,
-  border: "1px solid #ccc",
-  width: "100%",
-  maxWidth: 240,
+const catItem:CSSProperties={
+padding:"10px 12px",
+borderRadius:6,
+cursor:"pointer"
 }
 
-const gridStyle: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill,minmax(180px,1fr))",
-  gap: 20,
+const catActive:CSSProperties={
+...catItem,
+background:"black",
+color:"white"
 }
 
-const cardStyle: CSSProperties = {
-  border: "2px solid black",
-  borderRadius: 18,
-  padding: 16,
-  display: "flex",
-  flexDirection: "column",
+const filterRow:CSSProperties={
+display:"flex",
+gap:10,
+margin:"20px 0",
+flexWrap:"wrap"
 }
 
-const imageWrapper: CSSProperties = {
-  width: "100%",
-  height: 220,
-  position: "relative",
-  overflow: "hidden",
-  borderRadius: 12,
+const searchInput:CSSProperties={
+padding:10,
+borderRadius:6,
+border:"1px solid #ccc",
+width:"100%",
+maxWidth:240
 }
 
-const imageStyle: CSSProperties = {
-  width: "100%",
-  height: "100%",
-  objectFit: "contain",
+const gridStyle:CSSProperties={
+display:"grid",
+gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",
+gap:20
 }
 
-const mainBadge: CSSProperties = {
-  position: "absolute",
-  top: 8,
-  left: 8,
-  fontSize: 11,
-  padding: "3px 7px",
-  borderRadius: 4,
-  zIndex: 5,
+const cardStyle:CSSProperties={
+border:"2px solid black",
+borderRadius:18,
+padding:16,
+display:"flex",
+flexDirection:"column"
 }
 
-const btnStyle: CSSProperties = {
-  width: "100%",
-  padding: 12,
-  borderRadius: 10,
-  border: "none",
-  fontWeight: "bold",
-  cursor: "pointer",
+const imageWrapper:CSSProperties={
+width:"100%",
+height:220,
+position:"relative",
+overflow:"hidden",
+borderRadius:12
+}
+
+const imageStyle:CSSProperties={
+width:"100%",
+height:"100%",
+objectFit:"contain"
+}
+
+const btnStyle:CSSProperties={
+width:"100%",
+padding:12,
+borderRadius:10,
+border:"none",
+fontWeight:"bold",
+cursor:"pointer",
+background:"#f0c36d"
 }

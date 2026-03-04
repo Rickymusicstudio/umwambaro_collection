@@ -10,6 +10,7 @@ type Product = {
   id: string
   name: string
   price: number
+  discount: number | null
   image_url: string
   status: string | null
   is_active: boolean
@@ -23,34 +24,36 @@ type Product = {
 
 export default function AdminProductsPage() {
 
-  const [products, setProducts] = useState<Product[]>([])
-  const [filter, setFilter] = useState<
-    "all" | "active" | "reserved" | "sold" | "hidden" | "paid" | "ideni"
+  const [products,setProducts]=useState<Product[]>([])
+  const [filter,setFilter]=useState<
+    "all"|"active"|"reserved"|"sold"|"hidden"|"paid"|"ideni"
   >("all")
 
-  const router = useRouter()
+  const router=useRouter()
 
-  useEffect(() => {
+  useEffect(()=>{
     loadProducts()
-  }, [])
+  },[])
 
-  async function loadProducts() {
-    const { data } = await supabase
+  async function loadProducts(){
+
+    const {data}=await supabase
       .from("products")
       .select("*")
-      .order("created_at", { ascending: false })
+      .order("created_at",{ascending:false})
 
-    setProducts(data || [])
+    setProducts(data||[])
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this product?")) return
+  async function handleDelete(id:string){
 
-    const res = await fetch(`/admin/products/delete/${id}`, {
-      method: "POST"
+    if(!confirm("Delete this product?")) return
+
+    const res=await fetch(`/admin/products/delete/${id}`,{
+      method:"POST"
     })
 
-    if (res.ok) {
+    if(res.ok){
       await loadProducts()
       router.push("/admin/products")
     } else {
@@ -58,106 +61,130 @@ export default function AdminProductsPage() {
     }
   }
 
-  async function handleRepost(id: string) {
-    if (!confirm("Repost this product?")) return
+  async function handleRepost(id:string){
 
-    const { error } = await supabase
+    if(!confirm("Repost this product?")) return
+
+    const {error}=await supabase
       .from("products")
       .update({
-        status: "available",
-        is_active: true,
-        paid: false,
-        paid_amount: null,
-        debt: 0,
-        is_debt: false,
-        credit_customer: null,
-        credit_phone: null,
-        sold_at: null
+        status:"available",
+        is_active:true,
+        paid:false,
+        paid_amount:null,
+        debt:0,
+        is_debt:false,
+        credit_customer:null,
+        credit_phone:null,
+        sold_at:null
       })
-      .eq("id", id)
+      .eq("id",id)
 
-    if (error) alert("Repost failed")
+    if(error) alert("Repost failed")
     else await loadProducts()
   }
 
-  async function handleMarkPaid(product: Product) {
+  async function handleMarkPaid(product:Product){
 
-    const { error } = await supabase
+    const {error}=await supabase
       .from("products")
       .update({
-        paid: true,
-        paid_amount: product.price,
-        debt: 0,
-        is_debt: false,
-        credit_customer: null,
-        credit_phone: null,
-        status: "sold",
-        is_active: true,
-        sold_at: new Date().toISOString()
+        paid:true,
+        paid_amount:product.price,
+        debt:0,
+        is_debt:false,
+        credit_customer:null,
+        credit_phone:null,
+        status:"sold",
+        is_active:true,
+        sold_at:new Date().toISOString()
       })
-      .eq("id", product.id)
+      .eq("id",product.id)
 
-    if (error) alert("Failed to mark paid")
+    if(error) alert("Failed to mark paid")
     else await loadProducts()
   }
 
-  async function handleMarkIdeni(product: Product) {
+  async function handleMarkIdeni(product:Product){
 
-    const name = prompt("Customer name:")
-    if (!name) return
+    const name=prompt("Customer name:")
+    if(!name) return
 
-    const phone = prompt("Customer phone:")
-    if (!phone) return
+    const phone=prompt("Customer phone:")
+    if(!phone) return
 
-    const { error } = await supabase
+    const {error}=await supabase
       .from("products")
       .update({
-        paid: true,
-        paid_amount: 0,
-        debt: product.price,
-        is_debt: true,
-        credit_customer: name,
-        credit_phone: phone,
-        status: "sold",
-        is_active: true,
-        sold_at: new Date().toISOString()
+        paid:true,
+        paid_amount:0,
+        debt:product.price,
+        is_debt:true,
+        credit_customer:name,
+        credit_phone:phone,
+        status:"sold",
+        is_active:true,
+        sold_at:new Date().toISOString()
       })
-      .eq("id", product.id)
+      .eq("id",product.id)
 
-    if (error) alert("Failed to mark as ideni")
+    if(error) alert("Failed to mark as ideni")
     else await loadProducts()
   }
 
-  const filteredProducts = products.filter((p) => {
+  async function handleSetDiscount(product:Product){
 
-    const isSold = p.status === "sold"
-    const isReserved = p.status === "reserved"
-    const isHidden = !p.is_active
-    const isPaid = p.paid === true
-    const isIdeni = p.is_debt === true
+    const value=prompt("Discount % (0 - 90)")
 
-    if (filter === "active") return p.status === "available"
-    if (filter === "reserved") return isReserved
-    if (filter === "sold") return isSold
-    if (filter === "hidden") return isHidden
-    if (filter === "paid") return isPaid && !isIdeni
-    if (filter === "ideni") return isIdeni
+    if(!value) return
+
+    const discount=parseInt(value)
+
+    if(isNaN(discount)||discount<0||discount>90){
+      alert("Invalid discount")
+      return
+    }
+
+    const {error}=await supabase
+      .from("products")
+      .update({discount})
+      .eq("id",product.id)
+
+    if(error) alert("Failed to update discount")
+    else loadProducts()
+  }
+
+  const filteredProducts=products.filter((p)=>{
+
+    const isSold=p.status==="sold"
+    const isReserved=p.status==="reserved"
+    const isHidden=!p.is_active
+    const isPaid=p.paid===true
+    const isIdeni=p.is_debt===true
+
+    if(filter==="active") return p.status==="available"
+    if(filter==="reserved") return isReserved
+    if(filter==="sold") return isSold
+    if(filter==="hidden") return isHidden
+    if(filter==="paid") return isPaid&&!isIdeni
+    if(filter==="ideni") return isIdeni
 
     return true
   })
 
-  return (
-    <div style={{ maxWidth: 900, width: "100%" }}>
+  return(
+    <div style={{maxWidth:900,width:"100%"}}>
 
       {/* HEADER */}
+
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 15,
-          flexWrap: "wrap",
-          gap: 10
+          display:"flex",
+          justifyContent:"space-between",
+          alignItems:"center",
+          marginBottom:15,
+          flexWrap:"wrap",
+          gap:10
         }}
       >
         <h1>Product List</h1>
@@ -168,28 +195,28 @@ export default function AdminProductsPage() {
       </div>
 
       {/* FILTERS */}
+
       <div
         style={{
-          display: "flex",
-          gap: 10,
-          marginBottom: 15,
-          overflowX: "auto",
-          paddingBottom: 5
+          display:"flex",
+          gap:10,
+          marginBottom:15,
+          overflowX:"auto",
+          paddingBottom:5
         }}
       >
-        {["all","active","reserved","sold","hidden","paid","ideni"].map((f) => (
+        {["all","active","reserved","sold","hidden","paid","ideni"].map((f)=>(
           <button
             key={f}
-            onClick={() => setFilter(f as any)}
+            onClick={()=>setFilter(f as any)}
             style={{
-              padding: "6px 14px",
-              borderRadius: 20,
-              border: "1px solid #ddd",
-              background: filter === f ? "black" : "white",
-              color: filter === f ? "white" : "black",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-              flex: "0 0 auto"
+              padding:"6px 14px",
+              borderRadius:20,
+              border:"1px solid #ddd",
+              background:filter===f?"black":"white",
+              color:filter===f?"white":"black",
+              cursor:"pointer",
+              whiteSpace:"nowrap"
             }}
           >
             {f.toUpperCase()}
@@ -197,110 +224,152 @@ export default function AdminProductsPage() {
         ))}
       </div>
 
-      <hr />
+      <hr/>
 
-      {filteredProducts.map((p) => {
+      {filteredProducts.map((p)=>{
 
-        const isSold = p.status === "sold"
-        const isReserved = p.status === "reserved"
-        const isHidden = !p.is_active
-        const isPaid = p.paid === true
+        const discount=p.discount||0
 
-        return (
+        const finalPrice=discount
+          ?Math.round(p.price-(p.price*discount)/100)
+          :p.price
+
+        const isSold=p.status==="sold"
+        const isReserved=p.status==="reserved"
+        const isHidden=!p.is_active
+        const isPaid=p.paid===true
+
+        return(
           <div
             key={p.id}
             style={{
-              background: "white",
-              padding: 15,
-              borderRadius: 10,
-              marginTop: 15,
-              display: "flex",
-              gap: 15,
-              flexWrap: "wrap",
-              alignItems: "flex-start"
+              background:"white",
+              padding:15,
+              borderRadius:10,
+              marginTop:15,
+              display:"flex",
+              gap:15,
+              flexWrap:"wrap",
+              alignItems:"flex-start"
             }}
           >
 
             <img
-              src={p.image_url || "/placeholder.png"}
+              src={p.image_url||"/placeholder.png"}
               style={{
-                width: 70,
-                height: 70,
-                objectFit: "cover",
-                borderRadius: 8
+                width:70,
+                height:70,
+                objectFit:"cover",
+                borderRadius:8
               }}
             />
 
-            <div style={{ flex: 1, minWidth: 160 }}>
+            <div style={{flex:1,minWidth:160}}>
               <b>{p.name}</b>
-              <div>{p.price} RWF</div>
 
-              <div style={{ display: "flex", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
+              <div>
 
-                {p.status === "available" && (
+                {discount>0&&(
+                  <span style={{
+                    textDecoration:"line-through",
+                    color:"#888",
+                    marginRight:6
+                  }}>
+                    {p.price} RWF
+                  </span>
+                )}
+
+                <b>{finalPrice} RWF</b>
+
+                {discount>0&&(
+                  <span style={{
+                    marginLeft:8,
+                    background:"#ef4444",
+                    color:"white",
+                    fontSize:11,
+                    padding:"2px 8px",
+                    borderRadius:10
+                  }}>
+                    -{discount}%
+                  </span>
+                )}
+
+              </div>
+
+              <div style={{
+                display:"flex",
+                gap:6,
+                marginTop:6,
+                flexWrap:"wrap"
+              }}>
+
+                {p.status==="available"&&(
                   <Badge color="#22c55e">ACTIVE</Badge>
                 )}
 
-                {isReserved && (
+                {isReserved&&(
                   <Badge color="#2563eb">RESERVED</Badge>
                 )}
 
-                {isSold && (
+                {isSold&&(
                   <Badge color="#ef4444">SOLD</Badge>
                 )}
 
-                {p.is_debt && (
+                {p.is_debt&&(
                   <Badge color="#f59e0b">
                     IDENI ({p.credit_customer})
                   </Badge>
                 )}
 
-                {isHidden && <Badge color="#f97316">HIDDEN</Badge>}
+                {isHidden&&(
+                  <Badge color="#f97316">HIDDEN</Badge>
+                )}
 
               </div>
             </div>
 
             {/* ACTIONS */}
-            <div
-              style={{
-                display: "flex",
-                gap: 10,
-                flexWrap: "wrap"
-              }}
-            >
+
+            <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+
               <Link href={`/admin/products/edit/${p.id}`}>
                 Edit
               </Link>
 
-              {!isPaid && (
+              <button onClick={()=>handleSetDiscount(p)} style={btnOrange}>
+                Discount
+              </button>
+
+              {!isPaid&&(
                 <>
-                  <button onClick={() => handleMarkPaid(p)} style={btnBlue}>
+                  <button onClick={()=>handleMarkPaid(p)} style={btnBlue}>
                     Mark Paid
                   </button>
 
-                  <button onClick={() => handleMarkIdeni(p)} style={btnOrange}>
+                  <button onClick={()=>handleMarkIdeni(p)} style={btnOrange}>
                     Sell on Ideni
                   </button>
                 </>
               )}
 
-              {(isSold || isHidden || isPaid) && (
-                <button onClick={() => handleRepost(p.id)} style={btnGreen}>
+              {(isSold||isHidden||isPaid)&&(
+                <button onClick={()=>handleRepost(p.id)} style={btnGreen}>
                   Repost
                 </button>
               )}
 
-              <button onClick={() => handleDelete(p.id)} style={btnRed}>
+              <button onClick={()=>handleDelete(p.id)} style={btnRed}>
                 Delete
               </button>
+
             </div>
 
           </div>
         )
       })}
 
-      {filteredProducts.length === 0 && (
-        <p style={{ marginTop: 30 }}>
+      {filteredProducts.length===0&&(
+        <p style={{marginTop:30}}>
           No products found.
         </p>
       )}
@@ -312,18 +381,18 @@ export default function AdminProductsPage() {
 function Badge({
   children,
   color
-}: {
-  children: React.ReactNode
-  color: string
-}) {
-  return (
+}:{
+  children:React.ReactNode
+  color:string
+}){
+  return(
     <span
       style={{
-        background: color,
-        color: "white",
-        padding: "2px 10px",
-        fontSize: 11,
-        borderRadius: 20
+        background:color,
+        color:"white",
+        padding:"2px 10px",
+        fontSize:11,
+        borderRadius:20
       }}
     >
       {children}
@@ -331,30 +400,30 @@ function Badge({
   )
 }
 
-const btnBlue = {
-  color: "#2563eb",
-  background: "transparent",
-  border: "none",
-  cursor: "pointer"
+const btnBlue={
+  color:"#2563eb",
+  background:"transparent",
+  border:"none",
+  cursor:"pointer"
 }
 
-const btnOrange = {
-  color: "#f59e0b",
-  background: "transparent",
-  border: "none",
-  cursor: "pointer"
+const btnOrange={
+  color:"#f59e0b",
+  background:"transparent",
+  border:"none",
+  cursor:"pointer"
 }
 
-const btnGreen = {
-  color: "green",
-  background: "transparent",
-  border: "none",
-  cursor: "pointer"
+const btnGreen={
+  color:"green",
+  background:"transparent",
+  border:"none",
+  cursor:"pointer"
 }
 
-const btnRed = {
-  color: "red",
-  background: "transparent",
-  border: "none",
-  cursor: "pointer"
+const btnRed={
+  color:"red",
+  background:"transparent",
+  border:"none",
+  cursor:"pointer"
 }
