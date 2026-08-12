@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UMWAMBARO Collections
 
-## Getting Started
+Production-oriented single-seller ecommerce storefront for Rwanda, built with Next.js, TypeScript and Supabase.
 
-First, run the development server:
+## Included
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Responsive UMWAMBARO storefront with warmer Rwanda-inspired colors
+- Supabase product catalog and Storage image uploads
+- New + Chaguwa/used product condition
+- Product gallery, filters, search and cart
+- Server-side checkout API
+- Atomic stock validation/decrement in PostgreSQL
+- Flat Supabase-backed orders, order items and customer views
+- Supabase Auth + `admin_users` authorization
+- RLS-protected admin product and order operations
+- Admin dashboard with live order/product statistics
+- Cash on Delivery checkout
+- Tokenless WhatsApp order handoff using `wa.me`
+- Popup-safe WhatsApp opening with a structured order message
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies with `npm install`.
+2. Copy `.env.example` to `.env.local`.
+3. Add the Supabase URL/key.
+4. Set `NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER` to the store admin's Rwanda number in international format, for example `2507XXXXXXXX`.
+5. Run `database/UMWAMBARO_FINAL_RESTORE.sql` in the Supabase SQL Editor.
+6. Create the admin user in Supabase Authentication and add that user's UUID to `public.admin_users`.
+7. Start with `npm run dev`.
+8. For production, run `npm run build` then `npm start`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## WhatsApp order flow
 
-## Learn More
+When the customer presses **Place Order**:
 
-To learn more about Next.js, take a look at the following resources:
+1. A blank WhatsApp tab is opened immediately to avoid popup blockers.
+2. The order is created atomically in Supabase.
+3. The tab is redirected to WhatsApp with a pre-filled structured order message.
+4. The customer/admin presses **Send** in WhatsApp.
+5. The storefront redirects to the order-success page.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The current flow does **not** use the WhatsApp Cloud API and therefore does not require a Meta access token, phone-number ID or approved template.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Browsers and WhatsApp do not allow a website to silently press the final Send button. The user must confirm/send the message in WhatsApp.
 
-## Deploy on Vercel
+## Database
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Use `database/UMWAMBARO_FINAL_RESTORE.sql` for the current database. Older scripts are kept under `database/legacy/` for reference only.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The final script includes product condition support, admin authorization, product/image RLS, the current flat order schema, order indexes and the atomic `place_order()` RPC.
+
+See `docs/PRODUCTION_SETUP.md` for the production checklist.

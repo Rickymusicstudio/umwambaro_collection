@@ -1,148 +1,38 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import {
-  getCart,
-  removeFromCart,
-  updateQuantity,
-} from "@/lib/cart"
-
-type CartItem = {
-  id: string
-  name: string
-  price: number
-  image_url: string
-  size?: string | null
-  quantity: number
-}
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import Container from "@/components/layout/Container";
+import CartItem from "@/components/cart/CartItem";
+import CartEmpty from "@/components/cart/CartEmpty";
+import CartSummary from "@/components/cart/CartSummary";
+import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
-  const [cart, setCart] = useState<CartItem[]>([])
-
-  useEffect(() => {
-    setCart(getCart())
-  }, [])
-
-  function refresh() {
-    setCart(getCart())
-  }
-
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  )
-
-  if (cart.length === 0) {
-    return <p style={{ padding: 40 }}>Your cart is empty</p>
-  }
+  const { items, subtotal, removeItem, updateQuantity } = useCart();
 
   return (
-    <div style={{ maxWidth: 900, margin: "auto", padding: 40 }}>
-
-      <h1 style={{ fontSize: 26, fontWeight: "bold", marginBottom: 30 }}>
-        Your Cart
-      </h1>
-
-      {cart.map((item) => (
-        <div
-          key={`${item.id}-${item.size ?? "nosize"}`}
-          style={{
-            display: "flex",
-            gap: 20,
-            alignItems: "center",
-            borderBottom: "1px solid #ddd",
-            padding: "20px 0",
-          }}
-        >
-          {/* IMAGE */}
-          <img
-            src={item.image_url || "/placeholder.png"}
-            style={{
-              width: 100,
-              height: 100,
-              objectFit: "cover",
-              borderRadius: 10,
-            }}
-          />
-
-          {/* INFO */}
-          <div style={{ flex: 1 }}>
-            <h2 style={{ fontWeight: "bold" }}>{item.name}</h2>
-            <p>{item.price} RWF</p>
-
-            {item.size && (
-              <p style={{ fontSize: 14, opacity: 0.7 }}>
-                Size: {item.size}
-              </p>
-            )}
-
-            <input
-              type="number"
-              min={1}
-              value={item.quantity ?? 1}
-              onChange={(e) => {
-                updateQuantity(
-                  item.id,
-                  item.size ?? null,
-                  Number(e.target.value)
-                )
-                refresh()
-              }}
-              style={{
-                marginTop: 8,
-                width: 60,
-                padding: 5,
-              }}
-            />
+    <main className="bg-neutral-50 py-10 sm:py-14">
+      <Container>
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#C9A14A]">Your selection</p>
+            <h1 className="mt-2 text-4xl font-semibold">Shopping Cart</h1>
           </div>
-
-          {/* REMOVE */}
-          <button
-            onClick={() => {
-              removeFromCart(item.id, item.size ?? null)
-              refresh()
-            }}
-            style={{
-              color: "red",
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-            }}
-          >
-            Remove
-          </button>
+          <Link href="/shop" className="hidden items-center gap-2 text-sm font-semibold hover:text-[#C9A14A] sm:flex"><ArrowLeft size={17} /> Continue shopping</Link>
         </div>
-      ))}
-
-      {/* TOTAL */}
-      <div
-        style={{
-          textAlign: "right",
-          marginTop: 30,
-          fontWeight: "bold",
-          fontSize: 18,
-        }}
-      >
-        Total: {total} RWF
-      </div>
-
-      {/* CHECKOUT */}
-      <a
-        href="/checkout"
-        style={{
-          display: "block",
-          marginTop: 20,
-          background: "black",
-          color: "white",
-          padding: 14,
-          textAlign: "center",
-          borderRadius: 8,
-          textDecoration: "none",
-        }}
-      >
-        Proceed to Checkout
-      </a>
-
-    </div>
-  )
+        {items.length === 0 ? (
+          <div className="rounded-3xl bg-white shadow-sm"><CartEmpty /></div>
+        ) : (
+          <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+            <div className="space-y-4">
+              {items.map((item) => <CartItem key={item.id} item={item} onRemove={removeItem} onQuantityChange={updateQuantity} />)}
+              <Link href="/shop" className="inline-flex items-center gap-2 pt-2 text-sm font-semibold hover:text-[#C9A14A]"><ArrowLeft size={16} /> Continue shopping</Link>
+            </div>
+            <div className="lg:sticky lg:top-28 lg:self-start"><CartSummary subtotal={subtotal} /></div>
+          </div>
+        )}
+      </Container>
+    </main>
+  );
 }
