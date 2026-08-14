@@ -1,0 +1,61 @@
+import Link from "next/link";
+import Container from "./Container";
+
+const categories = [
+  "Women",
+  "Men",
+  "Kids",
+  "Shoes",
+  "Bags",
+  "Accessories",
+  "Sale",
+];
+
+export default function CategoryNav() {
+  return (
+    <nav className="border-b bg-white">
+
+      <Container>
+
+        <ul className="flex h-14 items-center justify-center gap-10 overflow-auto">
+
+          <li>
+            <Link
+              href="/"
+              className="font-semibold hover:text-[#C9A14A]"
+            >
+              Home
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              href="/shop"
+              className="font-semibold hover:text-[#C9A14A]"
+            >
+              Shop
+            </Link>
+          </li>
+
+          {categories.map((category) => (
+
+            <li key={category}>
+
+              <Link
+                href={`/shop?category=${category}`}
+                className="hover:text-[#C9A14A]"
+              >
+                {category}
+              </Link>
+
+            </li>
+
+          ))}
+
+        </ul>
+
+      </Container>
+
+    </nav>
+  );
+}
