@@ -49,7 +49,7 @@
 }
 
 :root {
-  --background: oklch(0.955 0.02 75);
+  --background: #eef5f4;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0.005 80);
   --card-foreground: oklch(0.145 0 0);
@@ -134,88 +134,20 @@ body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
-/* ===== Color palettes =====
-   Every store color comes from these slots. The active palette is the
-   data-palette attribute on <html> (set in app/layout.tsx). */
-:root,
-[data-palette="chocolate"] {
-  --um-dark: #2b1810;          /* top bar */
-  --um-dark2: #4a2c1d;         /* menu bar */
-  --um-page: #f3e9dc;          /* page background */
-  --um-soft: #f7efe4;          /* soft panels */
-  --um-cta: #b3261e;           /* main buttons */
-  --um-cta-hover: #8f1d17;
-  --um-cta-text: #ffffff;
-  --um-accent: #c8a27a;        /* highlights, search button */
-  --um-accent-light: #e8d3b0;  /* small text on dark bars */
-  --um-strong: #9e2a1f;        /* icons, active links */
-  --um-link: #6b3e26;          /* links */
-  --um-line: #e3d5c3;          /* borders */
-  --um-muted: #6b5a4e;         /* secondary text */
-}
-[data-palette="forest"] {
-  --um-dark: #13261c; --um-dark2: #1f3a2b; --um-page: #f2efe6; --um-soft: #f8f5ee;
-  --um-cta: #c9a14a; --um-cta-hover: #b38c36; --um-cta-text: #13261c;
-  --um-accent: #c9a14a; --um-accent-light: #e9d9a8; --um-strong: #8a6a1f; --um-link: #2f5a43;
-  --um-line: #e2dccb; --um-muted: #5f6359;
-}
-[data-palette="navy"] {
-  --um-dark: #14213d; --um-dark2: #22335a; --um-page: #f1f3f7; --um-soft: #f7f8fb;
-  --um-cta: #e85d4a; --um-cta-hover: #cf4a38; --um-cta-text: #ffffff;
-  --um-accent: #f2a65a; --um-accent-light: #fcd9a8; --um-strong: #c4402f; --um-link: #2a4b8d;
-  --um-line: #d9dee8; --um-muted: #5a6275;
-}
-[data-palette="gold"] {
-  --um-dark: #111111; --um-dark2: #262626; --um-page: #f5f2ec; --um-soft: #faf8f4;
-  --um-cta: #b8893b; --um-cta-hover: #9c7230; --um-cta-text: #ffffff;
-  --um-accent: #d4b06a; --um-accent-light: #ecd9ae; --um-strong: #8c6420; --um-link: #5c4a2a;
-  --um-line: #e4ddd0; --um-muted: #635c52;
-}
-[data-palette="plum"] {
-  --um-dark: #3a1530; --um-dark2: #57204a; --um-page: #f6ecee; --um-soft: #fbf4f5;
-  --um-cta: #c2185b; --um-cta-hover: #a3144c; --um-cta-text: #ffffff;
-  --um-accent: #e8a0b4; --um-accent-light: #f6d3dc; --um-strong: #a3144c; --um-link: #6d2a5c;
-  --um-line: #ead7dc; --um-muted: #6e5a64;
-}
-[data-palette="sunflower"] {
-  --um-dark: #1f1f1f; --um-dark2: #333333; --um-page: #fbf7ea; --um-soft: #fffbef;
-  --um-cta: #f5c518; --um-cta-hover: #e0b20c; --um-cta-text: #1f1f1f;
-  --um-accent: #f5c518; --um-accent-light: #fde68a; --um-strong: #b7791f; --um-link: #4a4a4a;
-  --um-line: #ece4c8; --um-muted: #5e5a4c;
-}
-[data-palette="rwanda"] {
-  --um-dark: #00577f; --um-dark2: #0a73a8; --um-page: #eef6f9; --um-soft: #f6fbfd;
-  --um-cta: #fad201; --um-cta-hover: #e5bf00; --um-cta-text: #00405e;
-  --um-accent: #fad201; --um-accent-light: #ffe680; --um-strong: #20603d; --um-link: #00577f;
-  --um-line: #d4e6ee; --um-muted: #50636c;
-}
-[data-palette="mustard"] {
-  --um-dark: #3b2416; --um-dark2: #5a3a24; --um-page: #f8f0dc; --um-soft: #fcf6e8;
-  --um-cta: #e0a100; --um-cta-hover: #c78f00; --um-cta-text: #2b1810;
-  --um-accent: #e0a100; --um-accent-light: #f5d77a; --um-strong: #9a6b00; --um-link: #6b3e26;
-  --um-line: #eadfc3; --um-muted: #6b5a4e;
-}
-[data-palette="lemon"] {
-  --um-dark: #1e3d2f; --um-dark2: #2d5a45; --um-page: #f6f8ec; --um-soft: #fbfcf3;
-  --um-cta: #e9d634; --um-cta-hover: #d6c21d; --um-cta-text: #1e3d2f;
-  --um-accent: #e9d634; --um-accent-light: #f3ea94; --um-strong: #5d7a1f; --um-link: #2d5a45;
-  --um-line: #e1e6cc; --um-muted: #5a6355;
-}
-[data-palette="teal"] {
-  --um-dark: #0f3b3e; --um-dark2: #165a5e; --um-page: #eef5f4; --um-soft: #f6fbfa;
-  --um-cta: #f2a900; --um-cta-hover: #d99700; --um-cta-text: #0f3b3e;
-  --um-accent: #f2a900; --um-accent-light: #ffd77a; --um-strong: #b07a00; --um-link: #165a5e;
-  --um-line: #d3e3e1; --um-muted: #536664;
-}
-[data-palette="kitenge"] {
-  --um-dark: #1b1464; --um-dark2: #2e2391; --um-page: #fbf3e4; --um-soft: #fff9ee;
-  --um-cta: #ff6b1a; --um-cta-hover: #e25a0e; --um-cta-text: #ffffff;
-  --um-accent: #ffc914; --um-accent-light: #ffe27a; --um-strong: #d9480f; --um-link: #2e2391;
-  --um-line: #eadfca; --um-muted: #5d5870;
-}
-[data-palette="terracotta"] {
-  --um-dark: #4a2418; --um-dark2: #6b3423; --um-page: #f6ede2; --um-soft: #fbf5ee;
-  --um-cta: #c8553d; --um-cta-hover: #ad4630; --um-cta-text: #ffffff;
-  --um-accent: #e3b58f; --um-accent-light: #f2d6bd; --um-strong: #a3442f; --um-link: #6b3423;
-  --um-line: #ead9c8; --um-muted: #6d5c52;
+/* ===== Store colors: teal + amber =====
+   Every store color comes from these slots. */
+:root {
+  --um-dark: #0f3b3e;          /* top bar */
+  --um-dark2: #165a5e;         /* menu bar */
+  --um-page: #eef5f4;          /* page background */
+  --um-soft: #f6fbfa;          /* soft panels */
+  --um-cta: #f2a900;           /* main buttons */
+  --um-cta-hover: #d99700;
+  --um-cta-text: #0f3b3e;
+  --um-accent: #f2a900;        /* highlights, search button */
+  --um-accent-light: #ffd77a;  /* small text on dark bars */
+  --um-strong: #b07a00;        /* icons, active links */
+  --um-link: #165a5e;          /* links */
+  --um-line: #d3e3e1;          /* borders */
+  --um-muted: #536664;         /* secondary text */
 }
