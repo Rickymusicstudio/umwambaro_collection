@@ -6,6 +6,7 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import StoreChrome from "@/components/store/StoreChrome";
 import { siteConfig } from "@/constants/site";
+import PalettePicker from "@/components/store/PalettePicker";
 
 export const metadata: Metadata = {
   title: `${siteConfig.fullName} · ${siteConfig.tagline}`,
@@ -20,11 +21,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-[#f3e9dc] text-neutral-900 antialiased">
+    <html lang="en" data-palette="chocolate">
+      <body className="min-h-screen bg-[var(--um-page)] text-neutral-900 antialiased">
         <CartProvider>
           <StoreChrome>{children}</StoreChrome>
         </CartProvider>
+        <PalettePicker />
       </body>
     </html>
   );

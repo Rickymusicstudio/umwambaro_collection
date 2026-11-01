@@ -15,7 +15,7 @@ export default function ShopHero() {
 
       <div className="relative flex h-full items-center justify-center">
         <div className="text-center text-white">
-          <p className="mb-5 uppercase tracking-[0.45em] text-[#c8a27a]">
+          <p className="mb-5 uppercase tracking-[0.45em] text-[var(--um-accent)]">
             Discover
           </p>
 

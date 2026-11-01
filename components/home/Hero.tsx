@@ -39,7 +39,7 @@ export default function Hero() {
 
               <Link
                 href="/shop"
-                className="rounded-full border border-[#d7bfa7] bg-white/70 px-8 py-4 transition hover:border-[#c8a27a] hover:bg-white"
+                className="rounded-full border border-[#d7bfa7] bg-white/70 px-8 py-4 transition hover:border-[var(--um-accent)] hover:bg-white"
               >
                 Browse Products
               </Link>

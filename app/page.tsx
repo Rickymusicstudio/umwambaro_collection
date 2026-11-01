@@ -19,13 +19,13 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-7xl space-y-3 px-2 py-3 sm:space-y-4 sm:px-4 sm:py-4">
       {/* banner */}
-      <section className="relative overflow-hidden rounded-lg bg-gradient-to-r from-[#4a2c1d] to-[#37475a] text-white">
+      <section className="relative overflow-hidden rounded-lg bg-gradient-to-r from-[var(--um-dark2)] to-[var(--um-dark2)] text-white">
         <div className="relative z-10 max-w-xl p-5 sm:p-10">
-          <p className="text-sm font-semibold text-[#e8d3b0]">{siteConfig.fullName}</p>
+          <p className="text-sm font-semibold text-[var(--um-accent-light)]">{siteConfig.fullName}</p>
           <h1 className="mt-1 text-2xl font-extrabold leading-tight sm:text-4xl">{siteConfig.tagline}</h1>
           <p className="mt-2 text-sm text-neutral-200 sm:text-base">New and Chaguwa clothes. Pay when it arrives.</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Link href="/shop" className="rounded-full bg-[#b3261e] px-5 py-2.5 text-sm font-boldtext-white hover:bg-[#8f1d17]">Shop now</Link>
+            <Link href="/shop" className="rounded-full bg-[var(--um-cta)] px-5 py-2.5 text-sm font-boldtext-white hover:bg-[var(--um-cta-hover)]">Shop now</Link>
             <Link href="/shop?condition=chaguwa" className="rounded-full border border-white/60 px-5 py-2.5 text-sm font-bold hover:bg-white/10">Chaguwa deals</Link>
           </div>
         </div>
@@ -45,7 +45,7 @@ export default async function HomePage() {
         <div className="grid grid-cols-5 gap-2 sm:gap-4">
           {shopCategories.map((c) => (
             <Link key={c.name} href={`/shop?category=${encodeURIComponent(c.name)}`} className="group text-center">
-              <span className="relative mx-auto block aspect-square w-full max-w-[120px] overflow-hidden rounded-full bg-neutral-100 ring-2 ring-transparent group-hover:ring-[#c8a27a]">
+              <span className="relative mx-auto block aspect-square w-full max-w-[120px] overflow-hidden rounded-full bg-neutral-100 ring-2 ring-transparent group-hover:ring-[var(--um-accent)]">
                 <Image src={c.image} alt="" fill sizes="(max-width: 640px) 20vw, 120px" className="object-cover" />
               </span>
               <span className="mt-1.5 block text-xs font-semibold text-neutral-800 sm:text-sm">{c.name}</span>
@@ -67,7 +67,7 @@ export default async function HomePage() {
           <section className="rounded-lg bg-white p-3 sm:p-4">
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="text-lg font-bold sm:text-xl">Just arrived</h2>
-              <Link href="/shop?sort=newest" className="text-sm font-semibold text-[#6b3e26] hover:underline">See all</Link>
+              <Link href="/shop?sort=newest" className="text-sm font-semibold text-[var(--um-link)] hover:underline">See all</Link>
             </div>
             <ProductGrid products={(newIn.length ? newIn : products).slice(0, 20)} />
           </section>

@@ -253,16 +253,16 @@ export default function AdminGuard({
    * LOADING
    */
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f3e9dc]">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--um-page)]">
       <div className="text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#4a2c1d] text-white">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--um-dark2)] text-white">
           <Loader2
             size={25}
             className="animate-spin"
           />
         </div>
 
-        <p className="mt-4 text-sm font-medium text-[#6b5a4e]">
+        <p className="mt-4 text-sm font-medium text-[var(--um-muted)]">
           Checking admin access...
         </p>
 
@@ -288,20 +288,20 @@ function AccessCard({
   error?: boolean;
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f3e9dc] px-4">
-      <div className="w-full max-w-lg rounded-lg border border-[#e3d5c3] bg-[#ffffff] p-8 text-center shadow-sm">
+    <div className="flex min-h-screen items-center justify-center bg-[var(--um-page)] px-4">
+      <div className="w-full max-w-lg rounded-lg border border-[var(--um-line)] bg-[#ffffff] p-8 text-center shadow-sm">
         <ShieldCheck
           className={`mx-auto ${
-            error ? "text-red-500" : "text-[#4a2c1d]"
+            error ? "text-red-500" : "text-[var(--um-dark2)]"
           }`}
           size={42}
         />
 
-        <h1 className="mt-5 text-2xl font-semibold text-[#2b1810]">
+        <h1 className="mt-5 text-2xl font-semibold text-[var(--um-dark)]">
           {title}
         </h1>
 
-        <p className="mt-3 text-sm leading-6 text-[#6b5a4e]">
+        <p className="mt-3 text-sm leading-6 text-[var(--um-muted)]">
           {message}
         </p>
 
@@ -309,7 +309,7 @@ function AccessCard({
           <button
             type="button"
             onClick={onClick}
-            className="mt-6 rounded-xl bg-[#4a2c1d] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2b1810]"
+            className="mt-6 rounded-xl bg-[var(--um-dark2)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--um-dark)]"
           >
             {button}
           </button>

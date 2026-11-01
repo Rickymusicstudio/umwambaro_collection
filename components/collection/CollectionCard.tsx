@@ -34,7 +34,7 @@ export default function CollectionCard({
             {title}
           </h2>
 
-          <p className="mt-3 text-[#c8a27a]">
+          <p className="mt-3 text-[var(--um-accent)]">
             Explore →
           </p>
 

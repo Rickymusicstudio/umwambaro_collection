@@ -553,7 +553,7 @@ export default function AdminProducts() {
       >
         <div className="flex items-start justify-between gap-4 border-b border-neutral-100 pb-5">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9e2a1f]">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--um-strong)]">
               {editingId ? "Edit product" : "New product"}
             </p>
             <h3 className="mt-1 text-2xl font-semibold">
@@ -741,13 +741,13 @@ export default function AdminProducts() {
               disabled={uploading}
               className={`mt-5 flex min-h-36 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed px-5 py-6 text-center transition ${
                 dragging
-                  ? "border-[#9e2a1f] bg-amber-50"
+                  ? "border-[var(--um-strong)] bg-amber-50"
                   : "border-neutral-300 bg-white hover:border-neutral-500 hover:bg-neutral-50"
               } ${uploading ? "cursor-wait opacity-70" : "cursor-pointer"}`}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
                 {uploading ? (
-                  <Upload className="animate-pulse text-[#9e2a1f]" size={22} />
+                  <Upload className="animate-pulse text-[var(--um-strong)]" size={22} />
                 ) : (
                   <ImagePlus className="text-neutral-500" size={22} />
                 )}
@@ -812,7 +812,7 @@ export default function AdminProducts() {
                           onClick={() => setMainImage(url)}
                           className={`rounded-lg px-2 py-1.5 text-[11px] font-semibold ${
                             form.image === url
-                              ? "bg-[#4a2c1d] text-white"
+                              ? "bg-[var(--um-dark2)] text-white"
                               : "bg-neutral-100 text-neutral-700"
                           }`}
                         >
@@ -823,7 +823,7 @@ export default function AdminProducts() {
                           onClick={() => setHoverImage(url)}
                           className={`rounded-lg px-2 py-1.5 text-[11px] font-semibold ${
                             form.hoverImage === url
-                              ? "bg-[#9e2a1f] text-white"
+                              ? "bg-[var(--um-strong)] text-white"
                               : "bg-neutral-100 text-neutral-700"
                           }`}
                         >
@@ -882,7 +882,7 @@ export default function AdminProducts() {
           </div>
         </div>
 
-        <div className="mt-6 rounded-lg border border-[#e3d5c3] bg-[#ffffff] p-4 sm:p-5">
+        <div className="mt-6 rounded-lg border border-[var(--um-line)] bg-[#ffffff] p-4 sm:p-5">
           <div className="mb-4">
             <p className="text-sm font-semibold text-neutral-900">Homepage placement</p>
             <p className="mt-1 text-xs text-neutral-500">
@@ -1065,7 +1065,7 @@ function Toggle({
       <span
         className={`flex h-5 w-5 items-center justify-center rounded-md border transition ${
           checked
-            ? "border-black bg-[#4a2c1d] text-white"
+            ? "border-black bg-[var(--um-dark2)] text-white"
             : "border-neutral-300 bg-white"
         }`}
       >

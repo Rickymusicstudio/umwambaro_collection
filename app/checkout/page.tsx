@@ -119,13 +119,13 @@ export default function CheckoutPage() {
       <div className="mx-auto max-w-3xl px-2 py-6 sm:px-4">
         <div className="rounded-lg bg-white p-10 text-center">
           <h1 className="text-xl font-bold">Your cart is empty</h1>
-          <Link href="/shop" className="mt-5 inline-block rounded-full bg-[#b3261e] text-white px-6 py-3 font-bold">Start shopping</Link>
+          <Link href="/shop" className="mt-5 inline-block rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] px-6 py-3 font-bold">Start shopping</Link>
         </div>
       </div>
     );
   }
 
-  const input = "mt-1 h-12 w-full rounded-lg border border-neutral-400 bg-white px-3 text-base outline-none focus:border-[#b3261e] focus:ring-2 focus:ring-[#b3261e]/30";
+  const input = "mt-1 h-12 w-full rounded-lg border border-neutral-400 bg-white px-3 text-base outline-none focus:border-[var(--um-cta)] focus:ring-2 focus:ring-[var(--um-cta)]/30";
 
   return (
     <div className="mx-auto max-w-5xl px-2 py-3 sm:px-4 sm:py-4">
@@ -160,7 +160,7 @@ export default function CheckoutPage() {
 
           <section className="rounded-lg bg-white p-4 sm:p-5">
             <h2 className="text-lg font-bold">2. Payment</h2>
-            <div className="mt-3 flex items-center gap-3 rounded-lg border-2 border-[#b3261e] bg-[#fffaf2] p-3">
+            <div className="mt-3 flex items-center gap-3 rounded-lg border-2 border-[var(--um-cta)] bg-[#fffaf2] p-3">
               <Banknote className="text-[#067d62]" />
               <div><p className="font-bold">Pay on delivery</p><p className="text-sm text-neutral-600">Pay when your order arrives. We call you first to confirm.</p></div>
             </div>
@@ -184,7 +184,7 @@ export default function CheckoutPage() {
         </div>
 
         <aside className="h-fit rounded-lg bg-white p-4 lg:sticky lg:top-32">
-          <button disabled={loading || !zones?.length} className="w-full rounded-full bg-[#b3261e] text-white py-3 font-bold hover:bg-[#8f1d17] disabled:opacity-60">
+          <button disabled={loading || !zones?.length} className="w-full rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] py-3 font-bold hover:bg-[var(--um-cta-hover)] disabled:opacity-60">
             {loading ? "Placing order…" : "Place order"}
           </button>
           <p className="mt-2 text-center text-xs text-neutral-600">You pay when it arrives.</p>

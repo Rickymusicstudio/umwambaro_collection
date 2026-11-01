@@ -31,7 +31,7 @@ export default function Hero() {
             h-72
             w-72
             rounded-full
-            bg-[#c8a27a]/10
+            bg-[var(--um-accent)]/10
             blur-3xl
           "
         />
@@ -51,7 +51,7 @@ export default function Hero() {
             h-96
             w-96
             rounded-full
-            bg-[#c8a27a]/10
+            bg-[var(--um-accent)]/10
             blur-3xl
           "
         />
@@ -132,7 +132,7 @@ export default function Hero() {
             justify-center
             rounded-full
             border-2
-            border-[#c8a27a]
+            border-[var(--um-accent)]
           "
         >
           <motion.div
@@ -148,7 +148,7 @@ export default function Hero() {
               h-3
               w-3
               rounded-full
-              bg-[#c8a27a]
+              bg-[var(--um-accent)]
             "
           />
         </div>

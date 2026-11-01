@@ -12,7 +12,7 @@ export default async function TrendingProducts() {
   if (products.length === 0) return null;
 
   return (
-    <section className="bg-gradient-to-br from-[#f7efe4] via-[#f8f0f7] to-[#f5e8df] py-16 sm:py-20">
+    <section className="bg-gradient-to-br from-[var(--um-soft)] via-[#f8f0f7] to-[#f5e8df] py-16 sm:py-20">
       <Container>
         {/* Section Header */}
         <div className="mb-10 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
@@ -21,10 +21,10 @@ export default async function TrendingProducts() {
               <Flame
                 size={17}
                 strokeWidth={2}
-                className="text-[#c8a27a]"
+                className="text-[var(--um-accent)]"
               />
 
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c8a27a]">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--um-accent)]">
                 Trending
               </p>
             </div>
@@ -40,7 +40,7 @@ export default async function TrendingProducts() {
 
           <Link
             href="/shop?sort=trending"
-            className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-gray-900 transition-colors hover:text-[#c8a27a]"
+            className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-gray-900 transition-colors hover:text-[var(--um-accent)]"
           >
             View all
             <ArrowRight

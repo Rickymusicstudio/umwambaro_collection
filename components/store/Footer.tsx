@@ -7,8 +7,8 @@ export default function Footer() {
   const socials = Object.entries(social).filter(([, url]) => url);
 
   return (
-    <footer className="mt-10 bg-[#4a2c1d] pb-20 text-sm text-neutral-200 sm:pb-0">
-      <a href="#top" className="block bg-[#37475a] py-3 text-center font-medium text-white hover:bg-[#485769]">
+    <footer className="mt-10 bg-[var(--um-dark2)] pb-20 text-sm text-neutral-200 sm:pb-0">
+      <a href="#top" className="block bg-[var(--um-dark2)] py-3 text-center font-medium text-white hover:bg-[#485769]">
         Back to top
       </a>
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">

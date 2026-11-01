@@ -137,8 +137,8 @@ export default function FilterSidebar({
               }
               className={`rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition ${
                 filters.condition === option.value
-                  ? "border-[#c8a27a] bg-[#fff7e8] text-[#8a681f]"
-                  : "border-neutral-200 bg-white hover:border-[#c8a27a]"
+                  ? "border-[var(--um-accent)] bg-[#fff7e8] text-[#8a681f]"
+                  : "border-neutral-200 bg-white hover:border-[var(--um-accent)]"
               }`}
             >
               {option.label}

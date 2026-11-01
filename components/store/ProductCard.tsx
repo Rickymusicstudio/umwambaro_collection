@@ -41,13 +41,13 @@ export default function ProductCard({ product, priority = false }: { product: Pr
         <span className="absolute left-2 top-2 flex flex-col items-start gap-1">
           {off > 0 && <span className="rounded bg-[#cc0c39] px-1.5 py-0.5 text-xs font-bold text-white">-{off}%</span>}
           {product.condition === "chaguwa"
-            ? <span className="rounded bg-[#4a2c1d] px-1.5 py-0.5 text-[11px] font-bold text-white">Chaguwa</span>
+            ? <span className="rounded bg-[var(--um-dark2)] px-1.5 py-0.5 text-[11px] font-bold text-white">Chaguwa</span>
             : product.isNew && <span className="rounded bg-[#067d62] px-1.5 py-0.5 text-[11px] font-bold text-white">New</span>}
         </span>
       </Link>
 
       <div className="flex flex-1 flex-col gap-1 p-2.5">
-        <Link href={`/shop/${product.slug}`} className="line-clamp-2 text-sm leading-snug text-neutral-900 hover:text-[#9e2a1f]">
+        <Link href={`/shop/${product.slug}`} className="line-clamp-2 text-sm leading-snug text-neutral-900 hover:text-[var(--um-strong)]">
           {product.name}
         </Link>
         <div className="mt-auto pt-1">
@@ -56,15 +56,15 @@ export default function ProductCard({ product, priority = false }: { product: Pr
           {soldOut ? (
             <p className="mt-1 text-xs font-semibold text-[#cc0c39]">Sold out</p>
           ) : product.stock <= 3 ? (
-            <p className="mt-1 text-xs font-semibold text-[#9e2a1f]">Only {product.stock} left</p>
+            <p className="mt-1 text-xs font-semibold text-[var(--um-strong)]">Only {product.stock} left</p>
           ) : null}
         </div>
         {!soldOut && (needsChoice ? (
-          <Link href={`/shop/${product.slug}`} className="mt-2 rounded-full bg-[#b3261e] py-2 text-center text-sm font-semiboldtext-white hover:bg-[#8f1d17]">
+          <Link href={`/shop/${product.slug}`} className="mt-2 rounded-full bg-[var(--um-cta)] py-2 text-center text-sm font-semibold text-[var(--um-cta-text)] hover:bg-[var(--um-cta-hover)]">
             Choose size
           </Link>
         ) : (
-          <button onClick={add} className="mt-2 flex items-center justify-center gap-1.5 rounded-full bg-[#b3261e] py-2 text-sm font-semiboldtext-white hover:bg-[#8f1d17]">
+          <button onClick={add} className="mt-2 flex items-center justify-center gap-1.5 rounded-full bg-[var(--um-cta)] py-2 text-sm font-semibold text-[var(--um-cta-text)] hover:bg-[var(--um-cta-hover)]">
             {added ? <><Check size={16} /> Added</> : <><ShoppingCart size={16} /> Add to cart</>}
           </button>
         ))}
@@ -88,7 +88,7 @@ export function ProductRow({ title, href, products }: { title: string; href: str
     <section className="rounded-lg bg-white p-3 sm:p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3">
         <h2 className="text-lg font-bold text-neutral-900 sm:text-xl">{title}</h2>
-        <Link href={href} className="text-sm font-semibold text-[#6b3e26] hover:text-[#9e2a1f] hover:underline">See all</Link>
+        <Link href={href} className="text-sm font-semibold text-[var(--um-link)] hover:text-[var(--um-strong)] hover:underline">See all</Link>
       </div>
       <div className="no-scrollbar -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:gap-3">
         {products.slice(0, 12).map((p) => (

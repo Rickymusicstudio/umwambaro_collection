@@ -50,7 +50,7 @@ function Track() {
   }
 
   const stepIndex = result ? steps.findIndex((s) => s.key === result.status) : -1;
-  const input = "mt-1 h-12 w-full rounded-lg border border-neutral-400 px-3 text-base outline-none focus:border-[#b3261e] focus:ring-2 focus:ring-[#b3261e]/30";
+  const input = "mt-1 h-12 w-full rounded-lg border border-neutral-400 px-3 text-base outline-none focus:border-[var(--um-cta)] focus:ring-2 focus:ring-[var(--um-cta)]/30";
 
   return (
     <div className="mx-auto max-w-2xl space-y-3 px-2 py-4 sm:px-4">
@@ -61,7 +61,7 @@ function Track() {
           <label className="text-sm font-semibold">Order number<input className={input} value={order} onChange={(e) => setOrder(e.target.value)} placeholder="UMW-…" /></label>
           <label className="text-sm font-semibold">Phone used for the order<input className={input} value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" inputMode="tel" placeholder="0788 123 456" /></label>
         </div>
-        <button disabled={loading} className="mt-4 w-full rounded-full bg-[#b3261e] text-white py-3 font-bold hover:bg-[#8f1d17] disabled:opacity-60">{loading ? "Searching…" : "Track order"}</button>
+        <button disabled={loading} className="mt-4 w-full rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] py-3 font-bold hover:bg-[var(--um-cta-hover)] disabled:opacity-60">{loading ? "Searching…" : "Track order"}</button>
         {message && <p className="mt-3 rounded-lg bg-[#fff3f3] p-3 text-sm font-semibold text-[#cc0c39]">{message}</p>}
       </form>
 

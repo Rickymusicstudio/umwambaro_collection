@@ -22,7 +22,7 @@ export function Logo({ small = false }: { small?: boolean }) {
       <span className={`${small ? "text-lg" : "text-xl sm:text-2xl"} font-extrabold tracking-tight`}>
         UMWAMBARO
       </span>
-      <span className="mt-0.5 h-1 w-full rounded-full bg-[#c8a27a]" />
+      <span className="mt-0.5 h-1 w-full rounded-full bg-[var(--um-accent)]" />
     </Link>
   );
 }
@@ -44,7 +44,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="bg-[#2b1810] text-white">
+      <div className="bg-[var(--um-dark)] text-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2 sm:flex-nowrap sm:gap-4 sm:px-4">
           <Logo />
 
@@ -62,7 +62,7 @@ export default function Header() {
               aria-label="Search products"
               className="min-w-0 flex-1 px-3 text-[15px] text-neutral-900 outline-none placeholder:text-neutral-500"
             />
-            <button type="submit" aria-label="Search" className="grid w-12 place-items-center bg-[#e8d3b0] text-[#2b1810] hover:bg-[#f3a847]">
+            <button type="submit" aria-label="Search" className="grid w-12 place-items-center bg-[var(--um-accent-light)] text-[var(--um-dark)] hover:bg-[#f3a847]">
               <Search size={22} />
             </button>
           </form>
@@ -77,7 +77,7 @@ export default function Header() {
             </Link>
             <Link href="/cart" aria-label={`Cart, ${totalItems} items`} className="relative flex items-end gap-1 rounded px-2 py-1 hover:outline hover:outline-1 hover:outline-white">
               <ShoppingCart size={30} />
-              <span className="absolute left-[18px] top-0 min-w-5 rounded-full bg-[#c8a27a] px-1 text-center text-xs font-bold text-[#2b1810]">
+              <span className="absolute left-[18px] top-0 min-w-5 rounded-full bg-[var(--um-accent)] px-1 text-center text-xs font-bold text-[var(--um-dark)]">
                 {totalItems}
               </span>
               <strong className="hidden text-sm sm:inline">Cart</strong>
@@ -87,7 +87,7 @@ export default function Header() {
       </div>
 
       {/* category strip – swipe on phones */}
-      <nav aria-label="Categories" className="bg-[#4a2c1d] text-white">
+      <nav aria-label="Categories" className="bg-[var(--um-dark2)] text-white">
         <div className="no-scrollbar mx-auto flex max-w-7xl gap-1 overflow-x-auto px-2 py-1.5 sm:px-4">
           {quickLinks.map((l) => {
             const active = current === l.href || (l.href === "/shop" && current === "/shop");
@@ -96,7 +96,7 @@ export default function Header() {
                 key={l.href}
                 href={l.href}
                 className={`shrink-0 whitespace-nowrap rounded px-3 py-1.5 text-sm font-medium ${
-                  active ? "bg-white text-[#2b1810]" : "hover:outline hover:outline-1 hover:outline-white"
+                  active ? "bg-white text-[var(--um-dark)]" : "hover:outline hover:outline-1 hover:outline-white"
                 }`}
               >
                 {l.label}

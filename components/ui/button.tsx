@@ -43,10 +43,10 @@ export interface ButtonProps
 
 const variants = {
   primary:
-    "bg-[#b3261e] text-white hover:bg-[#8f1d17]",
+    "bg-[var(--um-cta)] text-[var(--um-cta-text)] hover:bg-[var(--um-cta-hover)]",
 
   secondary:
-    "bg-[#4a2c1d] text-white hover:bg-[#2b1810]",
+    "bg-[var(--um-dark2)] text-white hover:bg-[var(--um-dark)]",
 
   outline:
     "border border-neutral-300 bg-white hover:bg-neutral-100",
