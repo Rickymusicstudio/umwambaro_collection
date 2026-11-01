@@ -21,20 +21,20 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-[#eaeded] text-neutral-900">
+      <div className="min-h-screen bg-[#f3e9dc] text-neutral-900">
         <div className="flex min-h-screen">
           {/* computer: sidebar */}
-          <aside className="hidden w-60 shrink-0 bg-[#131921] text-white lg:block">
+          <aside className="hidden w-60 shrink-0 bg-[#2b1810] text-white lg:block">
             <div className="sticky top-0 flex h-screen flex-col p-4">
               <Link href="/admin" className="px-2 pb-4">
                 <span className="block text-xl font-extrabold">UMWAMBARO</span>
-                <span className="mt-0.5 block h-1 w-full rounded-full bg-[#ff9900]" />
-                <span className="mt-2 block text-xs font-semibold uppercase tracking-wider text-[#febd69]">Seller admin</span>
+                <span className="mt-0.5 block h-1 w-full rounded-full bg-[#c8a27a]" />
+                <span className="mt-2 block text-xs font-semibold uppercase tracking-wider text-[#e8d3b0]">Seller admin</span>
               </Link>
               <nav className="mt-4 space-y-1">
                 {links.map(({ href, label, icon: Icon }) => (
                   <Link key={href} href={href}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold ${isActive(href) ? "bg-[#ff9900] text-[#131921]" : "text-neutral-300 hover:bg-white/10 hover:text-white"}`}>
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold ${isActive(href) ? "bg-[#c8a27a] text-[#2b1810]" : "text-neutral-300 hover:bg-white/10 hover:text-white"}`}>
                     <Icon size={18} /> {label}
                   </Link>
                 ))}
@@ -47,8 +47,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
           <main className="min-w-0 flex-1 pb-20 lg:pb-0">
             {/* phone: top bar */}
-            <div className="flex items-center justify-between bg-[#131921] px-4 py-3 text-white lg:hidden">
-              <Link href="/admin" className="font-extrabold">UMWAMBARO <span className="text-[#febd69]">admin</span></Link>
+            <div className="flex items-center justify-between bg-[#2b1810] px-4 py-3 text-white lg:hidden">
+              <Link href="/admin" className="font-extrabold">UMWAMBARO <span className="text-[#e8d3b0]">admin</span></Link>
               <Link href="/" target="_blank" className="text-sm text-neutral-300">View store</Link>
             </div>
             {children}
@@ -58,7 +58,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         {/* phone: bottom tabs */}
         <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
           {links.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className={`flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold ${isActive(href) ? "text-[#c45500]" : "text-neutral-600"}`}>
+            <Link key={href} href={href} className={`flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold ${isActive(href) ? "text-[#9e2a1f]" : "text-neutral-600"}`}>
               <Icon size={21} /> {label}
             </Link>
           ))}

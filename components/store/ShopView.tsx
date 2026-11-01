@@ -98,7 +98,7 @@ export default function ShopView({ products }: { products: Product[] }) {
           <div className="flex flex-wrap gap-2">
             {sizes.map((s) => (
               <button key={s} onClick={() => set("size", size === s ? "" : s)}
-                className={`min-w-11 rounded border px-2 py-1.5 font-semibold ${size === s ? "border-[#c45500] bg-[#fff3e0] text-[#c45500]" : "border-neutral-300 bg-white"}`}>
+                className={`min-w-11 rounded border px-2 py-1.5 font-semibold ${size === s ? "border-[#9e2a1f] bg-[#fff3e0] text-[#9e2a1f]" : "border-neutral-300 bg-white"}`}>
                 {s}
               </button>
             ))}
@@ -106,7 +106,7 @@ export default function ShopView({ products }: { products: Product[] }) {
         </div>
       )}
       <label className="flex items-center gap-2 font-semibold">
-        <input type="checkbox" checked={sale} onChange={(e) => set("sale", e.target.checked ? "true" : "")} className="h-5 w-5 accent-[#c45500]" />
+        <input type="checkbox" checked={sale} onChange={(e) => set("sale", e.target.checked ? "true" : "")} className="h-5 w-5 accent-[#9e2a1f]" />
         Deals only
       </label>
     </div>
@@ -117,7 +117,7 @@ export default function ShopView({ products }: { products: Product[] }) {
       <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg bg-white p-3">
         <p className="mr-auto text-sm text-neutral-700">
           <strong>{list.length}</strong> {list.length === 1 ? "result" : "results"}
-          {q && <> for <strong className="text-[#c45500]">&ldquo;{q}&rdquo;</strong></>}
+          {q && <> for <strong className="text-[#9e2a1f]">&ldquo;{q}&rdquo;</strong></>}
         </p>
         <button onClick={() => setOpen(true)} className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-sm font-semibold lg:hidden">
           <SlidersHorizontal size={16} /> Filters{chips.length ? ` (${chips.length})` : ""}
@@ -131,11 +131,11 @@ export default function ShopView({ products }: { products: Product[] }) {
       {chips.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-2">
           {chips.map((c) => (
-            <button key={c.label} onClick={c.clear} className="flex items-center gap-1 rounded-full bg-[#232f3e] px-3 py-1 text-xs font-semibold text-white">
+            <button key={c.label} onClick={c.clear} className="flex items-center gap-1 rounded-full bg-[#4a2c1d] px-3 py-1 text-xs font-semibold text-white">
               {c.label} <X size={14} />
             </button>
           ))}
-          <button onClick={clearAll} className="text-xs font-semibold text-[#007185] hover:underline">Clear all</button>
+          <button onClick={clearAll} className="text-xs font-semibold text-[#6b3e26] hover:underline">Clear all</button>
         </div>
       )}
 
@@ -146,7 +146,7 @@ export default function ShopView({ products }: { products: Product[] }) {
             <div className="rounded-lg bg-white p-10 text-center">
               <p className="text-lg font-bold">No products found</p>
               <p className="mt-1 text-sm text-neutral-600">Try another word or remove a filter.</p>
-              {chips.length > 0 && <button onClick={clearAll} className="mt-4 rounded-full bg-[#ffd814] px-5 py-2 text-sm font-bold">Clear filters</button>}
+              {chips.length > 0 && <button onClick={clearAll} className="mt-4 rounded-full bg-[#b3261e] text-white px-5 py-2 text-sm font-bold">Clear filters</button>}
             </div>
           )}
         </div>
@@ -160,7 +160,7 @@ export default function ShopView({ products }: { products: Product[] }) {
               <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-10 w-10 place-items-center"><X /></button>
             </div>
             {filters}
-            <button onClick={() => setOpen(false)} className="mt-6 w-full rounded-full bg-[#ffd814] py-3 font-bold">
+            <button onClick={() => setOpen(false)} className="mt-6 w-full rounded-full bg-[#b3261e] text-white py-3 font-bold">
               Show {list.length} results
             </button>
           </div>
@@ -176,7 +176,7 @@ function FilterGroup({ title, children }: { title: string; children: React.React
 
 function Option({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={`text-left ${active ? "font-bold text-[#c45500]" : "text-neutral-700 hover:text-[#c45500]"}`}>
+    <button onClick={onClick} className={`text-left ${active ? "font-bold text-[#9e2a1f]" : "text-neutral-700 hover:text-[#9e2a1f]"}`}>
       {children}
     </button>
   );

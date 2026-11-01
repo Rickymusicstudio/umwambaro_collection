@@ -46,7 +46,7 @@ export default function ProductDetail({ product }: { product: Product }) {
           <div className="no-scrollbar mt-2 flex gap-2 overflow-x-auto">
             {images.map((src, i) => (
               <button key={src} onClick={() => setActive(i)} aria-label={`Photo ${i + 1}`}
-                className={`relative h-16 w-16 shrink-0 overflow-hidden rounded border-2 ${i === active ? "border-[#ff9900]" : "border-transparent"}`}>
+                className={`relative h-16 w-16 shrink-0 overflow-hidden rounded border-2 ${i === active ? "border-[#c8a27a]" : "border-transparent"}`}>
                 <Image src={src} alt="" fill sizes="64px" className="object-cover" />
               </button>
             ))}
@@ -56,13 +56,13 @@ export default function ProductDetail({ product }: { product: Product }) {
 
       {/* details */}
       <div>
-        <Link href={`/shop?category=${encodeURIComponent(product.category)}`} className="text-sm font-semibold text-[#007185] hover:underline">
+        <Link href={`/shop?category=${encodeURIComponent(product.category)}`} className="text-sm font-semibold text-[#6b3e26] hover:underline">
           {product.category}
         </Link>
         <h1 className="mt-1 text-xl font-semibold leading-snug text-neutral-900 sm:text-2xl">{product.name}</h1>
         <div className="mt-2 flex flex-wrap gap-2">
           {product.condition === "chaguwa"
-            ? <span className="rounded bg-[#232f3e] px-2 py-0.5 text-xs font-bold text-white">Chaguwa (used, good condition)</span>
+            ? <span className="rounded bg-[#4a2c1d] px-2 py-0.5 text-xs font-bold text-white">Chaguwa (used, good condition)</span>
             : <span className="rounded bg-[#067d62] px-2 py-0.5 text-xs font-bold text-white">New</span>}
           {product.brand && <span className="rounded bg-neutral-100 px-2 py-0.5 text-xs font-semibold">{product.brand}</span>}
         </div>
@@ -79,7 +79,7 @@ export default function ProductDetail({ product }: { product: Product }) {
             <div className="flex flex-wrap gap-2">
               {product.sizes.map((s) => (
                 <button key={s} onClick={() => { setSize(s); setError(""); }}
-                  className={`min-w-12 rounded-lg border-2 px-3 py-2 text-sm font-bold ${size === s ? "border-[#c45500] bg-[#fff3e0]" : "border-neutral-300 bg-white"}`}>{s}</button>
+                  className={`min-w-12 rounded-lg border-2 px-3 py-2 text-sm font-bold ${size === s ? "border-[#9e2a1f] bg-[#fff3e0]" : "border-neutral-300 bg-white"}`}>{s}</button>
               ))}
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function ProductDetail({ product }: { product: Product }) {
             <div className="flex flex-wrap gap-2">
               {product.colors.map((c) => (
                 <button key={c} onClick={() => { setColor(c); setError(""); }}
-                  className={`rounded-lg border-2 px-3 py-2 text-sm font-bold ${color === c ? "border-[#c45500] bg-[#fff3e0]" : "border-neutral-300 bg-white"}`}>{c}</button>
+                  className={`rounded-lg border-2 px-3 py-2 text-sm font-bold ${color === c ? "border-[#9e2a1f] bg-[#fff3e0]" : "border-neutral-300 bg-white"}`}>{c}</button>
               ))}
             </div>
           </div>
@@ -122,8 +122,8 @@ export default function ProductDetail({ product }: { product: Product }) {
                 </div>
               </div>
             )}
-            {error && <p className="mt-3 rounded bg-[#fff3e0] p-2 text-sm font-semibold text-[#c45500]">{error}</p>}
-            <button onClick={() => add(false)} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#ffd814] py-3 font-bold hover:bg-[#f7ca00]">
+            {error && <p className="mt-3 rounded bg-[#fff3e0] p-2 text-sm font-semibold text-[#9e2a1f]">{error}</p>}
+            <button onClick={() => add(false)} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#b3261e] text-white py-3 font-bold hover:bg-[#8f1d17]">
               {added ? <><Check size={18} /> Added to cart</> : "Add to cart"}
             </button>
             <button onClick={() => add(true)} className="mt-2 w-full rounded-full bg-[#ffa41c] py-3 font-bold hover:bg-[#fa8900]">Buy now</button>
@@ -140,7 +140,7 @@ export default function ProductDetail({ product }: { product: Product }) {
       {!soldOut && (
         <div className="fixed inset-x-0 bottom-[60px] z-30 flex items-center gap-3 border-t border-neutral-200 bg-white p-3 md:hidden">
           <p className="text-lg font-bold">{rwf(product.price)}</p>
-          <button onClick={() => add(false)} className="flex-1 rounded-full bg-[#ffd814] py-3 text-sm font-bold">
+          <button onClick={() => add(false)} className="flex-1 rounded-full bg-[#b3261e] text-white py-3 text-sm font-bold">
             {added ? "Added ✓" : "Add to cart"}
           </button>
         </div>

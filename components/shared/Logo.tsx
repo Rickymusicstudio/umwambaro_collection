@@ -30,7 +30,7 @@ export default function Logo() {
           text-[8px]
           uppercase
           tracking-[0.35em]
-          text-[#C9A14A]
+          text-[#c8a27a]
           sm:mt-1.5
           sm:text-[10px]
           sm:tracking-[0.45em]

@@ -13,7 +13,7 @@ export default function StoreChrome({ children }: { children: ReactNode }) {
   return (
     <>
       <div id="top" />
-      <Suspense fallback={<div className="h-[104px] bg-[#131921]" />}>
+      <Suspense fallback={<div className="h-[104px] bg-[#2b1810]" />}>
         <Header />
       </Suspense>
       <main className="min-h-[60vh]">{children}</main>

@@ -21,10 +21,10 @@ export default async function BestSellers() {
               <Star
                 size={17}
                 strokeWidth={2}
-                className="text-[#C9A14A]"
+                className="text-[#c8a27a]"
               />
 
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#C9A14A]">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#c8a27a]">
                 Customer Favorites
               </p>
             </div>
@@ -40,7 +40,7 @@ export default async function BestSellers() {
 
           <Link
             href="/shop?sort=best-selling"
-            className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-gray-900 transition-colors hover:text-[#C9A14A]"
+            className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-gray-900 transition-colors hover:text-[#c8a27a]"
           >
             View all
             <ArrowRight

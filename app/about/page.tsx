@@ -21,13 +21,13 @@ export default function AboutPage() {
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
           {points.map(({ icon: Icon, title, text }) => (
             <div key={title} className="rounded-lg border border-neutral-200 p-4">
-              <Icon className="text-[#c45500]" />
+              <Icon className="text-[#9e2a1f]" />
               <p className="mt-2 font-bold">{title}</p>
               <p className="mt-1 text-sm text-neutral-600">{text}</p>
             </div>
           ))}
         </div>
-        <Link href="/shop" className="mt-6 inline-block rounded-full bg-[#ffd814] px-6 py-3 font-bold">Start shopping</Link>
+        <Link href="/shop" className="mt-6 inline-block rounded-full bg-[#b3261e] text-white px-6 py-3 font-bold">Start shopping</Link>
       </section>
     </div>
   );

@@ -22,7 +22,7 @@ export default function CategoryNav() {
           <li>
             <Link
               href="/"
-              className="font-semibold hover:text-[#C9A14A]"
+              className="font-semibold hover:text-[#c8a27a]"
             >
               Home
             </Link>
@@ -31,7 +31,7 @@ export default function CategoryNav() {
           <li>
             <Link
               href="/shop"
-              className="font-semibold hover:text-[#C9A14A]"
+              className="font-semibold hover:text-[#c8a27a]"
             >
               Shop
             </Link>
@@ -43,7 +43,7 @@ export default function CategoryNav() {
 
               <Link
                 href={`/shop?category=${category}`}
-                className="hover:text-[#C9A14A]"
+                className="hover:text-[#c8a27a]"
               >
                 {category}
               </Link>

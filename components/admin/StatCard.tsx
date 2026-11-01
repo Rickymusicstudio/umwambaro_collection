@@ -9,7 +9,7 @@ export default function StatCard({ label, value, hint, icon }: { label: string; 
           <p className="mt-1 text-xl font-bold tracking-tight sm:mt-2 sm:text-3xl">{value}</p>
           {hint && <p className="mt-1 text-xs text-neutral-500">{hint}</p>}
         </div>
-        <div className="hidden rounded-xl bg-[#c45500]/10 p-3 text-[#c45500] sm:block">{icon}</div>
+        <div className="hidden rounded-xl bg-[#9e2a1f]/10 p-3 text-[#9e2a1f] sm:block">{icon}</div>
       </div>
     </div>
   );

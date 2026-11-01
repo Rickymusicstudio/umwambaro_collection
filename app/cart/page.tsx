@@ -16,14 +16,14 @@ export default function CartPage() {
           <ShoppingCart className="mx-auto text-neutral-300" size={56} />
           <h1 className="mt-4 text-xl font-bold">Your cart is empty</h1>
           <p className="mt-1 text-neutral-600">Find something you like and add it here.</p>
-          <Link href="/shop" className="mt-5 inline-block rounded-full bg-[#ffd814] px-6 py-3 font-bold hover:bg-[#f7ca00]">Start shopping</Link>
+          <Link href="/shop" className="mt-5 inline-block rounded-full bg-[#b3261e] text-white px-6 py-3 font-bold hover:bg-[#8f1d17]">Start shopping</Link>
         </div>
       </div>
     );
   }
 
   const checkout = (
-    <Link href="/checkout" className="block w-full rounded-full bg-[#ffd814] py-3 text-center font-bold hover:bg-[#f7ca00]">
+    <Link href="/checkout" className="block w-full rounded-full bg-[#b3261e] text-white py-3 text-center font-bold hover:bg-[#8f1d17]">
       Proceed to checkout ({totalItems} {totalItems === 1 ? "item" : "items"})
     </Link>
   );
@@ -41,13 +41,13 @@ export default function CartPage() {
                   {img && <Image src={img} alt={item.product.name} fill sizes="128px" className="object-cover" />}
                 </Link>
                 <div className="min-w-0 flex-1">
-                  <Link href={`/shop/${item.product.slug}`} className="line-clamp-2 font-medium hover:text-[#c45500]">{item.product.name}</Link>
+                  <Link href={`/shop/${item.product.slug}`} className="line-clamp-2 font-medium hover:text-[#9e2a1f]">{item.product.name}</Link>
                   <p className="mt-0.5 text-xs text-neutral-600">
                     {[item.size && `Size ${item.size}`, item.color, item.product.condition === "chaguwa" ? "Chaguwa" : null].filter(Boolean).join(" · ")}
                   </p>
                   <p className="mt-1 font-bold">{rwf(item.product.price)}</p>
                   <div className="mt-2 flex items-center gap-3">
-                    <div className="flex items-center rounded-full border-2 border-[#ffd814]">
+                    <div className="flex items-center rounded-full border-2 border-[#b3261e]">
                       <button onClick={() => updateQuantity(item.id, item.quantity - 1)} aria-label="Less" className="grid h-8 w-9 place-items-center">
                         {item.quantity === 1 ? <Trash2 size={15} /> : <Minus size={15} />}
                       </button>
@@ -56,7 +56,7 @@ export default function CartPage() {
                         <Plus size={15} />
                       </button>
                     </div>
-                    <button onClick={() => removeItem(item.id)} className="text-xs font-semibold text-[#007185] hover:underline">Remove</button>
+                    <button onClick={() => removeItem(item.id)} className="text-xs font-semibold text-[#6b3e26] hover:underline">Remove</button>
                   </div>
                 </div>
               </li>

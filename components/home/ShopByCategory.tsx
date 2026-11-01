@@ -56,7 +56,7 @@ export default function ShopByCategory() {
         {/* Section heading */}
         <div className="mb-10 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-[#C9A14A]">
+            <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-[#c8a27a]">
               Explore
             </p>
 
@@ -72,7 +72,7 @@ export default function ShopByCategory() {
 
           <Link
             href="/shop"
-            className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-gray-900 transition-colors hover:text-[#C9A14A]"
+            className="group inline-flex w-fit items-center gap-2 text-sm font-semibold text-gray-900 transition-colors hover:text-[#c8a27a]"
           >
             View all products
             <ArrowRight

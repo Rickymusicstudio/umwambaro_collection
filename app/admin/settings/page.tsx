@@ -67,24 +67,24 @@ export default function AdminSettingsPage() {
         <section className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="flex items-center gap-2 text-lg font-bold"><Truck size={20} className="text-[#c45500]" /> Delivery fees</h2>
+              <h2 className="flex items-center gap-2 text-lg font-bold"><Truck size={20} className="text-[#9e2a1f]" /> Delivery fees</h2>
               <p className="text-sm text-neutral-500">The fee customers pay for each district. Set 0 for free delivery. Turn a district off to stop delivering there.</p>
             </div>
             <button onClick={save} disabled={!changed.length || saving}
-              className="rounded-full bg-[#ffd814] px-5 py-2.5 text-sm font-bold hover:bg-[#f7ca00] disabled:opacity-50">
+              className="rounded-full bg-[#b3261e] text-white px-5 py-2.5 text-sm font-bold hover:bg-[#8f1d17] disabled:opacity-50">
               {saving ? "Saving…" : changed.length ? `Save ${changed.length} change${changed.length === 1 ? "" : "s"}` : "Saved"}
             </button>
           </div>
 
           {provinces.length > 0 && (
-            <div className="mt-4 flex flex-wrap items-end gap-2 rounded-lg bg-[#f0f2f2] p-3 text-sm">
+            <div className="mt-4 flex flex-wrap items-end gap-2 rounded-lg bg-[#f7efe4] p-3 text-sm">
               <span className="font-semibold">Quick set:</span>
-              <select value={bulk.province} onChange={(e) => setBulk({ ...bulk, province: e.target.value })} className="h-10 rounded-lg border border-[#a6a6a6] bg-white px-2">
+              <select value={bulk.province} onChange={(e) => setBulk({ ...bulk, province: e.target.value })} className="h-10 rounded-lg border border-[#bfae98] bg-white px-2">
                 {provinces.map((p) => <option key={p}>{p}</option>)}
               </select>
               <input type="number" min={0} step={500} inputMode="numeric" placeholder="Fee (RWF)" value={bulk.fee}
-                onChange={(e) => setBulk({ ...bulk, fee: e.target.value })} className="h-10 w-32 rounded-lg border border-[#a6a6a6] bg-white px-2" />
-              <button onClick={applyBulk} className="h-10 rounded-lg bg-[#232f3e] px-4 font-semibold text-white">Apply to all</button>
+                onChange={(e) => setBulk({ ...bulk, fee: e.target.value })} className="h-10 w-32 rounded-lg border border-[#bfae98] bg-white px-2" />
+              <button onClick={applyBulk} className="h-10 rounded-lg bg-[#4a2c1d] px-4 font-semibold text-white">Apply to all</button>
             </div>
           )}
 
@@ -95,11 +95,11 @@ export default function AdminSettingsPage() {
             <div className="mt-4 overflow-x-auto rounded-lg border border-[#c9d4db]">
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-[#f0f2f2] text-left text-xs uppercase tracking-wide text-neutral-600">
-                    <th className="border border-[#d5d9d9] px-3 py-2">Province</th>
-                    <th className="border border-[#d5d9d9] px-3 py-2">District</th>
-                    <th className="border border-[#d5d9d9] px-3 py-2">Fee (RWF)</th>
-                    <th className="border border-[#d5d9d9] px-3 py-2">Delivering</th>
+                  <tr className="bg-[#f7efe4] text-left text-xs uppercase tracking-wide text-neutral-600">
+                    <th className="border border-[#e3d5c3] px-3 py-2">Province</th>
+                    <th className="border border-[#e3d5c3] px-3 py-2">District</th>
+                    <th className="border border-[#e3d5c3] px-3 py-2">Fee (RWF)</th>
+                    <th className="border border-[#e3d5c3] px-3 py-2">Delivering</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -107,17 +107,17 @@ export default function AdminSettingsPage() {
                     const dirty = saved[z.district] && (saved[z.district].fee !== z.fee || saved[z.district].active !== z.active);
                     return (
                       <tr key={z.district} className={dirty ? "bg-[#fffaf2]" : ""}>
-                        <td className="border border-[#d5d9d9] px-3 py-2 text-neutral-600">{z.province}</td>
-                        <td className="border border-[#d5d9d9] px-3 py-2 font-semibold">{z.district}</td>
-                        <td className="border border-[#d5d9d9] px-3 py-1.5">
+                        <td className="border border-[#e3d5c3] px-3 py-2 text-neutral-600">{z.province}</td>
+                        <td className="border border-[#e3d5c3] px-3 py-2 font-semibold">{z.district}</td>
+                        <td className="border border-[#e3d5c3] px-3 py-1.5">
                           <input type="number" min={0} step={500} inputMode="numeric" value={z.fee}
                             onChange={(e) => update(z.district, { fee: Math.max(0, Math.round(Number(e.target.value) || 0)) })}
-                            className="h-9 w-28 rounded border border-[#a6a6a6] px-2 focus:border-[#e77600] focus:outline-none" />
+                            className="h-9 w-28 rounded border border-[#bfae98] px-2 focus:border-[#b3261e] focus:outline-none" />
                           <span className="ml-2 text-xs text-neutral-500">{z.fee ? rwf(z.fee) : "Free"}</span>
                         </td>
-                        <td className="border border-[#d5d9d9] px-3 py-2">
+                        <td className="border border-[#e3d5c3] px-3 py-2">
                           <label className="flex items-center gap-2">
-                            <input type="checkbox" checked={z.active} onChange={(e) => update(z.district, { active: e.target.checked })} className="h-5 w-5 accent-[#c45500]" />
+                            <input type="checkbox" checked={z.active} onChange={(e) => update(z.district, { active: e.target.checked })} className="h-5 w-5 accent-[#9e2a1f]" />
                             {z.active ? "Yes" : "No"}
                           </label>
                         </td>
@@ -143,7 +143,7 @@ export default function AdminSettingsPage() {
           </div>
         </section>
 
-        <section className="rounded-lg border border-[#ff9900] bg-[#fffaf2] p-4 text-sm leading-6 text-[#7a4a00] sm:p-6">
+        <section className="rounded-lg border border-[#c8a27a] bg-[#fffaf2] p-4 text-sm leading-6 text-[#5a3220] sm:p-6">
           <h2 className="font-bold">How orders work</h2>
           <ul className="mt-2 space-y-1">
             <li>• Prices, stock and delivery fees are checked by the database when the customer orders.</li>
@@ -159,7 +159,7 @@ export default function AdminSettingsPage() {
 
 function Setting({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-[#f0f2f2] p-3">
+    <div className="rounded-lg bg-[#f7efe4] p-3">
       <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">{label}</p>
       <p className="mt-1 font-semibold">{value}</p>
     </div>

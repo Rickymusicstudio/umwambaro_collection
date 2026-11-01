@@ -24,7 +24,7 @@ export default function RelatedProducts({
 
         <div>
 
-          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-[#C9A14A]">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-[#c8a27a]">
             You May Also Like
           </p>
 

@@ -16,14 +16,14 @@ export default function HeroContent() {
         className="
           inline-block
           rounded-full
-          bg-[#C9A14A]/10
+          bg-[#c8a27a]/10
           px-5
           py-2
           text-sm
           font-semibold
           uppercase
           tracking-[0.3em]
-          text-[#C9A14A]
+          text-[#c8a27a]
         "
       >
         New Collection 2026
@@ -50,7 +50,7 @@ export default function HeroContent() {
         <br />
 
         African
-        <span className="text-[#C9A14A]">
+        <span className="text-[#c8a27a]">
           {" "}
           Luxury
         </span>
@@ -143,7 +143,7 @@ export default function HeroContent() {
             font-semibold
             uppercase
             tracking-[0.25em]
-            text-[#C9A14A]
+            text-[#c8a27a]
             transition
             hover:text-black
           "

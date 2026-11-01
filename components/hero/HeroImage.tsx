@@ -27,7 +27,7 @@ export default function HeroImage() {
           absolute
           inset-0
           rounded-[3rem]
-          bg-[#C9A14A]/10
+          bg-[#c8a27a]/10
           blur-3xl
         "
       />
@@ -84,7 +84,7 @@ export default function HeroImage() {
             backdrop-blur
           "
         >
-          <span className="text-sm font-semibold uppercase tracking-widest text-[#C9A14A]">
+          <span className="text-sm font-semibold uppercase tracking-widest text-[#c8a27a]">
             New Arrival
           </span>
         </motion.div>
@@ -115,7 +115,7 @@ export default function HeroImage() {
             lg:block
           "
         >
-          <p className="text-4xl font-bold text-[#C9A14A]">
+          <p className="text-4xl font-bold text-[#c8a27a]">
             5K+
           </p>
 
@@ -124,7 +124,7 @@ export default function HeroImage() {
           </p>
 
           <div className="mt-4 h-2 w-36 overflow-hidden rounded-full bg-neutral-200">
-            <div className="h-full w-[95%] rounded-full bg-[#C9A14A]" />
+            <div className="h-full w-[95%] rounded-full bg-[#c8a27a]" />
           </div>
 
           <p className="mt-2 text-xs text-neutral-500">
@@ -191,7 +191,7 @@ export default function HeroImage() {
           w-24
           rounded-full
           border-2
-          border-[#C9A14A]/30
+          border-[#c8a27a]/30
         "
       />
 
@@ -205,7 +205,7 @@ export default function HeroImage() {
           h-5
           w-5
           rounded-full
-          bg-[#C9A14A]
+          bg-[#c8a27a]
         "
       />
     </motion.div>

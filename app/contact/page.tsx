@@ -22,10 +22,10 @@ export default function ContactPage() {
         <ul className="mt-5 divide-y divide-neutral-200">
           {rows.map(({ icon: Icon, label, value, href }) => (
             <li key={label} className="flex items-center gap-3 py-3">
-              <Icon className="text-[#c45500]" />
+              <Icon className="text-[#9e2a1f]" />
               <div>
                 <p className="text-xs text-neutral-500">{label}</p>
-                {href ? <a href={href} className="font-bold text-[#007185] hover:underline">{value}</a> : <p className="font-bold">{value}</p>}
+                {href ? <a href={href} className="font-bold text-[#6b3e26] hover:underline">{value}</a> : <p className="font-bold">{value}</p>}
               </div>
             </li>
           ))}
@@ -34,7 +34,7 @@ export default function ContactPage() {
       <section className="rounded-lg bg-white p-5 text-sm sm:p-8">
         <p className="font-bold">Already ordered?</p>
         <p className="mt-1 text-neutral-700">See where your order is with your order number and phone.</p>
-        <Link href="/track" className="mt-3 inline-block rounded-full bg-[#ffd814] px-5 py-2.5 font-bold">Track my order</Link>
+        <Link href="/track" className="mt-3 inline-block rounded-full bg-[#b3261e] text-white px-5 py-2.5 font-bold">Track my order</Link>
       </section>
     </div>
   );

@@ -57,16 +57,16 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-          <section className="rounded-lg border border-[#d5d9d9] bg-[#ffffff] shadow-sm">
-            <div className="flex items-center justify-between border-b border-[#d5d9d9] p-5"><div><h2 className="font-semibold">Recent orders</h2><p className="mt-1 text-sm text-[#565959]">Latest customer purchases from Supabase.</p></div><Link href="/admin/orders" className="inline-flex items-center gap-1 text-sm font-semibold text-[#232f3e]">View all <ArrowRight size={16} /></Link></div>
-            {orders.length === 0 ? <div className="p-10 text-center text-sm text-[#565959]">{loading ? "Loading orders…" : "No orders yet."}</div> : <div className="divide-y divide-[#d5d9d9]">{orders.map((order) => <div key={order.id} className="flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">{order.order_number}</p><p className="text-sm text-[#565959]">{order.customer_name} · {order.customer_phone}</p></div><div className="flex items-center gap-4"><Price price={Number(order.total_amount)} size="sm" /><span className="rounded-full bg-[#f0f2f2] px-2.5 py-1 text-xs font-semibold capitalize">{order.status}</span></div></div>)}</div>}
+          <section className="rounded-lg border border-[#e3d5c3] bg-[#ffffff] shadow-sm">
+            <div className="flex items-center justify-between border-b border-[#e3d5c3] p-5"><div><h2 className="font-semibold">Recent orders</h2><p className="mt-1 text-sm text-[#6b5a4e]">Latest customer purchases from Supabase.</p></div><Link href="/admin/orders" className="inline-flex items-center gap-1 text-sm font-semibold text-[#4a2c1d]">View all <ArrowRight size={16} /></Link></div>
+            {orders.length === 0 ? <div className="p-10 text-center text-sm text-[#6b5a4e]">{loading ? "Loading orders…" : "No orders yet."}</div> : <div className="divide-y divide-[#e3d5c3]">{orders.map((order) => <div key={order.id} className="flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">{order.order_number}</p><p className="text-sm text-[#6b5a4e]">{order.customer_name} · {order.customer_phone}</p></div><div className="flex items-center gap-4"><Price price={Number(order.total_amount)} size="sm" /><span className="rounded-full bg-[#f7efe4] px-2.5 py-1 text-xs font-semibold capitalize">{order.status}</span></div></div>)}</div>}
           </section>
-          <section className="rounded-lg border border-[#d5d9d9] bg-[#ffffff] p-5 shadow-sm"><h2 className="font-semibold">Quick actions</h2><div className="mt-4 space-y-2"><Quick href="/admin/orders">Manage orders</Quick><Quick href="/admin/products">Manage products</Quick><Quick href="/shop">Open storefront</Quick></div></section>
+          <section className="rounded-lg border border-[#e3d5c3] bg-[#ffffff] p-5 shadow-sm"><h2 className="font-semibold">Quick actions</h2><div className="mt-4 space-y-2"><Quick href="/admin/orders">Manage orders</Quick><Quick href="/admin/products">Manage products</Quick><Quick href="/shop">Open storefront</Quick></div></section>
         </div>
       </div>
     </>
   );
 }
 
-function Quick({ href, children }: { href: string; children: ReactNode }) { return <Link href={href} className="flex items-center justify-between rounded-xl border border-[#d5d9d9] bg-white p-4 text-sm font-semibold transition hover:bg-[#fffaf2]">{children}<ArrowRight size={16} /></Link>; }
+function Quick({ href, children }: { href: string; children: ReactNode }) { return <Link href={href} className="flex items-center justify-between rounded-xl border border-[#e3d5c3] bg-white p-4 text-sm font-semibold transition hover:bg-[#fffaf2]">{children}<ArrowRight size={16} /></Link>; }
 function formatRwf(value: number) { return `RWF ${new Intl.NumberFormat("en-RW").format(value)}`; }

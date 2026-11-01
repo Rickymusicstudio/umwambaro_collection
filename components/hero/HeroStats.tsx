@@ -30,7 +30,7 @@ export default function HeroStats() {
           key={stat.label}
           className="text-center"
         >
-          <h3 className="text-3xl font-bold text-[#C9A14A]">
+          <h3 className="text-3xl font-bold text-[#c8a27a]">
             {stat.value}
           </h3>
 

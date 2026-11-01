@@ -10,7 +10,7 @@ export default function SectionTitle({
   return (
     <div className="mb-16 text-center">
 
-      <p className="mb-3 uppercase tracking-[0.45em] text-[#C9A14A]">
+      <p className="mb-3 uppercase tracking-[0.45em] text-[#c8a27a]">
         Luxury Fashion
       </p>
 
