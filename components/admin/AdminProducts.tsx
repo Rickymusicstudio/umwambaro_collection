@@ -582,7 +582,11 @@ export default function AdminProducts() {
                 setForm({
                   ...form,
                   name: event.target.value,
-                  slug: form.slug || slugify(event.target.value),
+                  // Keep the slug following the name until the admin edits it by hand.
+                  slug:
+                    !form.slug || form.slug === slugify(form.name)
+                      ? slugify(event.target.value)
+                      : form.slug,
                 })
               }
               className={inputClass}
