@@ -126,7 +126,7 @@ export default function ProductDetail({ product }: { product: Product }) {
             <button onClick={() => add(false)} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] py-3 font-bold hover:bg-[var(--um-cta-hover)]">
               {added ? <><Check size={18} /> Added to cart</> : "Add to cart"}
             </button>
-            <button onClick={() => add(true)} className="mt-2 w-full rounded-full bg-[#ffa41c] py-3 font-bold hover:bg-[#fa8900]">Buy now</button>
+            <button onClick={() => add(true)} className="mt-2 w-full rounded-full bg-[var(--um-accent-light)] py-3 font-bold text-[var(--um-dark)] hover:bg-[var(--um-accent)]">Buy now</button>
           </>
         )}
         <ul className="mt-4 space-y-2 border-t border-neutral-200 pt-4 text-sm text-neutral-700">
