@@ -9,6 +9,13 @@ const palettes = [
   { key: "navy", label: "Navy · coral", swatch: ["#14213d", "#f1f3f7", "#e85d4a"] },
   { key: "gold", label: "Black · gold", swatch: ["#111111", "#f5f2ec", "#b8893b"] },
   { key: "plum", label: "Plum · blush · pink", swatch: ["#3a1530", "#f6ecee", "#c2185b"] },
+  { key: "sunflower", label: "Charcoal · sunflower yellow", swatch: ["#1f1f1f", "#fbf7ea", "#f5c518"] },
+  { key: "rwanda", label: "Rwanda blue · yellow · green", swatch: ["#00577f", "#fad201", "#20603d"] },
+  { key: "mustard", label: "Chocolate · mustard yellow", swatch: ["#3b2416", "#f8f0dc", "#e0a100"] },
+  { key: "lemon", label: "Green · lemon yellow", swatch: ["#1e3d2f", "#f6f8ec", "#e9d634"] },
+  { key: "teal", label: "Teal · amber", swatch: ["#0f3b3e", "#eef5f4", "#f2a900"] },
+  { key: "kitenge", label: "Kitenge: indigo · orange · yellow", swatch: ["#1b1464", "#ff6b1a", "#ffc914"] },
+  { key: "terracotta", label: "Terracotta · sand", swatch: ["#4a2418", "#f6ede2", "#c8553d"] },
 ];
 
 export default function PalettePicker() {
@@ -28,12 +35,12 @@ export default function PalettePicker() {
   }
 
   return (
-    <div className="fixed bottom-20 right-3 z-[100] w-60 rounded-xl border border-neutral-300 bg-white p-3 text-sm shadow-xl md:bottom-4">
+    <div className="fixed bottom-20 right-3 z-[100] w-64 rounded-xl border border-neutral-300 bg-white p-3 text-sm shadow-xl md:bottom-4">
       <button onClick={() => setOpen(!open)} className="flex w-full items-center justify-between font-bold">
         Try colors <span>{open ? "–" : "+"}</span>
       </button>
       {open && (
-        <ul className="mt-2 space-y-1">
+        <ul className="mt-2 max-h-[60vh] space-y-1 overflow-y-auto">
           {palettes.map((p) => (
             <li key={p.key}>
               <button onClick={() => choose(p.key)}

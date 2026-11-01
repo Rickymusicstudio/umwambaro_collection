@@ -177,3 +177,45 @@ body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
   --um-accent: #e8a0b4; --um-accent-light: #f6d3dc; --um-strong: #a3144c; --um-link: #6d2a5c;
   --um-line: #ead7dc; --um-muted: #6e5a64;
 }
+[data-palette="sunflower"] {
+  --um-dark: #1f1f1f; --um-dark2: #333333; --um-page: #fbf7ea; --um-soft: #fffbef;
+  --um-cta: #f5c518; --um-cta-hover: #e0b20c; --um-cta-text: #1f1f1f;
+  --um-accent: #f5c518; --um-accent-light: #fde68a; --um-strong: #b7791f; --um-link: #4a4a4a;
+  --um-line: #ece4c8; --um-muted: #5e5a4c;
+}
+[data-palette="rwanda"] {
+  --um-dark: #00577f; --um-dark2: #0a73a8; --um-page: #eef6f9; --um-soft: #f6fbfd;
+  --um-cta: #fad201; --um-cta-hover: #e5bf00; --um-cta-text: #00405e;
+  --um-accent: #fad201; --um-accent-light: #ffe680; --um-strong: #20603d; --um-link: #00577f;
+  --um-line: #d4e6ee; --um-muted: #50636c;
+}
+[data-palette="mustard"] {
+  --um-dark: #3b2416; --um-dark2: #5a3a24; --um-page: #f8f0dc; --um-soft: #fcf6e8;
+  --um-cta: #e0a100; --um-cta-hover: #c78f00; --um-cta-text: #2b1810;
+  --um-accent: #e0a100; --um-accent-light: #f5d77a; --um-strong: #9a6b00; --um-link: #6b3e26;
+  --um-line: #eadfc3; --um-muted: #6b5a4e;
+}
+[data-palette="lemon"] {
+  --um-dark: #1e3d2f; --um-dark2: #2d5a45; --um-page: #f6f8ec; --um-soft: #fbfcf3;
+  --um-cta: #e9d634; --um-cta-hover: #d6c21d; --um-cta-text: #1e3d2f;
+  --um-accent: #e9d634; --um-accent-light: #f3ea94; --um-strong: #5d7a1f; --um-link: #2d5a45;
+  --um-line: #e1e6cc; --um-muted: #5a6355;
+}
+[data-palette="teal"] {
+  --um-dark: #0f3b3e; --um-dark2: #165a5e; --um-page: #eef5f4; --um-soft: #f6fbfa;
+  --um-cta: #f2a900; --um-cta-hover: #d99700; --um-cta-text: #0f3b3e;
+  --um-accent: #f2a900; --um-accent-light: #ffd77a; --um-strong: #b07a00; --um-link: #165a5e;
+  --um-line: #d3e3e1; --um-muted: #536664;
+}
+[data-palette="kitenge"] {
+  --um-dark: #1b1464; --um-dark2: #2e2391; --um-page: #fbf3e4; --um-soft: #fff9ee;
+  --um-cta: #ff6b1a; --um-cta-hover: #e25a0e; --um-cta-text: #ffffff;
+  --um-accent: #ffc914; --um-accent-light: #ffe27a; --um-strong: #d9480f; --um-link: #2e2391;
+  --um-line: #eadfca; --um-muted: #5d5870;
+}
+[data-palette="terracotta"] {
+  --um-dark: #4a2418; --um-dark2: #6b3423; --um-page: #f6ede2; --um-soft: #fbf5ee;
+  --um-cta: #c8553d; --um-cta-hover: #ad4630; --um-cta-text: #ffffff;
+  --um-accent: #e3b58f; --um-accent-light: #f2d6bd; --um-strong: #a3442f; --um-link: #6b3423;
+  --um-line: #ead9c8; --um-muted: #6d5c52;
+}

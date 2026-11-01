@@ -25,7 +25,7 @@ export default async function HomePage() {
           <h1 className="mt-1 text-2xl font-extrabold leading-tight sm:text-4xl">{siteConfig.tagline}</h1>
           <p className="mt-2 text-sm text-neutral-200 sm:text-base">New and Chaguwa clothes. Pay when it arrives.</p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Link href="/shop" className="rounded-full bg-[var(--um-cta)] px-5 py-2.5 text-sm font-boldtext-white hover:bg-[var(--um-cta-hover)]">Shop now</Link>
+            <Link href="/shop" className="rounded-full bg-[var(--um-cta)] px-5 py-2.5 text-sm font-bold text-[var(--um-cta-text)] hover:bg-[var(--um-cta-hover)]">Shop now</Link>
             <Link href="/shop?condition=chaguwa" className="rounded-full border border-white/60 px-5 py-2.5 text-sm font-bold hover:bg-white/10">Chaguwa deals</Link>
           </div>
         </div>
