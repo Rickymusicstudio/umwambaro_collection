@@ -31,3 +31,13 @@ on conflict (user_id) do nothing;
 ```
 
 The `legacy/` directory contains older restore scripts kept only for reference. Do not use those scripts for a new production installation.
+
+## Accounting (admin → Accounting)
+
+Run `ACCOUNTING_SETUP.sql` once, after the main script. It adds:
+
+- `money_entries`: in-shop sales, other income and expenses
+- `debts` + `debt_payments`: amadeni (customers who owe the shop, and what the shop owes)
+- admin-only RLS on all three tables
+
+Website orders are counted automatically once they are marked **Delivered**.

@@ -3,13 +3,14 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeft, LayoutDashboard, Package, ShoppingBag, Users, Settings } from "lucide-react";
+import { ArrowLeft, Calculator, LayoutDashboard, Package, ShoppingBag, Users, Settings } from "lucide-react";
 import AdminGuard from "@/components/admin/AdminGuard";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/accounting", label: "Accounting", icon: Calculator },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
@@ -56,7 +57,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* phone: bottom tabs */}
-        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
           {links.map(({ href, label, icon: Icon }) => (
             <Link key={href} href={href} className={`flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold ${isActive(href) ? "text-[var(--um-strong)]" : "text-neutral-600"}`}>
               <Icon size={21} /> {label}
