@@ -70,7 +70,7 @@ export default function Entries({ kinds, period, entries, orders, onChange }: {
           </div>
         )}
         <Field label="Amount (RWF)">
-          <input required type="number" min={1} step={100} inputMode="numeric" value={form.amount}
+          <input required type="number" min={1} inputMode="numeric" value={form.amount}
             onChange={(e) => setForm({ ...form, amount: e.target.value })} className={inputClass} placeholder="e.g. 15000" />
         </Field>
         <div className="grid grid-cols-2 gap-3">

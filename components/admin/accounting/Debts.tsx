@@ -72,7 +72,7 @@ export default function Debts({ debts, onChange }: { debts: Debt[]; onChange: ()
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Amount (RWF)">
-              <input required type="number" min={1} step={100} inputMode="numeric" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className={inputClass} />
+              <input required type="number" min={1} inputMode="numeric" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} className={inputClass} />
             </Field>
             <Field label="Phone (optional)">
               <input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClass} placeholder="0788 123 456" />
