@@ -264,7 +264,7 @@ create index if not exists orders_district_idx on public.orders(district);
 create table if not exists public.order_items (
   id uuid primary key default gen_random_uuid(),
   order_id uuid not null references public.orders(id) on delete cascade,
-  product_id uuid not null references public.products(id) on restrict,
+  product_id uuid not null references public.products(id) on delete restrict,
   product_name text not null,
   sku text,
   price integer not null check (price >= 0),
@@ -507,3 +507,329 @@ using (bucket_id = 'product-images' and public.is_admin());
 -- After creating the administrator in Supabase Authentication, run:
 -- insert into public.admin_users (user_id) values ('YOUR_AUTH_USER_UUID')
 -- on conflict (user_id) do nothing;
+
+-- ############################################################
+-- VERSION 2 (launch) — delivery fees, stock on cancel,
+-- customer accounts, order history, wishlist, order tracking.
+-- Safe to re-run. Keeps all existing data.
+-- ############################################################
+
+-- ============================================================
+-- DELIVERY ZONES (one row per district, fee set by the admin)
+-- ============================================================
+
+create table if not exists public.delivery_zones (
+  district text primary key,
+  province text not null,
+  fee integer not null default 0 check (fee >= 0),
+  active boolean not null default true,
+  sort integer not null default 100
+);
+
+-- Starting fees: Kigali 2,000 RWF, rest of Rwanda 5,000 RWF.
+-- The admin can change every fee in Admin -> Settings.
+insert into public.delivery_zones (district, province, fee, sort) values
+  ('Gasabo','Kigali',2000,1),('Kicukiro','Kigali',2000,2),('Nyarugenge','Kigali',2000,3),
+  ('Bugesera','East',5000,10),('Gatsibo','East',5000,11),('Kayonza','East',5000,12),('Kirehe','East',5000,13),
+  ('Ngoma','East',5000,14),('Nyagatare','East',5000,15),('Rwamagana','East',5000,16),
+  ('Burera','North',5000,20),('Gakenke','North',5000,21),('Gicumbi','North',5000,22),('Musanze','North',5000,23),('Rulindo','North',5000,24),
+  ('Gisagara','South',5000,30),('Huye','South',5000,31),('Kamonyi','South',5000,32),('Muhanga','South',5000,33),
+  ('Nyamagabe','South',5000,34),('Nyanza','South',5000,35),('Nyaruguru','South',5000,36),('Ruhango','South',5000,37),
+  ('Karongi','West',5000,40),('Ngororero','West',5000,41),('Nyabihu','West',5000,42),('Nyamasheke','West',5000,43),
+  ('Rubavu','West',5000,44),('Rusizi','West',5000,45),('Rutsiro','West',5000,46)
+on conflict (district) do nothing;
+
+alter table public.delivery_zones enable row level security;
+drop policy if exists "Anyone can read delivery zones" on public.delivery_zones;
+create policy "Anyone can read delivery zones" on public.delivery_zones
+  for select to anon, authenticated using (true);
+drop policy if exists "Admins manage delivery zones" on public.delivery_zones;
+create policy "Admins manage delivery zones" on public.delivery_zones
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- ============================================================
+-- CHECKOUT: delivery fee now comes from delivery_zones (server side),
+-- never from the browser. Signature unchanged for the API route.
+-- ============================================================
+
+create or replace function public.place_order(
+  p_client_order_id uuid,
+  p_customer jsonb,
+  p_items jsonb,
+  p_shipping integer default 0,          -- ignored: kept for compatibility
+  p_payment_method text default 'cash_on_delivery'
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order_id uuid;
+  v_order_number text;
+  v_subtotal integer := 0;
+  v_shipping integer;
+  v_district text := trim(coalesce(p_customer->>'district', ''));
+  v_item jsonb;
+  v_product public.products%rowtype;
+  v_product_id uuid;
+  v_quantity integer;
+  v_total integer;
+  v_existing public.orders%rowtype;
+begin
+  if p_payment_method <> 'cash_on_delivery' then
+    raise exception 'Unsupported payment method';
+  end if;
+
+  if p_customer is null
+     or coalesce(trim(p_customer->>'fullName'), '') = ''
+     or coalesce(trim(p_customer->>'phone'), '') = ''
+     or v_district = ''
+     or coalesce(trim(p_customer->>'address'), '') = '' then
+    raise exception 'Complete customer delivery information is required';
+  end if;
+
+  select fee into v_shipping from public.delivery_zones
+   where lower(district) = lower(v_district) and active = true;
+  if not found then
+    raise exception 'We do not deliver to this district yet';
+  end if;
+
+  if jsonb_typeof(p_items) <> 'array' or jsonb_array_length(p_items) = 0 then
+    raise exception 'Order must contain at least one item';
+  end if;
+
+  select * into v_existing from public.orders where client_order_id = p_client_order_id;
+  if found then
+    return jsonb_build_object(
+      'id', v_existing.id, 'order_number', v_existing.order_number,
+      'subtotal', coalesce(v_existing.subtotal, 0), 'shipping', coalesce(v_existing.delivery_fee, 0),
+      'total', coalesce(v_existing.total_amount, 0), 'existing', true);
+  end if;
+
+  for v_item in select value from jsonb_array_elements(p_items)
+  loop
+    v_product_id := nullif(v_item->>'productId', '')::uuid;
+    v_quantity := (v_item->>'quantity')::integer;
+    if v_quantity is null or v_quantity < 1 then
+      raise exception 'Invalid product quantity';
+    end if;
+    select * into v_product from public.products
+     where id = v_product_id and is_active = true for update;
+    if not found then
+      raise exception 'One of the selected products is no longer available';
+    end if;
+    if v_product.stock < v_quantity then
+      raise exception 'Not enough stock for %', v_product.name;
+    end if;
+    v_subtotal := v_subtotal + (v_product.price * v_quantity);
+  end loop;
+
+  v_total := v_subtotal + v_shipping;
+  v_order_id := gen_random_uuid();
+  v_order_number := 'UMW-' || to_char(now(), 'YYYYMMDDHH24MISS') || '-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 6));
+
+  insert into public.orders (
+    id, user_id, client_order_id, order_number, customer_name, customer_email,
+    customer_phone, delivery_address, district, sector, cell, delivery_notes,
+    subtotal, delivery_fee, total_amount, currency, payment_method, payment_status, status
+  ) values (
+    v_order_id, auth.uid(), p_client_order_id, v_order_number,
+    trim(p_customer->>'fullName'), nullif(trim(p_customer->>'email'), ''),
+    trim(p_customer->>'phone'), trim(p_customer->>'address'),
+    (select district from public.delivery_zones where lower(district) = lower(v_district)),
+    nullif(trim(p_customer->>'sector'), ''), nullif(trim(p_customer->>'cell'), ''),
+    nullif(trim(p_customer->>'notes'), ''),
+    v_subtotal, v_shipping, v_total, 'RWF', p_payment_method, 'pending', 'pending'
+  );
+
+  for v_item in select value from jsonb_array_elements(p_items)
+  loop
+    v_product_id := (v_item->>'productId')::uuid;
+    v_quantity := (v_item->>'quantity')::integer;
+    select * into v_product from public.products where id = v_product_id for update;
+    insert into public.order_items (order_id, product_id, product_name, sku, price, quantity, color, size)
+    values (v_order_id, v_product.id, v_product.name, v_product.sku, v_product.price, v_quantity,
+            nullif(trim(v_item->>'color'), ''), nullif(trim(v_item->>'size'), ''));
+    update public.products
+       set stock = stock - v_quantity,
+           is_active = case when stock - v_quantity <= 0 then false else is_active end,
+           updated_at = now()
+     where id = v_product.id;
+  end loop;
+
+  return jsonb_build_object('id', v_order_id, 'order_number', v_order_number,
+    'subtotal', v_subtotal, 'shipping', v_shipping, 'total', v_total, 'existing', false);
+end;
+$$;
+
+revoke all on function public.place_order(uuid, jsonb, jsonb, integer, text) from public;
+grant execute on function public.place_order(uuid, jsonb, jsonb, integer, text) to anon, authenticated;
+
+-- ============================================================
+-- STOCK GOES BACK WHEN AN ORDER IS CANCELLED
+-- (and is taken again if a cancelled order is re-opened)
+-- ============================================================
+
+create or replace function public.restock_on_cancel()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_item record;
+begin
+  if new.status = 'cancelled' and old.status <> 'cancelled' then
+    for v_item in select product_id, quantity from public.order_items where order_id = new.id loop
+      update public.products
+         set stock = stock + v_item.quantity,
+             is_active = case when stock = 0 then true else is_active end,
+             updated_at = now()
+       where id = v_item.product_id;
+    end loop;
+  elsif old.status = 'cancelled' and new.status <> 'cancelled' then
+    for v_item in select oi.product_id, oi.quantity, p.stock, p.name
+                    from public.order_items oi join public.products p on p.id = oi.product_id
+                   where oi.order_id = new.id for update of p loop
+      if v_item.stock < v_item.quantity then
+        raise exception 'Not enough stock to re-open this order (%)', v_item.name;
+      end if;
+      update public.products
+         set stock = stock - v_item.quantity,
+             is_active = case when stock - v_item.quantity <= 0 then false else is_active end,
+             updated_at = now()
+       where id = v_item.product_id;
+    end loop;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists orders_restock_on_cancel on public.orders;
+create trigger orders_restock_on_cancel
+after update of status on public.orders
+for each row execute function public.restock_on_cancel();
+
+-- ============================================================
+-- CUSTOMER ACCOUNTS (login with phone number + password)
+-- ============================================================
+
+create table if not exists public.customer_profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  full_name text not null,
+  phone text not null unique,
+  email text,
+  district text,
+  sector text,
+  address text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.customer_profiles enable row level security;
+drop policy if exists "Customers read own profile" on public.customer_profiles;
+create policy "Customers read own profile" on public.customer_profiles
+  for select to authenticated using (id = auth.uid() or public.is_admin());
+drop policy if exists "Customers update own profile" on public.customer_profiles;
+create policy "Customers update own profile" on public.customer_profiles
+  for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
+
+-- phone can't be changed by the customer (it is their login)
+create or replace function public.guard_customer_profile()
+returns trigger language plpgsql as $$
+begin
+  if new.phone is distinct from old.phone and auth.uid() is not null and not public.is_admin() then
+    raise exception 'Phone number cannot be changed';
+  end if;
+  new.updated_at := now();
+  return new;
+end $$;
+drop trigger if exists customer_profiles_guard on public.customer_profiles;
+create trigger customer_profiles_guard before update on public.customer_profiles
+for each row execute function public.guard_customer_profile();
+
+-- create the profile when a customer signs up (admins are created by hand and are skipped)
+create or replace function public.handle_new_customer()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare m jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
+begin
+  if m->>'account_type' = 'customer' then
+    insert into public.customer_profiles (id, full_name, phone, email)
+    values (new.id, coalesce(nullif(trim(m->>'full_name'), ''), 'Customer'),
+            coalesce(m->>'phone', ''), nullif(trim(m->>'email'), ''))
+    on conflict (id) do nothing;
+  end if;
+  return new;
+end $$;
+drop trigger if exists on_auth_user_created_customer on auth.users;
+create trigger on_auth_user_created_customer
+after insert on auth.users
+for each row execute function public.handle_new_customer();
+
+-- customers can read their own orders and order items
+drop policy if exists "Customers read own orders" on public.orders;
+create policy "Customers read own orders" on public.orders
+  for select to authenticated using (user_id = auth.uid());
+drop policy if exists "Customers read own order items" on public.order_items;
+create policy "Customers read own order items" on public.order_items
+  for select to authenticated
+  using (exists (select 1 from public.orders o where o.id = order_id and o.user_id = auth.uid()));
+
+-- a customer may cancel their own order while it is still pending
+create or replace function public.cancel_my_order(p_order_id uuid)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  update public.orders set status = 'cancelled'
+   where id = p_order_id and user_id = auth.uid() and status = 'pending';
+  if not found then
+    raise exception 'This order can no longer be cancelled';
+  end if;
+  return true;
+end $$;
+revoke all on function public.cancel_my_order(uuid) from public;
+grant execute on function public.cancel_my_order(uuid) to authenticated;
+
+-- ============================================================
+-- WISHLIST
+-- ============================================================
+
+create table if not exists public.wishlist_items (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  product_id uuid not null references public.products(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (user_id, product_id)
+);
+alter table public.wishlist_items enable row level security;
+drop policy if exists "Customers manage own wishlist" on public.wishlist_items;
+create policy "Customers manage own wishlist" on public.wishlist_items
+  for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+-- ============================================================
+-- TRACK AN ORDER (no account needed): order number + phone
+-- ============================================================
+
+create or replace function public.track_order(p_order_number text, p_phone text)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+declare
+  v_digits text := regexp_replace(coalesce(p_phone, ''), '\D', '', 'g');
+  v_order public.orders%rowtype;
+begin
+  if length(v_digits) = 10 and left(v_digits, 1) = '0' then v_digits := '250' || substr(v_digits, 2); end if;
+  select * into v_order from public.orders
+   where upper(order_number) = upper(trim(p_order_number))
+     and regexp_replace(customer_phone, '\D', '', 'g') = v_digits;
+  if not found then return null; end if;
+  return jsonb_build_object(
+    'order_number', v_order.order_number, 'status', v_order.status,
+    'created_at', v_order.created_at, 'updated_at', v_order.updated_at,
+    'district', v_order.district, 'subtotal', v_order.subtotal,
+    'delivery_fee', v_order.delivery_fee, 'total', v_order.total_amount,
+    'items', coalesce((select jsonb_agg(jsonb_build_object('name', product_name, 'quantity', quantity,
+                         'price', price, 'size', size, 'color', color) order by created_at)
+                       from public.order_items where order_id = v_order.id), '[]'::jsonb));
+end $$;
+revoke all on function public.track_order(text, text) from public;
+grant execute on function public.track_order(text, text) to anon, authenticated;
+
+create index if not exists orders_user_id_idx on public.orders(user_id);

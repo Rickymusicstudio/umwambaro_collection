@@ -1,26 +1,155 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { Check, Truck } from "lucide-react";
 import AdminHeader from "@/components/admin/AdminHeader";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { siteConfig } from "@/constants/site";
+import { displayPhone, rwf } from "@/lib/format";
+
+type Zone = { district: string; province: string; fee: number; active: boolean; sort: number };
 
 export default function AdminSettingsPage() {
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [saved, setSaved] = useState<Record<string, Zone>>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [bulk, setBulk] = useState({ province: "Kigali", fee: "" });
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) { setError("Supabase is not configured."); setLoading(false); return; }
+    supabase.from("delivery_zones").select("*").order("sort").then(({ data, error }) => {
+      if (error) setError("Could not load delivery fees. Run the latest database script (UMWAMBARO_FINAL_RESTORE.sql) in Supabase.");
+      const rows = (data ?? []) as Zone[];
+      setZones(rows);
+      setSaved(Object.fromEntries(rows.map((z) => [z.district, z])));
+      setLoading(false);
+    });
+  }, []);
+
+  const changed = useMemo(
+    () => zones.filter((z) => saved[z.district] && (saved[z.district].fee !== z.fee || saved[z.district].active !== z.active)),
+    [zones, saved]
+  );
+  const provinces = useMemo(() => [...new Set(zones.map((z) => z.province))], [zones]);
+
+  const update = (district: string, patch: Partial<Zone>) =>
+    setZones((list) => list.map((z) => (z.district === district ? { ...z, ...patch } : z)));
+
+  function applyBulk() {
+    const fee = Math.max(0, Math.round(Number(bulk.fee)));
+    if (bulk.fee === "" || Number.isNaN(fee)) return;
+    setZones((list) => list.map((z) => (z.province === bulk.province ? { ...z, fee } : z)));
+  }
+
+  async function save() {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase || !changed.length) return;
+    setSaving(true); setError(""); setMessage("");
+    for (const z of changed) {
+      const { error } = await supabase.from("delivery_zones").update({ fee: z.fee, active: z.active }).eq("district", z.district);
+      if (error) { setError(`${z.district}: ${error.message}`); setSaving(false); return; }
+    }
+    setSaved(Object.fromEntries(zones.map((z) => [z.district, z])));
+    setMessage(`Saved ${changed.length} district${changed.length === 1 ? "" : "s"}. Customers see the new fees right away.`);
+    setSaving(false);
+  }
+
+  const { contact } = siteConfig;
+
   return (
     <>
-      <AdminHeader title="Settings" description="Core UMWAMBARO store configuration." />
-      <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
-        <section className="rounded-2xl border border-[#ead9c0] bg-[#fffaf3] p-6 shadow-sm">
-          <h2 className="font-semibold">Store</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <Setting label="Store name" value="UMWAMBARO Collections" />
+      <AdminHeader title="Settings" description="Delivery fees and store information." />
+      <div className="mx-auto max-w-5xl space-y-4 px-3 py-4 sm:px-6 lg:px-8">
+        <section className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="flex items-center gap-2 text-lg font-bold"><Truck size={20} className="text-[#c45500]" /> Delivery fees</h2>
+              <p className="text-sm text-neutral-500">The fee customers pay for each district. Set 0 for free delivery. Turn a district off to stop delivering there.</p>
+            </div>
+            <button onClick={save} disabled={!changed.length || saving}
+              className="rounded-full bg-[#ffd814] px-5 py-2.5 text-sm font-bold hover:bg-[#f7ca00] disabled:opacity-50">
+              {saving ? "Saving…" : changed.length ? `Save ${changed.length} change${changed.length === 1 ? "" : "s"}` : "Saved"}
+            </button>
+          </div>
+
+          {provinces.length > 0 && (
+            <div className="mt-4 flex flex-wrap items-end gap-2 rounded-lg bg-[#f0f2f2] p-3 text-sm">
+              <span className="font-semibold">Quick set:</span>
+              <select value={bulk.province} onChange={(e) => setBulk({ ...bulk, province: e.target.value })} className="h-10 rounded-lg border border-[#a6a6a6] bg-white px-2">
+                {provinces.map((p) => <option key={p}>{p}</option>)}
+              </select>
+              <input type="number" min={0} step={500} inputMode="numeric" placeholder="Fee (RWF)" value={bulk.fee}
+                onChange={(e) => setBulk({ ...bulk, fee: e.target.value })} className="h-10 w-32 rounded-lg border border-[#a6a6a6] bg-white px-2" />
+              <button onClick={applyBulk} className="h-10 rounded-lg bg-[#232f3e] px-4 font-semibold text-white">Apply to all</button>
+            </div>
+          )}
+
+          {error && <p className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+          {message && <p className="mt-3 flex items-center gap-2 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700"><Check size={16} /> {message}</p>}
+
+          {loading ? <p className="py-8 text-center text-sm text-neutral-500">Loading…</p> : (
+            <div className="mt-4 overflow-x-auto rounded-lg border border-[#c9d4db]">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-[#f0f2f2] text-left text-xs uppercase tracking-wide text-neutral-600">
+                    <th className="border border-[#d5d9d9] px-3 py-2">Province</th>
+                    <th className="border border-[#d5d9d9] px-3 py-2">District</th>
+                    <th className="border border-[#d5d9d9] px-3 py-2">Fee (RWF)</th>
+                    <th className="border border-[#d5d9d9] px-3 py-2">Delivering</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {zones.map((z) => {
+                    const dirty = saved[z.district] && (saved[z.district].fee !== z.fee || saved[z.district].active !== z.active);
+                    return (
+                      <tr key={z.district} className={dirty ? "bg-[#fffaf2]" : ""}>
+                        <td className="border border-[#d5d9d9] px-3 py-2 text-neutral-600">{z.province}</td>
+                        <td className="border border-[#d5d9d9] px-3 py-2 font-semibold">{z.district}</td>
+                        <td className="border border-[#d5d9d9] px-3 py-1.5">
+                          <input type="number" min={0} step={500} inputMode="numeric" value={z.fee}
+                            onChange={(e) => update(z.district, { fee: Math.max(0, Math.round(Number(e.target.value) || 0)) })}
+                            className="h-9 w-28 rounded border border-[#a6a6a6] px-2 focus:border-[#e77600] focus:outline-none" />
+                          <span className="ml-2 text-xs text-neutral-500">{z.fee ? rwf(z.fee) : "Free"}</span>
+                        </td>
+                        <td className="border border-[#d5d9d9] px-3 py-2">
+                          <label className="flex items-center gap-2">
+                            <input type="checkbox" checked={z.active} onChange={(e) => update(z.district, { active: e.target.checked })} className="h-5 w-5 accent-[#c45500]" />
+                            {z.active ? "Yes" : "No"}
+                          </label>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <section className="rounded-lg border border-neutral-200 bg-white p-4 shadow-sm sm:p-6">
+          <h2 className="text-lg font-bold">Store information</h2>
+          <p className="text-sm text-neutral-500">Shown on the Contact page and footer. To change it, edit <code className="rounded bg-neutral-100 px-1">constants/site.ts</code>.</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Setting label="Store name" value={siteConfig.fullName} />
+            <Setting label="Phone / WhatsApp for orders" value={contact.phone ? displayPhone(contact.phone) : "Not set (.env.local)"} />
+            <Setting label="Email" value={contact.email || "Not set"} />
+            <Setting label="Location" value={contact.location || "Not set"} />
+            <Setting label="Payment" value="Cash on delivery" />
             <Setting label="Currency" value="RWF" />
-            <Setting label="Payment" value="Cash on Delivery" />
-            <Setting label="Delivery" value="Rwanda · 1–3 business days" />
           </div>
         </section>
-        <section className="rounded-2xl border border-[#d7b46b] bg-[#fff8ed] p-6">
-          <h2 className="font-semibold text-[#6d4c12]">Production checklist</h2>
-          <ul className="mt-3 space-y-2 text-sm leading-6 text-[#765b2a]">
-            <li>• Supabase Auth protects the admin portal.</li>
-            <li>• Supabase RLS protects product and order writes.</li>
-            <li>• Checkout creates orders server-side and validates stock.</li>
-            <li>• WhatsApp notifications are sent server-side using Meta Cloud API.</li>
+
+        <section className="rounded-lg border border-[#ff9900] bg-[#fffaf2] p-4 text-sm leading-6 text-[#7a4a00] sm:p-6">
+          <h2 className="font-bold">How orders work</h2>
+          <ul className="mt-2 space-y-1">
+            <li>• Prices, stock and delivery fees are checked by the database when the customer orders.</li>
+            <li>• After ordering, WhatsApp opens on the customer&apos;s phone with the order ready to send to your number.</li>
+            <li>• Every order is also saved here under <strong>Orders</strong>, even if the customer doesn&apos;t press Send.</li>
+            <li>• Cancelling an order puts the items back in stock automatically.</li>
           </ul>
         </section>
       </div>
@@ -29,5 +158,10 @@ export default function AdminSettingsPage() {
 }
 
 function Setting({ label, value }: { label: string; value: string }) {
-  return <div className="rounded-xl bg-[#f7efe4] p-4"><p className="text-xs font-semibold uppercase tracking-wider text-[#6f625d]">{label}</p><p className="mt-1 font-medium">{value}</p></div>;
+  return (
+    <div className="rounded-lg bg-[#f0f2f2] p-3">
+      <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">{label}</p>
+      <p className="mt-1 font-semibold">{value}</p>
+    </div>
+  );
 }

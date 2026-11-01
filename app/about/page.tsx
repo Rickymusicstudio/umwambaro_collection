@@ -1,5 +1,34 @@
-import Container from "@/components/layout/Container";
+import Link from "next/link";
+import { Banknote, Recycle, Truck } from "lucide-react";
+import { siteConfig } from "@/constants/site";
+
+export const metadata = { title: "About · UMWAMBARO" };
 
 export default function AboutPage() {
-  return <main className="py-16"><Container><div className="mx-auto max-w-3xl"><p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#C9A14A]">About us</p><h1 className="mt-3 text-5xl font-semibold">Style made simple.</h1><p className="mt-6 text-lg leading-8 text-neutral-600">UMWAMBARO Collections is a modern Rwandan clothing store focused on making it easy to discover and buy pieces for everyday life and special occasions.</p><div className="mt-10 grid gap-5 sm:grid-cols-2"><div className="rounded-2xl bg-neutral-50 p-6"><h2 className="font-semibold">Our approach</h2><p className="mt-2 text-sm leading-6 text-neutral-600">Friendly shopping, carefully selected products, and straightforward service.</p></div><div className="rounded-2xl bg-neutral-50 p-6"><h2 className="font-semibold">Our promise</h2><p className="mt-2 text-sm leading-6 text-neutral-600">We want every customer to feel confident from browsing to delivery.</p></div></div></div></Container></main>;
+  const points = [
+    { icon: Recycle, title: "New and Chaguwa", text: "Brand new clothes and carefully chosen second-hand (Chaguwa) pieces at fair prices." },
+    { icon: Truck, title: "Delivery across Rwanda", text: "We deliver to all 30 districts. The fee is shown before you order." },
+    { icon: Banknote, title: "Pay on delivery", text: "No card needed. Check your items and pay when they arrive." },
+  ];
+  return (
+    <div className="mx-auto max-w-3xl px-2 py-4 sm:px-4">
+      <section className="rounded-lg bg-white p-5 sm:p-8">
+        <h1 className="text-2xl font-bold">About {siteConfig.fullName}</h1>
+        <p className="mt-3 leading-7 text-neutral-700">
+          {siteConfig.fullName} is a Rwandan clothing shop. We make it easy to find good clothes, shoes and accessories
+          for the whole family, and to order them from your phone.
+        </p>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          {points.map(({ icon: Icon, title, text }) => (
+            <div key={title} className="rounded-lg border border-neutral-200 p-4">
+              <Icon className="text-[#c45500]" />
+              <p className="mt-2 font-bold">{title}</p>
+              <p className="mt-1 text-sm text-neutral-600">{text}</p>
+            </div>
+          ))}
+        </div>
+        <Link href="/shop" className="mt-6 inline-block rounded-full bg-[#ffd814] px-6 py-3 font-bold">Start shopping</Link>
+      </section>
+    </div>
+  );
 }

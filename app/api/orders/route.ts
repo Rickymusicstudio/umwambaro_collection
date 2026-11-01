@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { normalizeRwandaPhone } from "@/lib/format";
 
 type OrderResult = {
   id: string;
@@ -25,26 +26,21 @@ const orderSchema = z.object({
     phone: z.string().trim().min(9).max(20),
     email: z.string().trim().email().max(160).optional().or(z.literal("")),
     district: z.string().trim().min(2).max(80),
-    sector: z.string().trim().max(80).optional(),
+    sector: z.string().trim().max(80).optional().or(z.literal("")),
     address: z.string().trim().min(3).max(300),
     notes: z.string().trim().max(500).optional(),
   }),
   items: z.array(itemSchema).min(1).max(30),
-  shipping: z.number().int().min(0).max(100000),
+  // delivery fee is calculated in the database from the district
   paymentMethod: z.literal("cash_on_delivery"),
 });
-
-function normalizeRwandaPhone(phone: string) {
-  const digits = phone.replace(/\D/g, "");
-  if (digits.startsWith("250") && digits.length === 12) return digits;
-  if (digits.startsWith("0") && digits.length === 10) return `250${digits.slice(1)}`;
-  return digits;
-}
 
 export async function POST(request: Request) {
   try {
     const payload = orderSchema.parse(await request.json());
-    const supabase = getSupabaseServerClient();
+    // If a customer is logged in, act as them so the order appears in their account.
+    const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") || undefined;
+    const supabase = getSupabaseServerClient(token);
 
     if (!supabase) {
       return NextResponse.json({ error: "Supabase is not configured." }, { status: 500 });
@@ -62,19 +58,15 @@ export async function POST(request: Request) {
         notes: payload.customer.notes || null,
       },
       p_items: payload.items,
-      p_shipping: payload.shipping,
       p_payment_method: payload.paymentMethod,
     });
 
     if (error) {
       console.error("Order creation failed:", error);
-      const message = error.message.includes("Not enough stock")
+      const known = ["Not enough stock", "no longer available", "Unsupported payment method", "do not deliver"];
+      const message = known.some((k) => error.message.includes(k))
         ? error.message
-        : error.message.includes("no longer available")
-          ? error.message
-          : error.message.includes("Unsupported payment method")
-            ? error.message
-            : "We could not place your order. Please try again.";
+        : "We could not place your order. Please try again.";
       return NextResponse.json({ error: message }, { status: 400 });
     }
 

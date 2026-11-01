@@ -1,5 +1,41 @@
-import Container from "@/components/layout/Container";
+import Link from "next/link";
+import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { siteConfig } from "@/constants/site";
+import { displayPhone } from "@/lib/format";
+
+export const metadata = { title: "Contact · UMWAMBARO" };
 
 export default function ContactPage() {
-  return <main className="bg-neutral-50 py-16"><Container><div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 shadow-sm"><p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#C9A14A]">Contact</p><h1 className="mt-3 text-4xl font-semibold">How can we help?</h1><p className="mt-4 leading-7 text-neutral-600">For product questions, orders, delivery, or returns, contact UMWAMBARO Collections.</p><div className="mt-8 space-y-4 rounded-2xl bg-neutral-50 p-6"><div><p className="text-sm text-neutral-500">Phone</p><p className="font-semibold">+250 7XX XXX XXX</p></div><div><p className="text-sm text-neutral-500">Email</p><p className="font-semibold">hello@umwambaro.com</p></div><div><p className="text-sm text-neutral-500">Location</p><p className="font-semibold">Kigali, Rwanda</p></div></div></div></Container></main>;
+  const { contact } = siteConfig;
+  const rows = [
+    contact.phone && { icon: Phone, label: "Call us", value: displayPhone(contact.phone), href: `tel:+${contact.phone.replace(/\D/g, "")}` },
+    contact.email && { icon: Mail, label: "Email", value: contact.email, href: `mailto:${contact.email}` },
+    contact.location && { icon: MapPin, label: "Location", value: contact.location },
+    contact.hours && { icon: Clock, label: "Open", value: contact.hours },
+  ].filter(Boolean) as { icon: typeof Phone; label: string; value: string; href?: string }[];
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-3 px-2 py-4 sm:px-4">
+      <section className="rounded-lg bg-white p-5 sm:p-8">
+        <h1 className="text-2xl font-bold">Contact us</h1>
+        <p className="mt-2 text-neutral-700">Questions about a product, an order or delivery? We are happy to help.</p>
+        <ul className="mt-5 divide-y divide-neutral-200">
+          {rows.map(({ icon: Icon, label, value, href }) => (
+            <li key={label} className="flex items-center gap-3 py-3">
+              <Icon className="text-[#c45500]" />
+              <div>
+                <p className="text-xs text-neutral-500">{label}</p>
+                {href ? <a href={href} className="font-bold text-[#007185] hover:underline">{value}</a> : <p className="font-bold">{value}</p>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section className="rounded-lg bg-white p-5 text-sm sm:p-8">
+        <p className="font-bold">Already ordered?</p>
+        <p className="mt-1 text-neutral-700">See where your order is with your order number and phone.</p>
+        <Link href="/track" className="mt-3 inline-block rounded-full bg-[#ffd814] px-5 py-2.5 font-bold">Track my order</Link>
+      </section>
+    </div>
+  );
 }

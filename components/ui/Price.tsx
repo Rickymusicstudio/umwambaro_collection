@@ -17,11 +17,7 @@ function formatPrice(
   value: number,
   currency: "RWF" = "RWF"
 ) {
-  return new Intl.NumberFormat("en-RW", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(value);
+  return `${currency} ${new Intl.NumberFormat("en-RW").format(Math.round(value))}`;
 }
 
 export default function Price({

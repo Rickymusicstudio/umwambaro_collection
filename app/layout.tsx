@@ -1,39 +1,29 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
 import "./globals.css";
 
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-
 import { CartProvider } from "@/context/CartContext";
+import StoreChrome from "@/components/store/StoreChrome";
+import { siteConfig } from "@/constants/site";
 
 export const metadata: Metadata = {
-  title: "Umwambaro Collections",
-  description:
-    "Luxury African fashion crafted with elegance and authenticity.",
+  title: `${siteConfig.fullName} · ${siteConfig.tagline}`,
+  description: siteConfig.description,
 };
 
-interface RootLayoutProps {
-  children: ReactNode;
-}
+export const viewport: Viewport = {
+  themeColor: "#131921",
+  width: "device-width",
+  initialScale: 1,
+};
 
-export default function RootLayout({
-  children,
-}: RootLayoutProps) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-white text-neutral-900 antialiased">
+      <body className="min-h-screen bg-[#eaeded] text-neutral-900 antialiased">
         <CartProvider>
-
-          <Header />
-
-          <main className="min-h-screen">
-            {children}
-          </main>
-
-          <Footer />
-
+          <StoreChrome>{children}</StoreChrome>
         </CartProvider>
       </body>
     </html>

@@ -1,28 +1,17 @@
-import Container from "@/components/layout/Container";
-import ShopClient from "@/components/shop/ShopClient";
-
+import { Suspense } from "react";
+import ShopView from "@/components/store/ShopView";
 import { getProducts } from "@/services/product.service";
+
+// New products from Admin show up within 30 seconds.
+export const revalidate = 30;
+
+export const metadata = { title: "Shop · UMWAMBARO" };
 
 export default async function ShopPage() {
   const products = await getProducts();
-
   return (
-    <main className="py-14">
-      <Container>
-        <div className="mb-10">
-          <h1 className="text-5xl font-bold">
-            Shop
-          </h1>
-
-          <p className="mt-3 text-neutral-500">
-            Browse all products available at Umwambaro Collections.
-          </p>
-        </div>
-
-        <ShopClient
-          products={products}
-        />
-      </Container>
-    </main>
+    <Suspense fallback={<p className="p-10 text-center text-neutral-500">Loading products…</p>}>
+      <ShopView products={products} />
+    </Suspense>
   );
 }

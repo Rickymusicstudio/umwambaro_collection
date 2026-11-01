@@ -1,4 +1,3 @@
-import { products as localProducts } from "@/data/products";
 import type { Product } from "@/types/product";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -68,22 +67,29 @@ async function fetchProducts(): Promise<Product[] | null> {
   const supabase = getSupabaseServerClient();
   if (!supabase) return null;
 
-  const { data, error } = await supabase
+  let data: unknown[] | null = null;
+  let error: { message: string } | null = null;
+  try {
+    ({ data, error } = await supabase
     .from("products")
     .select("*")
     .eq("is_active", true)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false }));
+  } catch (e) {
+    error = { message: e instanceof Error ? e.message : String(e) };
+  }
 
-  if (error) {
-    console.warn("Supabase products unavailable; using local catalog:", error.message);
+  if (error || !data) {
+    console.error("Could not load products from Supabase:", error?.message);
     return null;
   }
 
   return (data as SupabaseProduct[]).map(mapProduct);
 }
 
+// Never show demo products to customers: if Supabase fails we show an empty shop.
 export async function getProducts(): Promise<Product[]> {
-  return (await fetchProducts()) ?? localProducts;
+  return (await fetchProducts()) ?? [];
 }
 
 export async function getProduct(slug: string): Promise<Product | undefined> {

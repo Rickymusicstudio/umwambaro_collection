@@ -3,71 +3,67 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeft, LayoutDashboard, Package, ShoppingBag, Users, Settings, Sparkles } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, Package, ShoppingBag, Users, Settings } from "lucide-react";
 import AdminGuard from "@/components/admin/AdminGuard";
+
+const links = [
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
+];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-
-  if (pathname === "/admin/login") {
-    return <>{children}</>;
-  }
+  if (pathname === "/admin/login") return <>{children}</>;
+  const isActive = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));
 
   return (
     <AdminGuard>
-      <div className="min-h-screen bg-[#f7efe4] text-[#2a211f]">
+      <div className="min-h-screen bg-[#eaeded] text-neutral-900">
         <div className="flex min-h-screen">
-          <aside className="hidden w-64 shrink-0 bg-[#2a211f] text-white lg:block">
-            <div className="sticky top-0 flex h-screen flex-col p-5">
-              <Link href="/" className="border-b border-white/10 pb-5">
-                <div className="text-2xl font-semibold tracking-[0.18em]">UMWAMBARO</div>
-                <div className="mt-1 text-[10px] font-semibold tracking-[0.42em] text-[#e7bd63]">COLLECTIONS</div>
+          {/* computer: sidebar */}
+          <aside className="hidden w-60 shrink-0 bg-[#131921] text-white lg:block">
+            <div className="sticky top-0 flex h-screen flex-col p-4">
+              <Link href="/admin" className="px-2 pb-4">
+                <span className="block text-xl font-extrabold">UMWAMBARO</span>
+                <span className="mt-0.5 block h-1 w-full rounded-full bg-[#ff9900]" />
+                <span className="mt-2 block text-xs font-semibold uppercase tracking-wider text-[#febd69]">Seller admin</span>
               </Link>
-
-              <div className="mt-6 rounded-2xl border border-[#e7bd63]/20 bg-[#e7bd63]/10 p-4">
-                <div className="flex items-center gap-2 text-[#f6d78e]">
-                  <Sparkles size={14} />
-                  <p className="text-xs font-semibold uppercase tracking-wider">Store Admin</p>
-                </div>
-                <p className="mt-2 text-xs leading-5 text-white/60">Protected catalog management. Product writes are enforced by Supabase RLS.</p>
-              </div>
-
-              <nav className="mt-6 space-y-1">
-                <AdminLink href="/admin" icon={<LayoutDashboard size={18} />}>Dashboard</AdminLink>
-                <AdminLink href="/admin/orders" icon={<ShoppingBag size={18} />}>Orders</AdminLink>
-                <AdminLink href="/admin/products" icon={<Package size={18} />}>Products</AdminLink>
-                <AdminLink href="/admin/customers" icon={<Users size={18} />}>Customers</AdminLink>
-                <AdminLink href="/admin/settings" icon={<Settings size={18} />}>Settings</AdminLink>
+              <nav className="mt-4 space-y-1">
+                {links.map(({ href, label, icon: Icon }) => (
+                  <Link key={href} href={href}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold ${isActive(href) ? "bg-[#ff9900] text-[#131921]" : "text-neutral-300 hover:bg-white/10 hover:text-white"}`}>
+                    <Icon size={18} /> {label}
+                  </Link>
+                ))}
               </nav>
-
-              <div className="mt-auto border-t border-white/10 pt-4">
-                <Link href="/" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-white/65 transition hover:bg-white/10 hover:text-white">
-                  <ArrowLeft size={18} /> Back to store
-                </Link>
-              </div>
+              <Link href="/" target="_blank" className="mt-auto flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-neutral-300 hover:bg-white/10 hover:text-white">
+                <ArrowLeft size={18} /> View store
+              </Link>
             </div>
           </aside>
 
-          <main className="min-w-0 flex-1">
-            <div className="border-b border-[#ead9c0] bg-[#fffaf3] px-4 py-4 shadow-sm lg:hidden">
-              <div className="flex items-center justify-between">
-                <Link href="/" className="font-semibold tracking-[0.14em]">UMWAMBARO</Link>
-                <Link href="/admin" className="rounded-full bg-[#a44a2f] px-4 py-2 text-sm font-semibold text-white">Dashboard</Link>
-              </div>
+          <main className="min-w-0 flex-1 pb-20 lg:pb-0">
+            {/* phone: top bar */}
+            <div className="flex items-center justify-between bg-[#131921] px-4 py-3 text-white lg:hidden">
+              <Link href="/admin" className="font-extrabold">UMWAMBARO <span className="text-[#febd69]">admin</span></Link>
+              <Link href="/" target="_blank" className="text-sm text-neutral-300">View store</Link>
             </div>
             {children}
           </main>
         </div>
+
+        {/* phone: bottom tabs */}
+        <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
+          {links.map(({ href, label, icon: Icon }) => (
+            <Link key={href} href={href} className={`flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold ${isActive(href) ? "text-[#c45500]" : "text-neutral-600"}`}>
+              <Icon size={21} /> {label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </AdminGuard>
-  );
-}
-
-function AdminLink({ href, icon, children }: { href: string; icon: ReactNode; children: ReactNode }) {
-  return (
-    <Link href={href} className="group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-white/65 transition hover:bg-white/10 hover:text-white">
-      <span className="transition group-hover:text-[#e7bd63]">{icon}</span>
-      {children}
-    </Link>
   );
 }

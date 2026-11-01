@@ -71,10 +71,7 @@ export function CartProvider({ children }: CartProviderProps) {
       return [
         ...current,
         {
-          id:
-            typeof crypto !== "undefined" && crypto.randomUUID
-              ? crypto.randomUUID()
-              : `${Date.now()}-${product.id}`,
+          id: `${Date.now()}-${Math.random().toString(36).slice(2)}-${product.id}`,
           product,
           quantity: Math.min(quantity, product.stock),
           color,

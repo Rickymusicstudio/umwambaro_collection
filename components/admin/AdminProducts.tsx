@@ -1,5 +1,6 @@
 "use client";
 
+import { shopCategories } from "@/constants/site";
 import {
   useEffect,
   useMemo,
@@ -463,6 +464,21 @@ export default function AdminProducts() {
       .eq("id", product.id);
 
     if (deleteError) {
+      // Products that customers already ordered must stay for the order history:
+      // hide them from the shop instead of deleting.
+      if (deleteError.code === "23503" || /foreign key|order_items/i.test(deleteError.message)) {
+        const { error: hideError } = await supabase
+          .from("products")
+          .update({ is_active: false })
+          .eq("id", product.id);
+        if (hideError) {
+          setError(hideError.message);
+          return;
+        }
+        setMessage(`“${product.name}” has orders, so it was hidden from the shop instead of deleted.`);
+        await loadProducts();
+        return;
+      }
       setError(deleteError.message);
       return;
     }
@@ -521,7 +537,7 @@ export default function AdminProducts() {
 
       {(message || error) && (
         <div
-          className={`rounded-2xl p-4 text-sm ${
+          className={`rounded-lg p-4 text-sm ${
             error
               ? "bg-red-50 text-red-700"
               : "bg-emerald-50 text-emerald-700"
@@ -533,11 +549,11 @@ export default function AdminProducts() {
 
       <form
         onSubmit={saveProduct}
-        className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-7"
+        className="rounded-lg border border-neutral-200 bg-white p-5 shadow-sm sm:p-7"
       >
         <div className="flex items-start justify-between gap-4 border-b border-neutral-100 pb-5">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#C9A14A]">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c45500]">
               {editingId ? "Edit product" : "New product"}
             </p>
             <h3 className="mt-1 text-2xl font-semibold">
@@ -596,15 +612,18 @@ export default function AdminProducts() {
           </Field>
 
           <Field label="Category">
-            <input
+            <select
               required
               value={form.category}
               onChange={(event) =>
                 setForm({ ...form, category: event.target.value })
               }
               className={inputClass}
-              placeholder="Women"
-            />
+            >
+              {[...new Set([...shopCategories.map((c) => c.name), form.category].filter(Boolean))].map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
           </Field>
 
           <Field label="Condition">
@@ -683,7 +702,7 @@ export default function AdminProducts() {
             />
           </Field>
 
-          <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
+          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h4 className="font-semibold">Product images</h4>
@@ -720,15 +739,15 @@ export default function AdminProducts() {
                 void uploadFiles(Array.from(event.dataTransfer.files));
               }}
               disabled={uploading}
-              className={`mt-5 flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed px-5 py-6 text-center transition ${
+              className={`mt-5 flex min-h-36 w-full flex-col items-center justify-center rounded-lg border-2 border-dashed px-5 py-6 text-center transition ${
                 dragging
-                  ? "border-[#C9A14A] bg-amber-50"
+                  ? "border-[#c45500] bg-amber-50"
                   : "border-neutral-300 bg-white hover:border-neutral-500 hover:bg-neutral-50"
               } ${uploading ? "cursor-wait opacity-70" : "cursor-pointer"}`}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-100">
                 {uploading ? (
-                  <Upload className="animate-pulse text-[#C9A14A]" size={22} />
+                  <Upload className="animate-pulse text-[#c45500]" size={22} />
                 ) : (
                   <ImagePlus className="text-neutral-500" size={22} />
                 )}
@@ -777,7 +796,7 @@ export default function AdminProducts() {
                 {formImages.map((url) => (
                   <div
                     key={url}
-                    className="overflow-hidden rounded-2xl border border-neutral-200 bg-white"
+                    className="overflow-hidden rounded-lg border border-neutral-200 bg-white"
                   >
                     <div className="aspect-square bg-neutral-100">
                       <img
@@ -793,7 +812,7 @@ export default function AdminProducts() {
                           onClick={() => setMainImage(url)}
                           className={`rounded-lg px-2 py-1.5 text-[11px] font-semibold ${
                             form.image === url
-                              ? "bg-black text-white"
+                              ? "bg-[#232f3e] text-white"
                               : "bg-neutral-100 text-neutral-700"
                           }`}
                         >
@@ -804,7 +823,7 @@ export default function AdminProducts() {
                           onClick={() => setHoverImage(url)}
                           className={`rounded-lg px-2 py-1.5 text-[11px] font-semibold ${
                             form.hoverImage === url
-                              ? "bg-[#C9A14A] text-white"
+                              ? "bg-[#c45500] text-white"
                               : "bg-neutral-100 text-neutral-700"
                           }`}
                         >
@@ -823,7 +842,7 @@ export default function AdminProducts() {
                 ))}
               </div>
             ) : (
-              <div className="mt-5 flex min-h-32 items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-white text-center">
+              <div className="mt-5 flex min-h-32 items-center justify-center rounded-lg border border-dashed border-neutral-300 bg-white text-center">
                 <div>
                   <ImagePlus className="mx-auto text-neutral-300" size={30} />
                   <p className="mt-2 text-sm font-medium text-neutral-600">
@@ -863,7 +882,7 @@ export default function AdminProducts() {
           </div>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-[#ead9c0] bg-[#fffaf2] p-4 sm:p-5">
+        <div className="mt-6 rounded-lg border border-[#d5d9d9] bg-[#ffffff] p-4 sm:p-5">
           <div className="mb-4">
             <p className="text-sm font-semibold text-neutral-900">Homepage placement</p>
             <p className="mt-1 text-xs text-neutral-500">
@@ -911,7 +930,7 @@ export default function AdminProducts() {
         </div>
       </form>
 
-      <section className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-sm">
         <div className="flex flex-col gap-4 border-b border-neutral-100 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="font-semibold">Products ({products.length})</h3>
@@ -945,7 +964,7 @@ export default function AdminProducts() {
                 key={product.id}
                 className="flex flex-col gap-4 p-5 lg:flex-row lg:items-center"
               >
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-neutral-100">
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-neutral-100">
                   {product.image ? (
                     <img
                       src={product.image}
@@ -1046,7 +1065,7 @@ function Toggle({
       <span
         className={`flex h-5 w-5 items-center justify-center rounded-md border transition ${
           checked
-            ? "border-black bg-black text-white"
+            ? "border-black bg-[#232f3e] text-white"
             : "border-neutral-300 bg-white"
         }`}
       >

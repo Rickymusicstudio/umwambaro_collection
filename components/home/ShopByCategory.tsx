@@ -24,14 +24,14 @@ const categories = [
     slug: "kids",
     description: "Comfortable styles for little ones",
     image:
-      "/images/products/product3.png",
+      "/images/kids.jpeg",
   },
   {
     name: "Shoes",
     slug: "shoes",
     description: "Step into your perfect pair",
     image:
-      "/images/products/product4.png",
+      "/images/shoes.jpeg",
   },
   {
     name: "Accessories",

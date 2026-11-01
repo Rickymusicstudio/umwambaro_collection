@@ -8,6 +8,11 @@ import {
 
 import { cn } from "@/lib/utils";
 
+/**
+ * HTMLMotionProps allows Framer Motion types for `children`.
+ * For this reusable Button component we want normal React children,
+ * so we explicitly replace the children type with React.ReactNode.
+ */
 export interface ButtonProps
   extends Omit<HTMLMotionProps<"button">, "children"> {
   children?: React.ReactNode;
@@ -38,10 +43,10 @@ export interface ButtonProps
 
 const variants = {
   primary:
-    "bg-[#C9A14A] text-white hover:bg-[#b88f35]",
+    "bg-[#ffd814] text-neutral-900 hover:bg-[#f7ca00]",
 
   secondary:
-    "bg-neutral-900 text-white hover:bg-neutral-800",
+    "bg-[#232f3e] text-white hover:bg-[#131921]",
 
   outline:
     "border border-neutral-300 bg-white hover:bg-neutral-100",
@@ -67,18 +72,7 @@ const sizes = {
   "icon-lg": "h-14 w-14 p-0",
 } as const;
 
-/**
- * UMWAMBARO reusable Button component.
- *
- * Exported both as:
- *
- * import Button from "@/components/ui/button";
- *
- * and:
- *
- * import { Button } from "@/components/ui/button";
- */
-export function Button({
+function Button({
   children,
   className,
   variant = "primary",
@@ -88,12 +82,14 @@ export function Button({
   leftIcon,
   rightIcon,
   disabled,
+  type = "button",
   ...props
 }: ButtonProps) {
-  const isDisabled = disabled || loading;
+  const isDisabled = Boolean(disabled || loading);
 
   return (
     <motion.button
+      type={type}
       whileHover={{
         scale: isDisabled ? 1 : 1.02,
       }}
@@ -102,12 +98,11 @@ export function Button({
       }}
       disabled={isDisabled}
       className={cn(
-        "inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200",
-        "disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50",
         variants[variant],
         sizes[size],
         fullWidth && "w-full",
-        className,
+        className
       )}
       {...props}
     >
@@ -157,5 +152,16 @@ export function Button({
     </motion.button>
   );
 }
+
+/*
+ * Support both import styles:
+ *
+ * import Button from "@/components/ui/button";
+ *
+ * and:
+ *
+ * import { Button } from "@/components/ui/button";
+ */
+export { Button };
 
 export default Button;

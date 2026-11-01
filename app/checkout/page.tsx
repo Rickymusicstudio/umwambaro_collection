@@ -1,202 +1,114 @@
 "use client";
 
-import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Container from "@/components/layout/Container";
-import Price from "@/components/ui/Price";
+import { Banknote, Lock } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { rwf, normalizeRwandaPhone, isValidRwandaPhone, uuid } from "@/lib/format";
 import type { CustomerDetails } from "@/types/order";
 
-const initialForm: CustomerDetails = {
-  fullName: "",
-  phone: "",
-  email: "",
-  district: "",
-  sector: "",
-  address: "",
-  notes: "",
-};
+type Zone = { district: string; province: string; fee: number };
 
-function normalizeRwandaPhone(phone: string) {
-  const digits = phone.replace(/\D/g, "");
-  if (digits.startsWith("250") && digits.length === 12) return digits;
-  if (digits.startsWith("0") && digits.length === 10) return `250${digits.slice(1)}`;
-  return digits;
-}
+const emptyForm: CustomerDetails = { fullName: "", phone: "", email: "", district: "", sector: "", address: "", notes: "" };
+const SAVED_KEY = "umwambaro-delivery";
 
-function money(value: number) {
-  return `${new Intl.NumberFormat("en-RW").format(value)} RWF`;
-}
-
-function buildWhatsAppMessage(args: {
-  orderNumber: string;
-  customer: CustomerDetails;
-  items: ReturnType<typeof useCart>["items"];
-  total: number;
-  shipping: number;
-}) {
-  const { orderNumber, customer, items, total, shipping } = args;
-
-  const itemLines = items
-    .map((item, index) => {
-      const details = [
-        `Qty: ${item.quantity}`,
-        item.size ? `Size: ${item.size}` : "",
-        item.color ? `Color: ${item.color}` : "",
-      ].filter(Boolean);
-
-      return [
-        `${index + 1}. ${item.product.name}`,
-        `   ${details.join(" | ")}`,
-        `   Price: ${money(item.product.price * item.quantity)}`,
-      ].join("\n");
-    })
-    .join("\n\n");
-
+function whatsappMessage(orderNumber: string, c: CustomerDetails, items: ReturnType<typeof useCart>["items"], fee: number, total: number) {
+  const lines = items.map((i, n) =>
+    `${n + 1}. ${i.product.name} x${i.quantity}${i.size ? ` (Size ${i.size})` : ""}${i.color ? ` (${i.color})` : ""} – ${rwf(i.product.price * i.quantity)}`);
   return [
-    "UMWAMBARO COLLECTIONS",
-    "==============================",
-    "NEW ORDER",
-    "",
-    `Order: ${orderNumber}`,
-    "",
-    "CUSTOMER",
-    "------------------------------",
-    `Name:  ${customer.fullName}`,
-    `Phone: ${normalizeRwandaPhone(customer.phone)}`,
-    customer.email?.trim() ? `Email: ${customer.email.trim()}` : "",
-    "",
-    "DELIVERY",
-    "------------------------------",
-    `District: ${customer.district}`,
-    customer.sector?.trim() ? `Sector:   ${customer.sector.trim()}` : "",
-    `Address:  ${customer.address}`,
-    customer.notes?.trim() ? `Notes:    ${customer.notes.trim()}` : "",
-    "",
-    "ITEMS",
-    "------------------------------",
-    itemLines,
-    "",
-    "------------------------------",
-    `Subtotal: ${money(total - shipping)}`,
-    `Delivery: ${shipping === 0 ? "FREE" : money(shipping)}`,
-    `TOTAL:    ${money(total)}`,
-    "",
-    "PAYMENT",
-    "------------------------------",
-    "Cash on Delivery",
-    "",
-    "Please confirm this order with the customer.",
-  ]
-    .filter((line) => line !== "")
-    .join("\n");
-}
-
-function openWhatsAppOrder(
-  orderNumber: string,
-  customer: CustomerDetails,
-  items: ReturnType<typeof useCart>["items"],
-  total: number,
-  shipping: number,
-  popup: Window | null,
-) {
-  const adminNumber = process.env.NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER?.replace(/\D/g, "");
-  if (!adminNumber) {
-    popup?.close();
-    return;
-  }
-
-  const message = buildWhatsAppMessage({ orderNumber, customer, items, total, shipping });
-  const url = `https://wa.me/${adminNumber}?text=${encodeURIComponent(message)}`;
-
-  if (popup && !popup.closed) {
-    popup.location.replace(url);
-    try {
-      popup.opener = null;
-    } catch {
-      // Some browsers make opener read-only for an already-opened window.
-    }
-  } else {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
+    `NEW ORDER ${orderNumber}`, "",
+    `Name: ${c.fullName}`, `Phone: ${normalizeRwandaPhone(c.phone)}`,
+    `District: ${c.district}${c.sector ? `, ${c.sector}` : ""}`, `Address: ${c.address}`,
+    c.notes ? `Notes: ${c.notes}` : "", "",
+    ...lines, "",
+    `Delivery: ${fee ? rwf(fee) : "Free"}`, `TOTAL: ${rwf(total)}`, "Payment: Cash on delivery",
+  ].filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n");
 }
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState<CustomerDetails>(emptyForm);
+  const [zones, setZones] = useState<Zone[] | null>(null);
+  const [zoneError, setZoneError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const shipping = 0;
-  const total = subtotal + shipping;
+  // One id per checkout: pressing "Place order" twice can never create two orders.
+  const orderId = useRef<string>("");
 
-  function update(field: keyof CustomerDetails, value: string) {
-    setForm((current) => ({ ...current, [field]: value }));
-  }
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SAVED_KEY);
+      if (saved) setForm((f) => ({ ...f, ...JSON.parse(saved) }));
+    } catch { /* ignore */ }
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) { setZoneError("The shop is not connected yet."); return; }
+    supabase.from("delivery_zones").select("district, province, fee").eq("active", true).order("sort")
+      .then(({ data, error }) => {
+        if (error) setZoneError("Could not load delivery areas. Please refresh the page.");
+        setZones((data ?? []) as Zone[]);
+      });
+  }, []);
 
-  async function submit(e: FormEvent<HTMLFormElement>) {
+  const byProvince = useMemo(() => {
+    const groups = new Map<string, Zone[]>();
+    (zones ?? []).forEach((z) => groups.set(z.province, [...(groups.get(z.province) ?? []), z]));
+    return [...groups.entries()];
+  }, [zones]);
+  const zone = zones?.find((z) => z.district === form.district);
+  const fee = zone?.fee ?? 0;
+  const total = subtotal + fee;
+
+  const set = (k: keyof CustomerDetails) => (e: { target: { value: string } }) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  async function submit(e: FormEvent) {
     e.preventDefault();
     setError("");
-
-    if (!items.length) {
-      setError("Your cart is empty.");
-      return;
+    if (!form.fullName.trim() || !form.phone.trim() || !form.district || !form.address.trim()) {
+      return setError("Please fill in your name, phone, district and address.");
     }
+    if (!isValidRwandaPhone(form.phone)) return setError("Please enter a valid phone number, e.g. 0788 123 456.");
 
-    if (!form.fullName.trim() || !form.phone.trim() || !form.district.trim() || !form.address.trim()) {
-      setError("Please complete your name, phone, district, and delivery address.");
-      return;
-    }
-
-    // Open a blank tab immediately from the click event. This avoids popup
-    // blockers when the order API finishes asynchronously.
-    const whatsappPopup = window.open("about:blank", "_blank");
-
+    if (!orderId.current) orderId.current = uuid();
+    const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER?.replace(/\D/g, "");
+    // open WhatsApp tab right away (from the click) so phones don't block it
+    const popup = whatsapp ? window.open("about:blank", "_blank") : null;
     setLoading(true);
 
     try {
-      const clientOrderId = crypto.randomUUID();
-      const response = await fetch("/api/orders", {
+      const supabase = getSupabaseBrowserClient();
+      const token = (await supabase?.auth.getSession())?.data.session?.access_token;
+      const res = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
-          clientOrderId,
+          clientOrderId: orderId.current,
           customer: form,
-          items: items.map((item) => ({
-            productId: item.product.id,
-            quantity: item.quantity,
-            color: item.color,
-            size: item.size,
-          })),
-          shipping,
+          items: items.map((i) => ({ productId: i.product.id, quantity: i.quantity, color: i.color, size: i.size })),
           paymentMethod: "cash_on_delivery",
         }),
       });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) { popup?.close(); setError(result.error ?? "We could not place your order. Please try again."); return; }
 
-      const result = await response.json().catch(() => ({}));
+      const order = result.order as { orderNumber: string; total: number; shipping: number };
+      try {
+        const { fullName, phone, email, district, sector, address } = form;
+        localStorage.setItem(SAVED_KEY, JSON.stringify({ fullName, phone, email, district, sector, address }));
+      } catch { /* ignore */ }
 
-      if (!response.ok) {
-        whatsappPopup?.close();
-        setError(result.error ?? "We could not place your order.");
-        return;
+      if (popup && whatsapp) {
+        const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(whatsappMessage(order.orderNumber, form, items, order.shipping, order.total))}`;
+        popup.location.replace(url);
       }
-
-      const orderNumber = result.order?.orderNumber as string | undefined;
-      const savedTotal = Number(result.order?.total ?? total);
-
-      if (orderNumber) {
-        openWhatsAppOrder(orderNumber, form, items, savedTotal, shipping, whatsappPopup);
-      } else {
-        whatsappPopup?.close();
-      }
-
       clearCart();
-      router.push(`/checkout/success?order=${encodeURIComponent(orderNumber ?? "")}`);
-    } catch (err) {
-      whatsappPopup?.close();
-      setError(err instanceof Error ? err.message : "Unable to place your order. Please try again.");
+      router.push(`/checkout/success?order=${encodeURIComponent(order.orderNumber)}&total=${order.total}`);
+    } catch {
+      popup?.close();
+      setError("No internet connection. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -204,57 +116,86 @@ export default function CheckoutPage() {
 
   if (!items.length) {
     return (
-      <main className="bg-[#f7efe4] py-16">
-        <Container>
-          <div className="mx-auto max-w-xl rounded-3xl bg-[#fffaf3] p-10 text-center shadow-sm">
-            <h1 className="text-3xl font-semibold">Your cart is empty</h1>
-            <p className="mt-3 text-[#6f625d]">Add something to your cart before checking out.</p>
-            <Link href="/shop" className="mt-7 inline-flex rounded-xl bg-[#a44a2f] px-6 py-3 font-semibold text-white">Browse products</Link>
-          </div>
-        </Container>
-      </main>
+      <div className="mx-auto max-w-3xl px-2 py-6 sm:px-4">
+        <div className="rounded-lg bg-white p-10 text-center">
+          <h1 className="text-xl font-bold">Your cart is empty</h1>
+          <Link href="/shop" className="mt-5 inline-block rounded-full bg-[#ffd814] px-6 py-3 font-bold">Start shopping</Link>
+        </div>
+      </div>
     );
   }
 
+  const input = "mt-1 h-12 w-full rounded-lg border border-neutral-400 bg-white px-3 text-base outline-none focus:border-[#e77600] focus:ring-2 focus:ring-[#e77600]/30";
+
   return (
-    <main className="bg-[#f7efe4] py-10 sm:py-14">
-      <Container>
-        <div className="mb-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#a44a2f]">Almost there</p>
-          <h1 className="mt-2 text-4xl font-semibold">Checkout</h1>
-          <p className="mt-3 text-[#6f625d]">Enter your delivery details. Payment is currently Cash on Delivery.</p>
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-          <form onSubmit={submit} className="rounded-3xl bg-[#fffaf3] p-6 shadow-sm sm:p-8">
-            <h2 className="text-xl font-semibold">Delivery information</h2>
-            <div className="mt-6 grid gap-5 sm:grid-cols-2">
-              <Field label="Full name" value={form.fullName} onChange={(v) => update("fullName", v)} required />
-              <Field label="Phone number" value={form.phone} onChange={(v) => update("phone", v)} required placeholder="07XXXXXXXX" />
-              <Field label="Email (optional)" type="email" value={form.email ?? ""} onChange={(v) => update("email", v)} />
-              <Field label="District" value={form.district} onChange={(v) => update("district", v)} required placeholder="Gasabo" />
-              <Field label="Sector (optional)" value={form.sector ?? ""} onChange={(v) => update("sector", v)} />
-              <div className="sm:col-span-2"><label className="text-sm font-semibold">Delivery address *</label><textarea required value={form.address} onChange={(e) => update("address", e.target.value)} rows={4} placeholder="Street, house/building, landmark..." className="mt-2 w-full rounded-xl border border-[#d8c8b6] bg-white px-4 py-3 outline-none focus:border-[#a44a2f]" /></div>
-              <div className="sm:col-span-2"><label className="text-sm font-semibold">Order notes (optional)</label><textarea value={form.notes ?? ""} onChange={(e) => update("notes", e.target.value)} rows={3} placeholder="Anything we should know?" className="mt-2 w-full rounded-xl border border-[#d8c8b6] bg-white px-4 py-3 outline-none focus:border-[#a44a2f]" /></div>
+    <div className="mx-auto max-w-5xl px-2 py-3 sm:px-4 sm:py-4">
+      <h1 className="mb-3 flex items-center gap-2 text-xl font-bold sm:text-2xl"><Lock size={20} /> Checkout</h1>
+      <form onSubmit={submit} className="grid gap-3 lg:grid-cols-[1fr_340px]">
+        <div className="space-y-3">
+          <section className="rounded-lg bg-white p-4 sm:p-5">
+            <h2 className="text-lg font-bold">1. Delivery details</h2>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <label className="text-sm font-semibold">Full name *<input className={input} value={form.fullName} onChange={set("fullName")} autoComplete="name" /></label>
+              <label className="text-sm font-semibold">Phone number *<input className={input} value={form.phone} onChange={set("phone")} type="tel" inputMode="tel" autoComplete="tel" placeholder="0788 123 456" /></label>
+              <label className="text-sm font-semibold">District *
+                <select className={input} value={form.district} onChange={set("district")} disabled={!zones}>
+                  <option value="">{zones ? "Choose your district" : "Loading…"}</option>
+                  {byProvince.map(([province, list]) => (
+                    <optgroup key={province} label={province === "Kigali" ? "Kigali City" : `${province} Province`}>
+                      {list.map((z) => <option key={z.district} value={z.district}>{z.district} – {z.fee ? rwf(z.fee) : "Free delivery"}</option>)}
+                    </optgroup>
+                  ))}
+                </select>
+              </label>
+              <label className="text-sm font-semibold">Sector<input className={input} value={form.sector ?? ""} onChange={set("sector")} placeholder="e.g. Kimironko" /></label>
+              <label className="text-sm font-semibold sm:col-span-2">Address / directions *
+                <textarea className={`${input} h-auto py-2`} rows={2} value={form.address} onChange={set("address")} placeholder="Street, house, nearby place we can find easily" />
+              </label>
+              <label className="text-sm font-semibold sm:col-span-2">Notes (optional)
+                <input className={input} value={form.notes ?? ""} onChange={set("notes")} placeholder="Best time to call, etc." />
+              </label>
             </div>
+            {zoneError && <p className="mt-3 text-sm font-semibold text-[#cc0c39]">{zoneError}</p>}
+          </section>
 
-            <div className="mt-8 rounded-2xl border border-[#d7b46b]/40 bg-[#fff8ed] p-5"><p className="font-semibold">Payment method</p><p className="mt-1 text-sm text-[#6f625d]">Cash on Delivery — pay when your order arrives.</p></div>
-            <p className="mt-4 text-xs leading-5 text-[#8b7d76]">After the order is saved, WhatsApp will open with a prepared order message. Tap Send in WhatsApp to notify the store.</p>
-            {error && <p className="mt-5 rounded-xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}
-            <button disabled={loading} type="submit" className="mt-7 inline-flex w-full items-center justify-center rounded-xl bg-[#a44a2f] px-6 py-4 font-semibold text-white transition hover:bg-[#8e3d27] disabled:cursor-not-allowed disabled:opacity-60">{loading ? "Placing order..." : "Place Order"}</button>
-          </form>
+          <section className="rounded-lg bg-white p-4 sm:p-5">
+            <h2 className="text-lg font-bold">2. Payment</h2>
+            <div className="mt-3 flex items-center gap-3 rounded-lg border-2 border-[#e77600] bg-[#fffaf2] p-3">
+              <Banknote className="text-[#067d62]" />
+              <div><p className="font-bold">Pay on delivery</p><p className="text-sm text-neutral-600">Pay when your order arrives. We call you first to confirm.</p></div>
+            </div>
+          </section>
 
-          <aside className="h-fit rounded-3xl bg-[#fffaf3] p-6 shadow-sm lg:sticky lg:top-28">
-            <h2 className="text-xl font-semibold">Order summary</h2>
-            <div className="mt-6 space-y-4">{items.map((item) => <div key={item.id} className="flex justify-between gap-4 text-sm"><div><p className="font-medium">{item.product.name}</p><p className="text-[#6f625d]">Qty {item.quantity}{item.size ? ` · ${item.size}` : ""}{item.color ? ` · ${item.color}` : ""}</p></div><Price price={item.product.price * item.quantity} size="sm" /></div>)}</div>
-            <div className="mt-6 border-t border-[#ead9c0] pt-5"><div className="flex justify-between"><span className="text-[#6f625d]">Subtotal</span><Price price={subtotal} size="sm" /></div><div className="mt-3 flex justify-between"><span className="text-[#6f625d]">Delivery</span><span className="font-semibold text-emerald-600">Free</span></div><div className="mt-5 flex justify-between border-t border-[#ead9c0] pt-5 text-lg font-semibold"><span>Total</span><Price price={total} size="lg" /></div></div>
-          </aside>
+          <section className="rounded-lg bg-white p-4 sm:p-5">
+            <h2 className="text-lg font-bold">3. Your items ({items.length})</h2>
+            <ul className="mt-2 divide-y divide-neutral-200">
+              {items.map((i) => {
+                const img = i.product.images[0] ?? i.product.image;
+                return (
+                  <li key={i.id} className="flex items-center gap-3 py-2">
+                    <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded bg-neutral-100">{img && <Image src={img} alt="" fill sizes="56px" className="object-cover" />}</span>
+                    <span className="min-w-0 flex-1 text-sm"><span className="line-clamp-1">{i.product.name}</span><span className="text-neutral-500">Qty {i.quantity}{i.size ? ` · ${i.size}` : ""}</span></span>
+                    <span className="text-sm font-bold">{rwf(i.product.price * i.quantity)}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
         </div>
-      </Container>
-    </main>
-  );
-}
 
-function Field({ label, value, onChange, required = false, type = "text", placeholder }: { label: string; value: string; onChange: (value: string) => void; required?: boolean; type?: string; placeholder?: string }) {
-  return <div><label className="text-sm font-semibold">{label}{required ? " *" : ""}</label><input required={required} type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className="mt-2 h-12 w-full rounded-xl border border-[#d8c8b6] bg-white px-4 outline-none focus:border-[#a44a2f]" /></div>;
+        <aside className="h-fit rounded-lg bg-white p-4 lg:sticky lg:top-32">
+          <button disabled={loading || !zones?.length} className="w-full rounded-full bg-[#ffd814] py-3 font-bold hover:bg-[#f7ca00] disabled:opacity-60">
+            {loading ? "Placing order…" : "Place order"}
+          </button>
+          <p className="mt-2 text-center text-xs text-neutral-600">You pay when it arrives.</p>
+          <dl className="mt-4 space-y-1 border-t border-neutral-200 pt-3 text-sm">
+            <div className="flex justify-between"><dt>Items:</dt><dd>{rwf(subtotal)}</dd></div>
+            <div className="flex justify-between"><dt>Delivery:</dt><dd>{form.district ? (fee ? rwf(fee) : "Free") : "Choose district"}</dd></div>
+            <div className="flex justify-between border-t border-neutral-200 pt-2 text-lg font-bold text-[#b12704]"><dt>Order total:</dt><dd>{rwf(total)}</dd></div>
+          </dl>
+          {error && <p role="alert" className="mt-3 rounded-lg bg-[#fff3f3] p-3 text-sm font-semibold text-[#cc0c39]">{error}</p>}
+        </aside>
+      </form>
+    </div>
+  );
 }

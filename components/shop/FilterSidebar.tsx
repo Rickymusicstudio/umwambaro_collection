@@ -57,12 +57,15 @@ export default function FilterSidebar({
     <motion.aside
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="sticky top-24 rounded-3xl border bg-white p-6 shadow-sm"
+      className="sticky top-24 rounded-3xl border border-[#ead9c0] bg-white p-6 shadow-sm"
     >
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Filters</h2>
+          <h2 className="text-xl font-semibold text-[#2a211f]">
+            Filters
+          </h2>
+
           <p className="text-sm text-neutral-500">
             Refine your shopping experience
           </p>
@@ -71,7 +74,7 @@ export default function FilterSidebar({
         <button
           type="button"
           onClick={onReset}
-          className="flex items-center gap-2 rounded-xl border px-3 py-2 text-sm transition hover:bg-neutral-100"
+          className="flex items-center gap-2 rounded-xl border border-[#d8c8b6] px-3 py-2 text-sm transition hover:bg-neutral-100"
         >
           <RotateCcw size={16} />
           Reset
@@ -80,36 +83,36 @@ export default function FilterSidebar({
 
       {/* Categories */}
       <section className="mb-8">
-        <h3 className="mb-3 font-semibold">Categories</h3>
+        <h3 className="mb-3 font-semibold text-[#2a211f]">
+          Categories
+        </h3>
 
         <div className="space-y-3">
           {categories.map((category) => (
             <label
               key={category}
-              className="flex cursor-pointer items-center gap-3"
+              className="flex cursor-pointer items-center gap-3 text-sm"
             >
               <input
                 type="checkbox"
                 checked={filters.categories.includes(category)}
-                onChange={() => onCategoryToggle(category)}
-                className="h-4 w-4 rounded border-neutral-300"
+                onChange={() =>
+                  onCategoryToggle(category)
+                }
+                className="h-4 w-4"
               />
 
-              <span className="text-sm">{category}</span>
+              <span>{category}</span>
             </label>
           ))}
-
-          {categories.length === 0 && (
-            <p className="text-sm text-neutral-400">
-              No categories available
-            </p>
-          )}
         </div>
       </section>
 
       {/* Condition */}
       <section className="mb-8">
-        <h3 className="mb-3 font-semibold">Condition</h3>
+        <h3 className="mb-3 font-semibold text-[#2a211f]">
+          Condition
+        </h3>
 
         <div className="grid grid-cols-1 gap-2">
           {[
@@ -146,7 +149,9 @@ export default function FilterSidebar({
 
       {/* Sizes */}
       <section className="mb-8">
-        <h3 className="mb-3 font-semibold">Sizes</h3>
+        <h3 className="mb-3 font-semibold text-[#2a211f]">
+          Sizes
+        </h3>
 
         <div className="flex flex-wrap gap-2">
           {sizes.map((size) => (
@@ -156,25 +161,21 @@ export default function FilterSidebar({
               onClick={() => onSizeToggle(size)}
               className={`rounded-lg border px-3 py-2 text-sm transition ${
                 filters.sizes.includes(size)
-                  ? "border-amber-500 bg-amber-500 text-white"
-                  : "border-neutral-200 hover:border-amber-500"
+                  ? "border-[#a44a2f] bg-[#a44a2f] text-white"
+                  : "border-neutral-200 bg-white hover:border-[#a44a2f]"
               }`}
             >
               {size}
             </button>
           ))}
-
-          {sizes.length === 0 && (
-            <p className="text-sm text-neutral-400">
-              No sizes available
-            </p>
-          )}
         </div>
       </section>
 
       {/* Colors */}
       <section className="mb-8">
-        <h3 className="mb-3 font-semibold">Colors</h3>
+        <h3 className="mb-3 font-semibold text-[#2a211f]">
+          Colors
+        </h3>
 
         <div className="flex flex-wrap gap-3">
           {colors.map((color) => (
@@ -185,40 +186,35 @@ export default function FilterSidebar({
               className={`rounded-full border px-4 py-2 transition ${
                 filters.colors.includes(color)
                   ? "border-amber-500 bg-amber-50"
-                  : "border-neutral-200 hover:border-amber-500"
+                  : "border-neutral-200 bg-white hover:border-amber-500"
               }`}
             >
               <div className="flex items-center gap-2">
                 <span
-                  className="h-4 w-4 rounded-full border"
+                  className="h-4 w-4 rounded-full border border-neutral-300"
                   style={{
                     backgroundColor: color.toLowerCase(),
                   }}
                 />
 
-                <span className="text-sm">{color}</span>
+                <span className="text-sm">
+                  {color}
+                </span>
               </div>
             </button>
           ))}
-
-          {colors.length === 0 && (
-            <p className="text-sm text-neutral-400">
-              No colors available
-            </p>
-          )}
         </div>
       </section>
 
       {/* Price */}
       <section className="mb-8">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="font-semibold">Maximum Price</h3>
+          <h3 className="font-semibold text-[#2a211f]">
+            Maximum Price
+          </h3>
 
-          <span className="text-sm font-medium text-neutral-600">
-            {new Intl.NumberFormat("en-RW").format(
-              filters.maxPrice
-            )}{" "}
-            RWF
+          <span className="text-sm font-semibold text-[#a44a2f]">
+            {filters.maxPrice.toLocaleString()} RWF
           </span>
         </div>
 
@@ -227,14 +223,14 @@ export default function FilterSidebar({
           min={0}
           max={500000}
           step={5000}
-          value={filters.maxPrice}
-          onChange={(event) =>
-            onPriceChange(Number(event.target.value))
+          value={Math.min(filters.maxPrice, 500000)}
+          onChange={(e) =>
+            onPriceChange(Number(e.target.value))
           }
-          className="w-full accent-[#C9A14A]"
+          className="w-full accent-[#a44a2f]"
         />
 
-        <div className="mt-2 flex justify-between text-xs text-neutral-400">
+        <div className="mt-2 flex justify-between text-xs text-neutral-500">
           <span>0 RWF</span>
           <span>500,000 RWF</span>
         </div>
@@ -242,15 +238,15 @@ export default function FilterSidebar({
 
       {/* Stock */}
       <section>
-        <label className="flex cursor-pointer items-center gap-3">
+        <label className="flex cursor-pointer items-center gap-3 text-sm">
           <input
             type="checkbox"
             checked={filters.inStockOnly}
             onChange={onStockToggle}
-            className="h-4 w-4 rounded border-neutral-300"
+            className="h-4 w-4"
           />
 
-          <span className="text-sm">In Stock Only</span>
+          <span>In Stock Only</span>
         </label>
       </section>
     </motion.aside>

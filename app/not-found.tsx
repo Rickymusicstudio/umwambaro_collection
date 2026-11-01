@@ -1,6 +1,14 @@
 import Link from "next/link";
-import Container from "@/components/layout/Container";
 
 export default function NotFound() {
-  return <main className="py-24"><Container><div className="mx-auto max-w-xl text-center"><p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#C9A14A]">404</p><h1 className="mt-3 text-4xl font-semibold">We couldn't find that page.</h1><p className="mt-4 text-neutral-600">The page or product may have moved.</p><Link href="/shop" className="mt-8 inline-flex rounded-xl bg-black px-6 py-3 font-semibold text-white">Go to Shop</Link></div></Container></main>;
+  return (
+    <div className="mx-auto max-w-xl px-2 py-8 sm:px-4">
+      <div className="rounded-lg bg-white p-8 text-center">
+        <p className="text-5xl font-extrabold text-[#ff9900]">404</p>
+        <h1 className="mt-2 text-xl font-bold">We couldn&apos;t find that page</h1>
+        <p className="mt-1 text-neutral-600">The product may be sold out or moved.</p>
+        <Link href="/shop" className="mt-5 inline-block rounded-full bg-[#ffd814] px-6 py-3 font-bold">Go to the shop</Link>
+      </div>
+    </div>
+  );
 }
