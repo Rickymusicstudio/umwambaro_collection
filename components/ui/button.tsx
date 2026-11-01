@@ -9,7 +9,9 @@ import {
 import { cn } from "@/lib/utils";
 
 export interface ButtonProps
-  extends HTMLMotionProps<"button"> {
+  extends Omit<HTMLMotionProps<"button">, "children"> {
+  children?: React.ReactNode;
+
   variant?:
     | "primary"
     | "secondary"
@@ -65,55 +67,57 @@ const sizes = {
   "icon-lg": "h-14 w-14 p-0",
 } as const;
 
-export default function Button({
+/**
+ * UMWAMBARO reusable Button component.
+ *
+ * Exported both as:
+ *
+ * import Button from "@/components/ui/button";
+ *
+ * and:
+ *
+ * import { Button } from "@/components/ui/button";
+ */
+export function Button({
   children,
-
   className,
-
   variant = "primary",
-
   size = "md",
-
   loading = false,
-
   fullWidth = false,
-
   leftIcon,
-
   rightIcon,
-
   disabled,
-
   ...props
 }: ButtonProps) {
+  const isDisabled = disabled || loading;
+
   return (
     <motion.button
       whileHover={{
-        scale: disabled ? 1 : 1.02,
+        scale: isDisabled ? 1 : 1.02,
       }}
       whileTap={{
-        scale: disabled ? 1 : 0.98,
+        scale: isDisabled ? 1 : 0.98,
       }}
-      disabled={disabled || loading}
+      disabled={isDisabled}
       className={cn(
-        "inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50",
-
+        "inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200",
+        "disabled:cursor-not-allowed disabled:opacity-50",
         variants[variant],
-
         sizes[size],
-
         fullWidth && "w-full",
-
-        className
+        className,
       )}
       {...props}
     >
-              {loading ? (
+      {loading ? (
         <span className="flex items-center gap-2">
           <svg
             className="h-4 w-4 animate-spin"
             viewBox="0 0 24 24"
             fill="none"
+            aria-hidden="true"
           >
             <circle
               cx="12"
@@ -141,7 +145,7 @@ export default function Button({
             </span>
           )}
 
-          <span>{children as React.ReactNode}</span>
+          <span>{children}</span>
 
           {rightIcon && (
             <span className="ml-2 flex items-center justify-center">
@@ -153,3 +157,5 @@ export default function Button({
     </motion.button>
   );
 }
+
+export default Button;

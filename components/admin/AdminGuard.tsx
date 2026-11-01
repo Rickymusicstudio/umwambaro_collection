@@ -7,10 +7,23 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const VERIFY_TIMEOUT_MS = 8000;
 
-function withTimeout<T>(promise: Promise<T>, ms: number) {
+function withTimeout<T>(
+  promise: PromiseLike<T>,
+  ms: number
+): Promise<T> {
   return Promise.race([
-    promise,
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Admin verification timed out. Please try again.")), ms)),
+    Promise.resolve(promise),
+    new Promise<never>((_, reject) =>
+      setTimeout(
+        () =>
+          reject(
+            new Error(
+              "Admin verification timed out. Please try again."
+            )
+          ),
+        ms,
+      )
+    ),
   ]);
 }
 
