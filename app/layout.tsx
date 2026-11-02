@@ -8,6 +8,7 @@ import StoreChrome from "@/components/store/StoreChrome";
 import { siteConfig } from "@/constants/site";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: `${siteConfig.fullName} · ${siteConfig.tagline}`,
   description: siteConfig.description,
 };

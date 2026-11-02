@@ -7,6 +7,7 @@ import { Banknote, Check, Minus, Plus, ShieldCheck, Truck } from "lucide-react";
 import type { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
 import ProductGallery from "@/components/store/ProductGallery";
+import ShareButton from "@/components/store/ShareButton";
 import { rwf, discountPercent } from "@/lib/format";
 
 export default function ProductDetail({ product }: { product: Product }) {
@@ -41,9 +42,13 @@ export default function ProductDetail({ product }: { product: Product }) {
 
       {/* details */}
       <div>
-        <Link href={`/shop?category=${encodeURIComponent(product.category)}`} className="text-sm font-semibold text-[var(--um-link)] hover:underline">
-          {product.category}
-        </Link>
+        <div className="flex items-center justify-between gap-2">
+          <Link href={`/shop?category=${encodeURIComponent(product.category)}`} className="text-sm font-semibold text-[var(--um-link)] hover:underline">
+            {product.category}
+          </Link>
+          <ShareButton path={`/shop/${product.slug}`} title={product.name}
+            text={`${product.name} – ${rwf(product.price)} at Umwambaro Collections`} />
+        </div>
         <h1 className="mt-1 text-xl font-semibold leading-snug text-neutral-900 sm:text-2xl">{product.name}</h1>
         <div className="mt-2 flex flex-wrap gap-2">
           {product.condition === "chaguwa"

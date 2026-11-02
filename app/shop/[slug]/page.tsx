@@ -3,6 +3,8 @@ import Link from "next/link";
 import ProductDetail from "@/components/store/ProductDetail";
 import { ProductRow } from "@/components/store/ProductCard";
 import { getProduct, getRelatedProducts } from "@/services/product.service";
+import { siteConfig } from "@/constants/site";
+import { rwf } from "@/lib/format";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -11,7 +13,24 @@ interface ProductPageProps {
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params;
   const product = await getProduct(slug);
-  return { title: product ? `${product.name} · UMWAMBARO` : "Product · UMWAMBARO" };
+  if (!product) return { title: "Product · UMWAMBARO" };
+  // What WhatsApp, Facebook etc. show when someone shares the product link.
+  const title = `${product.name} – ${rwf(product.price)}`;
+  const description = [
+    product.condition === "chaguwa" ? "Chaguwa (used, good condition)" : "New",
+    product.description,
+    "Pay on delivery anywhere in Rwanda.",
+  ].filter(Boolean).join(" · ");
+  const image = product.images[0] || product.image;
+  return {
+    title: `${product.name} · UMWAMBARO`,
+    description,
+    openGraph: {
+      title, description, url: `/shop/${product.slug}`, siteName: siteConfig.fullName, type: "website",
+      images: image ? [{ url: image, alt: product.name }] : undefined,
+    },
+    twitter: { card: "summary_large_image", title, description, images: image ? [image] : undefined },
+  };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {

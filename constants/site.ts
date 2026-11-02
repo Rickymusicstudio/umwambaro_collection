@@ -9,6 +9,7 @@ export const siteConfig = {
   fullName: "Umwambaro Collections",
   tagline: "Fashion for everyone in Rwanda",
   description: "New and Chaguwa clothes, shoes and accessories. Pay on delivery anywhere in Rwanda.",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.umwambarocollections.com", // used for shared links
 
   contact: {
     phone: whatsapp,                // shop phone (defaults to the WhatsApp order number)
