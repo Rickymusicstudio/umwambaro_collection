@@ -26,6 +26,13 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/button";
 import Price from "@/components/ui/Price";
 
+// e.g. "polo-shirt" → "UMW-POLO-SHIR-7F3A" (random end keeps it unique)
+function makeSku(slug: string) {
+  const name = slug.split("-").filter(Boolean).slice(0, 2).map((w) => w.slice(0, 4)).join("-").toUpperCase();
+  const random = Math.random().toString(16).slice(2, 6).toUpperCase().padEnd(4, "0");
+  return `UMW-${name || "ITEM"}-${random}`;
+}
+
 type AdminProduct = {
   id: string;
   sku: string | null;
@@ -389,7 +396,8 @@ export default function AdminProducts() {
     }
 
     const payload = {
-      sku: form.sku.trim() || null,
+      // the database needs a SKU, so make one when the box is left empty
+      sku: form.sku.trim() || makeSku(slug),
       name: form.name.trim(),
       slug,
       description: form.description.trim() || null,
@@ -600,7 +608,7 @@ export default function AdminProducts() {
                 setForm({ ...form, sku: event.target.value })
               }
               className={inputClass}
-              placeholder="UMW-005"
+              placeholder="Leave empty to create one"
             />
           </Field>
 
