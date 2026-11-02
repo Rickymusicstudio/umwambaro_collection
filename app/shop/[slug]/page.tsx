@@ -6,6 +6,13 @@ import { getProduct, getRelatedProducts } from "@/services/product.service";
 import { siteConfig } from "@/constants/site";
 import { rwf } from "@/lib/format";
 
+// Cache each product page for 30 seconds (like the home and shop pages)
+// instead of asking the database on every visit. Pages are built on first visit.
+export const revalidate = 30;
+export async function generateStaticParams() {
+  return [];
+}
+
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }

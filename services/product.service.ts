@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Product } from "@/types/product";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -63,7 +64,9 @@ function mapProduct(row: SupabaseProduct): Product {
   };
 }
 
-async function fetchProducts(): Promise<Product[] | null> {
+// cache(): one database call per page view, even when metadata, the page and
+// related products all ask for products.
+const fetchProducts = cache(async (): Promise<Product[] | null> => {
   const supabase = getSupabaseServerClient();
   if (!supabase) return null;
 
@@ -85,7 +88,7 @@ async function fetchProducts(): Promise<Product[] | null> {
   }
 
   return (data as SupabaseProduct[]).map(mapProduct);
-}
+});
 
 // Never show demo products to customers: if Supabase fails we show an empty shop.
 export async function getProducts(): Promise<Product[]> {
