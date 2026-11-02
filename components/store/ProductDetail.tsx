@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Banknote, Check, Minus, Plus, ShieldCheck, Truck } from "lucide-react";
 import type { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
+import ProductGallery from "@/components/store/ProductGallery";
 import { rwf, discountPercent } from "@/lib/format";
 
 export default function ProductDetail({ product }: { product: Product }) {
   const router = useRouter();
   const { addItem } = useCart();
   const images = product.images.length ? product.images : product.image ? [product.image] : [];
-  const [active, setActive] = useState(0);
   const [size, setSize] = useState(product.sizes?.length === 1 ? product.sizes[0] : "");
   const [color, setColor] = useState(product.colors?.length === 1 ? product.colors[0] : "");
   const [qty, setQty] = useState(1);
@@ -37,22 +36,8 @@ export default function ProductDetail({ product }: { product: Product }) {
   return (
     <div className="grid gap-4 pb-24 md:grid-cols-2 md:gap-8 md:pb-0 lg:grid-cols-[1.1fr_1fr_300px]">
       {/* photos */}
-      <div>
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-neutral-100">
-          {images[active] && <Image src={images[active]} alt={product.name} fill priority sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />}
-          {off > 0 && <span className="absolute left-3 top-3 rounded bg-[#cc0c39] px-2 py-1 text-sm font-bold text-white">-{off}%</span>}
-        </div>
-        {images.length > 1 && (
-          <div className="no-scrollbar mt-2 flex gap-2 overflow-x-auto">
-            {images.map((src, i) => (
-              <button key={src} onClick={() => setActive(i)} aria-label={`Photo ${i + 1}`}
-                className={`relative h-16 w-16 shrink-0 overflow-hidden rounded border-2 ${i === active ? "border-[var(--um-accent)]" : "border-transparent"}`}>
-                <Image src={src} alt="" fill sizes="64px" className="object-cover" />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <ProductGallery images={images} name={product.name}
+        badge={off > 0 ? <span className="absolute left-3 top-3 rounded bg-[#cc0c39] px-2 py-1 text-sm font-bold text-white">-{off}%</span> : undefined} />
 
       {/* details */}
       <div>
