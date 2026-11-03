@@ -9,6 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { rwf, normalizeRwandaPhone, isValidRwandaPhone, uuid } from "@/lib/format";
 import type { CustomerDetails } from "@/types/order";
+import { saveMyOrder } from "@/lib/myOrders";
 
 type Zone = { district: string; province: string; fee: number };
 
@@ -95,6 +96,7 @@ export default function CheckoutPage() {
       if (!res.ok) { popup?.close(); setError(result.error ?? "We could not place your order. Please try again."); return; }
 
       const order = result.order as { orderNumber: string; total: number; shipping: number };
+      saveMyOrder({ orderNumber: order.orderNumber, phone: normalizeRwandaPhone(form.phone), total: order.total, placedAt: new Date().toISOString() });
       try {
         const { fullName, phone, email, district, sector, address } = form;
         localStorage.setItem(SAVED_KEY, JSON.stringify({ fullName, phone, email, district, sector, address }));
