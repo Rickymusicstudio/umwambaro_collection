@@ -11,6 +11,13 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: `${siteConfig.fullName} · ${siteConfig.tagline}`,
   description: siteConfig.description,
+  openGraph: {
+    title: `${siteConfig.fullName} · ${siteConfig.tagline}`,
+    description: siteConfig.description,
+    siteName: siteConfig.fullName,
+    type: "website",
+    locale: "en_RW",
+  },
 };
 
 export const viewport: Viewport = {
