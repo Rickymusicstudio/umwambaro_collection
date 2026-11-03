@@ -19,19 +19,19 @@ export default function FeaturedCollections() {
           <CollectionCard
             title="Women"
             href="/shop/women"
-            image="/images/women.jpeg"
+            image="/images/categories/women.webp"
           />
 
           <CollectionCard
             title="Men"
             href="/shop/men"
-            image="/images/men.jpeg"
+            image="/images/categories/men.webp"
           />
 
           <CollectionCard
             title="Accessories"
             href="/shop/accessories"
-            image="/images/accessories.jpeg"
+            image="/images/categories/accessories.webp"
           />
 
         </div>

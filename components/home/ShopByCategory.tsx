@@ -10,42 +10,42 @@ const categories = [
     slug: "women",
     description: "Elegant styles for every occasion",
     image:
-      "/images/women.jpeg",
+      "/images/categories/women.webp",
   },
   {
     name: "Men",
     slug: "men",
     description: "Modern looks for everyday style",
     image:
-      "/images/men.jpeg",
+      "/images/categories/men.webp",
   },
   {
     name: "Kids",
     slug: "kids",
     description: "Comfortable styles for little ones",
     image:
-      "/images/kids.jpeg",
+      "/images/categories/kids.webp",
   },
   {
     name: "Shoes",
     slug: "shoes",
     description: "Step into your perfect pair",
     image:
-      "/images/shoes.jpeg",
+      "/images/categories/shoes.webp",
   },
   {
     name: "Accessories",
     slug: "accessories",
     description: "Complete your look",
     image:
-      "/images/accessories.jpeg",
+      "/images/categories/accessories.webp",
   },
   {
     name: "Sale",
     slug: "sale",
     description: "Great styles at special prices",
     image:
-      "/images/kcc.png",
+      "/images/banner.webp",
   },
 ];
 

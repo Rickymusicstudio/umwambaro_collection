@@ -29,7 +29,7 @@ export default async function HomePage() {
             <Link href="/shop?condition=chaguwa" className="rounded-full border border-white/60 px-5 py-2.5 text-sm font-bold hover:bg-white/10">Chaguwa deals</Link>
           </div>
         </div>
-        <Image src="/images/shop-banner.jpeg" alt="" fill priority sizes="100vw" className="object-cover opacity-25" />
+        <Image src="/images/banner.webp" alt="" fill priority sizes="100vw" className="object-cover opacity-25" />
       </section>
 
       {/* trust strip */}

@@ -4,7 +4,7 @@ export default function ShopHero() {
   return (
     <section className="relative h-[55vh] overflow-hidden">
       <Image
-        src="/images/shop-banner.jpeg"
+        src="/images/banner.webp"
         alt="Shop"
         fill
         priority

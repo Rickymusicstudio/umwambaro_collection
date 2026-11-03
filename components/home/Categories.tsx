@@ -3,12 +3,12 @@ import Link from "next/link";
 import Container from "@/components/layout/Container";
 
 const categories = [
-  { name: "Women", image: "/images/women.jpeg" },
-  { name: "Men", image: "/images/men.jpeg" },
-  { name: "Kids", image: "/images/products/product3.png" },
-  { name: "Shoes", image: "/images/products/product4.png" },
-  { name: "Bags", image: "/images/kcc.png" },
-  { name: "Accessories", image: "/images/accessories.jpeg" },
+  { name: "Women", image: "/images/categories/women.webp" },
+  { name: "Men", image: "/images/categories/men.webp" },
+  { name: "Kids", image: "/images/categories/kids.webp" },
+  { name: "Shoes", image: "/images/categories/shoes.webp" },
+  { name: "Bags", image: "/images/banner.webp" },
+  { name: "Accessories", image: "/images/categories/accessories.webp" },
 ];
 
 export default function Categories() {

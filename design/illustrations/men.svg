@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <rect width="800" height="800" fill="#dfe9e7"/>
+  <circle cx="400" cy="430" r="300" fill="#cddcd9"/>
+  <!-- blazer -->
+  <path d="M230 260 L330 200 L400 300 L470 200 L570 260 L610 690 L190 690 Z" fill="#0f3b3e"/>
+  <!-- shirt -->
+  <path d="M330 200 L400 300 L470 200 L450 190 L400 230 L350 190 Z" fill="#f6efe2"/>
+  <path d="M345 190 L400 232 L380 262 L330 205 Z M455 190 L400 232 L420 262 L470 205 Z" fill="#ffffff"/>
+  <!-- lapels -->
+  <path d="M330 200 L400 300 L392 420 L300 300 Z" fill="#165a5e"/>
+  <path d="M470 200 L400 300 L408 420 L500 300 Z" fill="#165a5e"/>
+  <!-- tie -->
+  <path d="M388 236 L412 236 L420 258 L412 420 L400 440 L388 420 L380 258 Z" fill="#f2a900"/>
+  <!-- pocket square + buttons -->
+  <path d="M480 360 L540 352 L542 372 L482 380 Z" fill="#ffd77a"/>
+  <circle cx="400" cy="500" r="9" fill="#f2a900"/><circle cx="400" cy="560" r="9" fill="#f2a900"/>
+  <path d="M230 260 L190 690 L250 690 L270 330 Z M570 260 L610 690 L550 690 L530 330 Z" fill="#0c3134"/>
+</svg>

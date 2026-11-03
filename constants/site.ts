@@ -27,9 +27,9 @@ export const siteConfig = {
 
 // Main shop categories. `name` must match the Category typed in Admin → Products.
 export const shopCategories = [
-  { name: "Women", image: "/images/women.jpeg" },
-  { name: "Men", image: "/images/men.jpeg" },
-  { name: "Kids", image: "/images/kids.jpeg" },
-  { name: "Shoes", image: "/images/shoes.jpeg" },
-  { name: "Accessories", image: "/images/accessories.jpeg" },
+  { name: "Women", image: "/images/categories/women.webp" },
+  { name: "Men", image: "/images/categories/men.webp" },
+  { name: "Kids", image: "/images/categories/kids.webp" },
+  { name: "Shoes", image: "/images/categories/shoes.webp" },
+  { name: "Accessories", image: "/images/categories/accessories.webp" },
 ];

@@ -53,7 +53,7 @@ export default function Hero() {
           <div className="relative h-[420px]">
 
             <Image
-              src="/images/kcc.png"
+              src="/images/banner.webp"
               alt="Umwambaro Collection"
               fill
               priority
