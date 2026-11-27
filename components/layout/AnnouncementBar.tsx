@@ -23,7 +23,7 @@ const announcements: Announcement[] = [
 
   {
     icon: <Sparkles className="h-4 w-4" />,
-    text: "Discover the latest Umwambaro Collections arrivals.",
+    text: "Discover the latest Umwambaro Collection arrivals.",
   },
 
   {

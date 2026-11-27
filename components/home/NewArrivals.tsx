@@ -24,7 +24,7 @@ export default async function NewArrivals() {
             </h2>
 
             <p className="mt-3 max-w-xl text-sm leading-6 text-gray-600 sm:text-base">
-              Discover the latest pieces added to UMWAMBARO Collections.
+              Discover the latest pieces added to Umwambaro Collection.
             </p>
           </div>
 

@@ -21,7 +21,7 @@ export default function ShopHeader({
         animate={{ opacity: 1 }}
       >
         <p className="uppercase tracking-[0.3em] text-amber-300">
-          Umwambaro Collections
+          Umwambaro Collection
         </p>
 
         <h1 className="mt-4 text-5xl font-bold">

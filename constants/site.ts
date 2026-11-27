@@ -6,7 +6,7 @@ const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER ?? "";
 
 export const siteConfig = {
   name: "UMWAMBARO",
-  fullName: "Umwambaro Collections",
+  fullName: "Umwambaro Collection",
   tagline: "Fashion for everyone in Rwanda",
   description: "New and Chaguwa clothes, shoes and accessories. Pay on delivery anywhere in Rwanda.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.umwambarocollections.com", // used for shared links

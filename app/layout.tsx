@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
-import { DM_Serif_Display } from "next/font/google";
+import { Cormorant_Garamond } from "next/font/google";
 
 import "./globals.css";
 
-// Elegant serif used for the "Umwambaro" wordmark.
-const display = DM_Serif_Display({ weight: "400", subsets: ["latin"], variable: "--font-display", display: "swap" });
+// Elegant serif used for the UMWAMBARO wordmark.
+const display = Cormorant_Garamond({ weight: "600", subsets: ["latin"], variable: "--font-display", display: "swap" });
 
 import { CartProvider } from "@/context/CartContext";
 import StoreChrome from "@/components/store/StoreChrome";

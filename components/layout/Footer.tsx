@@ -28,7 +28,7 @@ export default function Footer() {
             <Link className="mt-4 inline-flex rounded-full bg-[var(--um-accent)] px-5 py-2.5 text-sm font-semibold text-[#2a211f] hover:bg-[var(--um-accent-light)]" href="/contact">Contact us</Link>
           </div>
         </div>
-        <div className="border-t border-white/10 py-5 text-xs text-white/50">© {new Date().getFullYear()} Umwambaro Collections. All rights reserved.</div>
+        <div className="border-t border-white/10 py-5 text-xs text-white/50">© {new Date().getFullYear()} Umwambaro Collection. All rights reserved.</div>
       </Container>
     </footer>
   );
