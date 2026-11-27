@@ -16,13 +16,37 @@ const quickLinks = [
   { label: "Track order", href: "/track" },
 ];
 
+/** The "U" brand mark (same shape as the site icon), in an amber badge. */
+export function LogoMark({ size = 40 }: { size?: number }) {
+  return (
+    <span
+      aria-hidden
+      className="grid shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#ffd77a] via-[#f2a900] to-[#c98a00] shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_2px_6px_rgba(0,0,0,0.25)]"
+      style={{ width: size, height: size }}
+    >
+      <svg viewBox="0 0 64 64" width={size * 0.7} height={size * 0.7}>
+        <path d="M20 13v18a12 12 0 0 0 24 0V13" fill="none" stroke="var(--um-dark)" strokeWidth="8" strokeLinecap="round" />
+        <rect x="18" y="52" width="28" height="4" rx="2" fill="var(--um-dark)" />
+      </svg>
+    </span>
+  );
+}
+
 export function Logo({ small = false }: { small?: boolean }) {
   return (
-    <Link href="/" className="flex shrink-0 flex-col leading-none text-white" aria-label="UMWAMBARO home">
-      <span className={`${small ? "text-lg" : "text-xl sm:text-2xl"} font-extrabold tracking-tight`}>
-        UMWAMBARO
+    <Link href="/" className="group flex shrink-0 items-center gap-2.5 leading-none text-white" aria-label="Umwambaro Collections home">
+      <LogoMark size={small ? 32 : 40} />
+      <span className="flex flex-col">
+        <span
+          className={`${small ? "text-[22px]" : "text-[24px] sm:text-[28px]"} tracking-[0.01em] transition-colors group-hover:text-[var(--um-accent-light)]`}
+          style={{ fontFamily: "var(--font-display), Georgia, serif" }}
+        >
+          Umwambaro
+        </span>
+        <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.42em] text-[var(--um-accent-light)] sm:text-[10px]">
+          Collections
+        </span>
       </span>
-      <span className="mt-0.5 h-1 w-full rounded-full bg-[var(--um-accent)]" />
     </Link>
   );
 }

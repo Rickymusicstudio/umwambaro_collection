@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { siteConfig, shopCategories } from "@/constants/site";
 import { displayPhone } from "@/lib/format";
+import { Logo } from "@/components/store/Header";
 
 export default function Footer() {
   const { contact, social } = siteConfig;
@@ -13,7 +14,7 @@ export default function Footer() {
       </a>
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="text-lg font-extrabold text-white">{siteConfig.name}</p>
+          <Logo small />
           <p className="mt-2 leading-6 text-neutral-300">{siteConfig.description}</p>
         </div>
         <div>

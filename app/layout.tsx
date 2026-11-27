@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+import { DM_Serif_Display } from "next/font/google";
+
 import "./globals.css";
+
+// Elegant serif used for the "Umwambaro" wordmark.
+const display = DM_Serif_Display({ weight: "400", subsets: ["latin"], variable: "--font-display", display: "swap" });
 
 import { CartProvider } from "@/context/CartContext";
 import StoreChrome from "@/components/store/StoreChrome";
@@ -28,7 +33,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={display.variable}>
       <body className="min-h-screen bg-[var(--um-page)] text-neutral-900 antialiased">
         <CartProvider>
           <StoreChrome>{children}</StoreChrome>
