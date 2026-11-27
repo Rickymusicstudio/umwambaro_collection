@@ -5,7 +5,7 @@ export default function Logo() {
     <Link
       href="/"
       className="flex min-w-0 shrink flex-col leading-none"
-      aria-label="UMWAMBARO Collections"
+      aria-label="Umwambaro Collection"
     >
       <span
         className="

@@ -47,7 +47,7 @@ export default function ProductDetail({ product }: { product: Product }) {
             {product.category}
           </Link>
           <ShareButton path={`/shop/${product.slug}`} title={product.name}
-            text={`${product.name} – ${rwf(product.price)} at Umwambaro Collections`} />
+            text={`${product.name} – ${rwf(product.price)} at Umwambaro Collection`} />
         </div>
         <h1 className="mt-1 text-xl font-semibold leading-snug text-neutral-900 sm:text-2xl">{product.name}</h1>
         <div className="mt-2 flex flex-wrap gap-2">

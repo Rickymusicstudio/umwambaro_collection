@@ -28,7 +28,13 @@ export async function generateMetadata({ params }: ProductPageProps) {
     product.description,
     "Pay on delivery anywhere in Rwanda.",
   ].filter(Boolean).join(" · ");
-  const image = product.images[0] || product.image;
+  const photo = product.images[0] || product.image;
+  // WhatsApp ignores preview pictures bigger than ~300 KB and shows the site icon instead.
+  // Product photos come straight from the phone (often 2 MB+), so share a small copy
+  // made by the site's own image resizer (~60–80 KB).
+  const image = photo
+    ? `${siteConfig.url.replace(/\/$/, "")}/_next/image?url=${encodeURIComponent(photo)}&w=750&q=75`
+    : undefined;
   return {
     title: `${product.name} · UMWAMBARO`,
     description,

@@ -145,7 +145,7 @@ export default function ProductTabs({
                       </p>
 
                       <p className="mt-1 text-sm text-neutral-500">
-                        Reviews from verified Umwambaro Collections customers.
+                        Reviews from verified Umwambaro Collection customers.
                       </p>
                     </div>
                   </div>
@@ -201,7 +201,7 @@ export default function ProductTabs({
 
                   <p>
                     Eligible products may be returned or exchanged according to
-                    the Umwambaro Collections return policy.
+                    the Umwambaro Collection return policy.
                   </p>
 
                   <p>

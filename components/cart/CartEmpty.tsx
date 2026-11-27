@@ -21,7 +21,7 @@ export default function CartEmpty() {
       <p className="mt-4 max-w-md text-neutral-500">
         Looks like you haven't added anything yet.
         Discover handcrafted pieces from
-        Umwambaro Collections.
+        Umwambaro Collection.
       </p>
 
       <Link
