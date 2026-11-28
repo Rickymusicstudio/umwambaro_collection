@@ -16,7 +16,7 @@ export default function BottomNav() {
     { href: "/account", label: "Account", icon: User, active: pathname.startsWith("/account") || pathname === "/track" },
   ];
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)] sm:hidden">
+    <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-neutral-200 bg-[var(--um-card)] pb-[env(safe-area-inset-bottom)] sm:hidden">
       {items.map(({ href, label, icon: Icon, active, badge }) => (
         <Link key={href} href={href} className={`relative flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold ${active ? "text-[var(--um-strong)]" : "text-neutral-600"}`}>
           <Icon size={22} />

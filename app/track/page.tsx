@@ -94,7 +94,7 @@ function Track() {
   return (
     <div className="mx-auto max-w-2xl space-y-3 px-2 py-4 sm:px-4">
       {mine && mine.length > 0 && (
-        <section className="rounded-lg bg-white p-4 sm:p-6">
+        <section className="rounded-lg bg-[var(--um-card)] p-4 sm:p-6">
           <h1 className="flex items-center gap-2 text-xl font-bold"><PackageSearch /> Your orders</h1>
           <p className="mt-1 text-sm text-neutral-600">Orders made on this phone. Tap one to see where it is.</p>
           <ul className="mt-3 divide-y divide-neutral-200">
@@ -122,7 +122,7 @@ function Track() {
         </section>
       )}
 
-      <form onSubmit={lookup} className="rounded-lg bg-white p-4 sm:p-6">
+      <form onSubmit={lookup} className="rounded-lg bg-[var(--um-card)] p-4 sm:p-6">
         <h2 className="flex items-center gap-2 text-xl font-bold"><PackageSearch /> {mine?.length ? "Track another order" : "Track your order"}</h2>
         <p className="mt-1 text-sm text-neutral-600">No account needed. Orders you make on this phone appear above automatically.</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -130,20 +130,20 @@ function Track() {
           <label className="text-sm font-semibold">Phone used for the order<input className={input} value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" inputMode="tel" placeholder="0788 123 456" /></label>
         </div>
         <button disabled={loading} className="mt-4 w-full rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] py-3 font-bold hover:bg-[var(--um-cta-hover)] disabled:opacity-60">{loading ? "Searching…" : "Track order"}</button>
-        {message && <p className="mt-3 rounded-lg bg-[#fff3f3] p-3 text-sm font-semibold text-[#cc0c39]">{message}</p>}
+        {message && <p className="mt-3 rounded-lg bg-[var(--um-danger-bg)] p-3 text-sm font-semibold text-[var(--um-danger)]">{message}</p>}
       </form>
 
       {result && (
-        <section className="rounded-lg bg-white p-4 sm:p-6">
+        <section className="rounded-lg bg-[var(--um-card)] p-4 sm:p-6">
           <p className="text-sm text-neutral-600">Order {result.order_number} · {new Date(result.created_at).toLocaleDateString("en-GB")}</p>
           {result.status === "cancelled" ? (
-            <p className="mt-3 rounded-lg bg-[#fff3f3] p-3 font-bold text-[#cc0c39]">This order was cancelled.</p>
+            <p className="mt-3 rounded-lg bg-[var(--um-danger-bg)] p-3 font-bold text-[var(--um-danger)]">This order was cancelled.</p>
           ) : (
             <ol className="mt-4 grid grid-cols-3 gap-1">
               {steps.map((s, i) => (
                 <li key={s.key} className="text-center">
                   <span className={`block h-2 rounded-full ${i <= stepIndex ? "bg-[#067d62]" : "bg-neutral-200"}`} />
-                  <span className={`mt-2 block text-xs font-semibold ${i <= stepIndex ? "text-[#067d62]" : "text-neutral-500"}`}>{s.label}</span>
+                  <span className={`mt-2 block text-xs font-semibold ${i <= stepIndex ? "text-[var(--um-success)]" : "text-neutral-500"}`}>{s.label}</span>
                 </li>
               ))}
             </ol>

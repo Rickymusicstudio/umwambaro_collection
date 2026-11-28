@@ -60,7 +60,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <Link href="/shop" className="hover:underline">Shop</Link> ›{" "}
         <Link href={`/shop?category=${encodeURIComponent(product.category)}`} className="hover:underline">{product.category}</Link>
       </nav>
-      <div className="rounded-lg bg-white p-3 sm:p-5">
+      <div className="rounded-lg bg-[var(--um-card)] p-3 sm:p-5">
         <ProductDetail product={product} />
       </div>
       <ProductRow title="You may also like" href={`/shop?category=${encodeURIComponent(product.category)}`} products={related} />

@@ -58,7 +58,7 @@ export default function ProductDetail({ product }: { product: Product }) {
         </div>
 
         <div className="mt-4 border-t border-neutral-200 pt-4">
-          {off > 0 && <p className="text-sm text-[#cc0c39]">Save {off}%</p>}
+          {off > 0 && <p className="text-sm text-[var(--um-danger)]">Save {off}%</p>}
           <p className="text-3xl font-bold text-neutral-900">{rwf(product.price)}</p>
           {off > 0 && <p className="text-sm text-neutral-500">Was <span className="line-through">{rwf(product.comparePrice!)}</span></p>}
         </div>
@@ -69,7 +69,7 @@ export default function ProductDetail({ product }: { product: Product }) {
             <div className="flex flex-wrap gap-2">
               {product.sizes.map((s) => (
                 <button key={s} onClick={() => { setSize(s); setError(""); }}
-                  className={`min-w-12 rounded-lg border-2 px-3 py-2 text-sm font-bold ${size === s ? "border-[var(--um-strong)] bg-[#fff3e0]" : "border-neutral-300 bg-white"}`}>{s}</button>
+                  className={`min-w-12 rounded-lg border-2 px-3 py-2 text-sm font-bold ${size === s ? "border-[var(--um-strong)] bg-[var(--um-warn-bg)]" : "border-neutral-300 bg-[var(--um-card)]"}`}>{s}</button>
               ))}
             </div>
           </div>
@@ -80,7 +80,7 @@ export default function ProductDetail({ product }: { product: Product }) {
             <div className="flex flex-wrap gap-2">
               {product.colors.map((c) => (
                 <button key={c} onClick={() => { setColor(c); setError(""); }}
-                  className={`rounded-lg border-2 px-3 py-2 text-sm font-bold ${color === c ? "border-[var(--um-strong)] bg-[#fff3e0]" : "border-neutral-300 bg-white"}`}>{c}</button>
+                  className={`rounded-lg border-2 px-3 py-2 text-sm font-bold ${color === c ? "border-[var(--um-strong)] bg-[var(--um-warn-bg)]" : "border-neutral-300 bg-[var(--um-card)]"}`}>{c}</button>
               ))}
             </div>
           </div>
@@ -95,9 +95,9 @@ export default function ProductDetail({ product }: { product: Product }) {
       </div>
 
       {/* buy box */}
-      <div className="h-fit rounded-lg border border-neutral-300 bg-white p-4 md:col-span-2 lg:col-span-1">
+      <div className="h-fit rounded-lg border border-neutral-300 bg-[var(--um-card)] p-4 md:col-span-2 lg:col-span-1">
         <p className="text-2xl font-bold">{rwf(product.price * qty)}</p>
-        <p className={`mt-2 font-semibold ${soldOut ? "text-[#cc0c39]" : "text-[#067d62]"}`}>
+        <p className={`mt-2 font-semibold ${soldOut ? "text-[var(--um-danger)]" : "text-[var(--um-success)]"}`}>
           {soldOut ? "Sold out" : product.stock <= 3 ? `Only ${product.stock} left – order soon` : "In stock"}
         </p>
         {!soldOut && (
@@ -112,7 +112,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                 </div>
               </div>
             )}
-            {error && <p className="mt-3 rounded bg-[#fff3e0] p-2 text-sm font-semibold text-[var(--um-strong)]">{error}</p>}
+            {error && <p className="mt-3 rounded bg-[var(--um-warn-bg)] p-2 text-sm font-semibold text-[var(--um-strong)]">{error}</p>}
             <button onClick={() => add(false)} className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] py-3 font-bold hover:bg-[var(--um-cta-hover)]">
               {added ? <><Check size={18} /> Added to cart</> : "Add to cart"}
             </button>
@@ -120,15 +120,15 @@ export default function ProductDetail({ product }: { product: Product }) {
           </>
         )}
         <ul className="mt-4 space-y-2 border-t border-neutral-200 pt-4 text-sm text-neutral-700">
-          <li className="flex gap-2"><Banknote size={18} className="shrink-0 text-[#067d62]" /> Pay when it arrives (cash on delivery)</li>
-          <li className="flex gap-2"><Truck size={18} className="shrink-0 text-[#067d62]" /> Delivery to all 30 districts – fee shown at checkout</li>
-          <li className="flex gap-2"><ShieldCheck size={18} className="shrink-0 text-[#067d62]" /> Check your item before you pay</li>
+          <li className="flex gap-2"><Banknote size={18} className="shrink-0 text-[var(--um-success)]" /> Pay when it arrives (cash on delivery)</li>
+          <li className="flex gap-2"><Truck size={18} className="shrink-0 text-[var(--um-success)]" /> Delivery to all 30 districts – fee shown at checkout</li>
+          <li className="flex gap-2"><ShieldCheck size={18} className="shrink-0 text-[var(--um-success)]" /> Check your item before you pay</li>
         </ul>
       </div>
 
       {/* phone: sticky buy bar */}
       {!soldOut && (
-        <div className="fixed inset-x-0 bottom-[60px] z-30 flex items-center gap-3 border-t border-neutral-200 bg-white p-3 md:hidden">
+        <div className="fixed inset-x-0 bottom-[60px] z-30 flex items-center gap-3 border-t border-neutral-200 bg-[var(--um-card)] p-3 md:hidden">
           <p className="text-lg font-bold">{rwf(product.price)}</p>
           <button onClick={() => add(false)} className="flex-1 rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] py-3 text-sm font-bold">
             {added ? "Added ✓" : "Add to cart"}

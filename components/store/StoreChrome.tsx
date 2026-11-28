@@ -11,7 +11,7 @@ export default function StoreChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   if (pathname.startsWith("/admin")) return <>{children}</>;
   return (
-    <>
+    <div className="store-dark min-h-screen">
       <div id="top" />
       <Suspense fallback={<div className="h-[104px] bg-[var(--um-dark)]" />}>
         <Header />
@@ -19,6 +19,6 @@ export default function StoreChrome({ children }: { children: ReactNode }) {
       <main className="min-h-[60vh]">{children}</main>
       <Footer />
       <BottomNav />
-    </>
+    </div>
   );
 }

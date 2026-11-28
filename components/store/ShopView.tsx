@@ -98,7 +98,7 @@ export default function ShopView({ products }: { products: Product[] }) {
           <div className="flex flex-wrap gap-2">
             {sizes.map((s) => (
               <button key={s} onClick={() => set("size", size === s ? "" : s)}
-                className={`min-w-11 rounded border px-2 py-1.5 font-semibold ${size === s ? "border-[var(--um-strong)] bg-[#fff3e0] text-[var(--um-strong)]" : "border-neutral-300 bg-white"}`}>
+                className={`min-w-11 rounded border px-2 py-1.5 font-semibold ${size === s ? "border-[var(--um-strong)] bg-[var(--um-warn-bg)] text-[var(--um-strong)]" : "border-neutral-300 bg-[var(--um-card)]"}`}>
                 {s}
               </button>
             ))}
@@ -114,7 +114,7 @@ export default function ShopView({ products }: { products: Product[] }) {
 
   return (
     <div className="mx-auto max-w-7xl px-2 py-3 sm:px-4 sm:py-4">
-      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg bg-white p-3">
+      <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg bg-[var(--um-card)] p-3">
         <p className="mr-auto text-sm text-neutral-700">
           <strong>{list.length}</strong> {list.length === 1 ? "result" : "results"}
           {q && <> for <strong className="text-[var(--um-strong)]">&ldquo;{q}&rdquo;</strong></>}
@@ -140,10 +140,10 @@ export default function ShopView({ products }: { products: Product[] }) {
       )}
 
       <div className="grid gap-4 lg:grid-cols-[220px_1fr]">
-        <aside className="hidden h-fit rounded-lg bg-white p-4 lg:block">{filters}</aside>
+        <aside className="hidden h-fit rounded-lg bg-[var(--um-card)] p-4 lg:block">{filters}</aside>
         <div>
           {list.length ? <ProductGrid products={list} /> : (
-            <div className="rounded-lg bg-white p-10 text-center">
+            <div className="rounded-lg bg-[var(--um-card)] p-10 text-center">
               <p className="text-lg font-bold">No products found</p>
               <p className="mt-1 text-sm text-neutral-600">Try another word or remove a filter.</p>
               {chips.length > 0 && <button onClick={clearAll} className="mt-4 rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] px-5 py-2 text-sm font-bold">Clear filters</button>}
@@ -154,7 +154,7 @@ export default function ShopView({ products }: { products: Product[] }) {
 
       {open && (
         <div className="fixed inset-0 z-50 bg-black/40 lg:hidden" onClick={() => setOpen(false)}>
-          <div className="absolute inset-y-0 left-0 w-[85%] max-w-sm overflow-y-auto bg-white p-4" onClick={(e) => e.stopPropagation()}>
+          <div className="absolute inset-y-0 left-0 w-[85%] max-w-sm overflow-y-auto bg-[var(--um-card)] p-4" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between">
               <p className="text-lg font-bold">Filters</p>
               <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-10 w-10 place-items-center"><X /></button>
