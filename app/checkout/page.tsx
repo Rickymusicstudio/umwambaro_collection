@@ -119,7 +119,7 @@ export default function CheckoutPage() {
   if (!items.length) {
     return (
       <div className="mx-auto max-w-3xl px-2 py-6 sm:px-4">
-        <div className="rounded-lg bg-white p-10 text-center">
+        <div className="rounded-lg bg-[var(--um-card)] p-10 text-center">
           <h1 className="text-xl font-bold">Your cart is empty</h1>
           <Link href="/shop" className="mt-5 inline-block rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] px-6 py-3 font-bold">Start shopping</Link>
         </div>
@@ -127,14 +127,14 @@ export default function CheckoutPage() {
     );
   }
 
-  const input = "mt-1 h-12 w-full rounded-lg border border-neutral-400 bg-white px-3 text-base outline-none focus:border-[var(--um-cta)] focus:ring-2 focus:ring-[var(--um-cta)]/30";
+  const input = "mt-1 h-12 w-full rounded-lg border border-neutral-400 bg-[var(--um-card)] px-3 text-base outline-none focus:border-[var(--um-cta)] focus:ring-2 focus:ring-[var(--um-cta)]/30";
 
   return (
     <div className="mx-auto max-w-5xl px-2 py-3 sm:px-4 sm:py-4">
       <h1 className="mb-3 flex items-center gap-2 text-xl font-bold sm:text-2xl"><Lock size={20} /> Checkout</h1>
       <form onSubmit={submit} className="grid gap-3 lg:grid-cols-[1fr_340px]">
         <div className="space-y-3">
-          <section className="rounded-lg bg-white p-4 sm:p-5">
+          <section className="rounded-lg bg-[var(--um-card)] p-4 sm:p-5">
             <h2 className="text-lg font-bold">1. Delivery details</h2>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <label className="text-sm font-semibold">Full name *<input className={input} value={form.fullName} onChange={set("fullName")} autoComplete="name" /></label>
@@ -157,18 +157,18 @@ export default function CheckoutPage() {
                 <input className={input} value={form.notes ?? ""} onChange={set("notes")} placeholder="Best time to call, etc." />
               </label>
             </div>
-            {zoneError && <p className="mt-3 text-sm font-semibold text-[#cc0c39]">{zoneError}</p>}
+            {zoneError && <p className="mt-3 text-sm font-semibold text-[var(--um-danger)]">{zoneError}</p>}
           </section>
 
-          <section className="rounded-lg bg-white p-4 sm:p-5">
+          <section className="rounded-lg bg-[var(--um-card)] p-4 sm:p-5">
             <h2 className="text-lg font-bold">2. Payment</h2>
-            <div className="mt-3 flex items-center gap-3 rounded-lg border-2 border-[var(--um-cta)] bg-[#fffaf2] p-3">
-              <Banknote className="text-[#067d62]" />
+            <div className="mt-3 flex items-center gap-3 rounded-lg border-2 border-[var(--um-cta)] bg-[var(--um-soft)] p-3">
+              <Banknote className="text-[var(--um-success)]" />
               <div><p className="font-bold">Pay on delivery</p><p className="text-sm text-neutral-600">Pay when your order arrives. We call you first to confirm.</p></div>
             </div>
           </section>
 
-          <section className="rounded-lg bg-white p-4 sm:p-5">
+          <section className="rounded-lg bg-[var(--um-card)] p-4 sm:p-5">
             <h2 className="text-lg font-bold">3. Your items ({items.length})</h2>
             <ul className="mt-2 divide-y divide-neutral-200">
               {items.map((i) => {
@@ -185,7 +185,7 @@ export default function CheckoutPage() {
           </section>
         </div>
 
-        <aside className="h-fit rounded-lg bg-white p-4 lg:sticky lg:top-32">
+        <aside className="h-fit rounded-lg bg-[var(--um-card)] p-4 lg:sticky lg:top-32">
           <button disabled={loading || !zones?.length} className="w-full rounded-full bg-[var(--um-cta)] text-[var(--um-cta-text)] py-3 font-bold hover:bg-[var(--um-cta-hover)] disabled:opacity-60">
             {loading ? "Placing order…" : "Place order"}
           </button>
@@ -193,9 +193,9 @@ export default function CheckoutPage() {
           <dl className="mt-4 space-y-1 border-t border-neutral-200 pt-3 text-sm">
             <div className="flex justify-between"><dt>Items:</dt><dd>{rwf(subtotal)}</dd></div>
             <div className="flex justify-between"><dt>Delivery:</dt><dd>{form.district ? (fee ? rwf(fee) : "Free") : "Choose district"}</dd></div>
-            <div className="flex justify-between border-t border-neutral-200 pt-2 text-lg font-bold text-[#b12704]"><dt>Order total:</dt><dd>{rwf(total)}</dd></div>
+            <div className="flex justify-between border-t border-neutral-200 pt-2 text-lg font-bold text-[var(--um-strong)]"><dt>Order total:</dt><dd>{rwf(total)}</dd></div>
           </dl>
-          {error && <p role="alert" className="mt-3 rounded-lg bg-[#fff3f3] p-3 text-sm font-semibold text-[#cc0c39]">{error}</p>}
+          {error && <p role="alert" className="mt-3 rounded-lg bg-[var(--um-danger-bg)] p-3 text-sm font-semibold text-[var(--um-danger)]">{error}</p>}
         </aside>
       </form>
     </div>

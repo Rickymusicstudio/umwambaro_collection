@@ -12,7 +12,7 @@ export default function AboutPage() {
   ];
   return (
     <div className="mx-auto max-w-3xl px-2 py-4 sm:px-4">
-      <section className="rounded-lg bg-white p-5 sm:p-8">
+      <section className="rounded-lg bg-[var(--um-card)] p-5 sm:p-8">
         <h1 className="text-2xl font-bold">About {siteConfig.fullName}</h1>
         <p className="mt-3 leading-7 text-neutral-700">
           {siteConfig.fullName} is a Rwandan clothing shop. We make it easy to find good clothes, shoes and accessories

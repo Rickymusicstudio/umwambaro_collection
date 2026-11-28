@@ -150,4 +150,57 @@ body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
   --um-link: #165a5e;          /* links */
   --um-line: #d3e3e1;          /* borders */
   --um-muted: #536664;         /* secondary text */
+  --um-card: #ffffff;          /* cards, boxes */
+  --um-success: #067d62;       /* "In stock", good news */
+  --um-danger: #cc0c39;        /* errors, sale price */
+  --um-warn-bg: #fff3e0;       /* warning box */
+  --um-danger-bg: #fff3f3;     /* error box */
 }
+
+/* ===== Shop theme: fully dark (black + gold) =====
+   Applied to the shop pages only (StoreChrome adds .store-dark); the admin area keeps the light colors.
+   The grey scale is flipped, so "dark grey text" becomes light grey and "light grey boxes" become dark. */
+.store-dark {
+  color-scheme: dark;
+  color: #f2f0eb;
+
+  --um-dark: #000000;
+  --um-dark2: #141414;
+  --um-page: #0b0b0b;
+  --um-soft: #1c1c1c;
+  --um-card: #161616;
+  --um-cta: #c9a24a;
+  --um-cta-hover: #b48d38;
+  --um-cta-text: #0b0b0b;
+  --um-accent: #c9a24a;
+  --um-accent-light: #e6c77a;
+  --um-strong: #d9b665;
+  --um-link: #e6c77a;
+  --um-line: #2c2c2c;
+  --um-muted: #a3a3a3;
+  --um-success: #4ade80;
+  --um-danger: #f87171;
+  --um-warn-bg: #2a2110;
+  --um-danger-bg: #2a1414;
+
+  --color-neutral-50: #1a1a1a;
+  --color-neutral-100: #202020;
+  --color-neutral-200: #2c2c2c;
+  --color-neutral-300: #3a3a3a;
+  --color-neutral-400: #6b6b6b;
+  --color-neutral-500: #8f8f8f;
+  --color-neutral-600: #a8a8a8;
+  --color-neutral-700: #c4c4c4;
+  --color-neutral-800: #dcdcdc;
+  --color-neutral-900: #f2f0eb;
+
+  --color-red-50: #2a1414;
+  --color-red-700: #f87171;
+  --color-emerald-50: #10261b;
+  --color-emerald-700: #4ade80;
+  --color-amber-50: #2a2110;
+  --color-amber-800: #e6c77a;
+
+  background: var(--um-page);
+}
+body:has(.store-dark) { background: #0b0b0b; }

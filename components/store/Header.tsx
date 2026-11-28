@@ -54,13 +54,13 @@ export default function Header() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2 sm:flex-nowrap sm:gap-4 sm:px-4">
           <Logo />
 
-          <div className="hidden items-center gap-1 text-xs leading-tight text-neutral-300 lg:flex">
+          <div className="hidden items-center gap-1 text-xs leading-tight text-white/70 lg:flex">
             <MapPin size={18} className="text-white" />
             <span>Deliver to<br /><strong className="text-sm text-white">All Rwanda</strong></span>
           </div>
 
           {/* search: full width on phones (second row) */}
-          <form onSubmit={search} role="search" className="order-last flex h-11 w-full overflow-hidden rounded-lg bg-white sm:order-none sm:flex-1">
+          <form onSubmit={search} role="search" className="order-last flex h-11 w-full overflow-hidden rounded-lg bg-[var(--um-card)] sm:order-none sm:flex-1">
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -68,14 +68,14 @@ export default function Header() {
               aria-label="Search products"
               className="min-w-0 flex-1 px-3 text-[15px] text-neutral-900 outline-none placeholder:text-neutral-500"
             />
-            <button type="submit" aria-label="Search" className="grid w-12 place-items-center bg-[var(--um-accent-light)] text-[var(--um-dark)] hover:bg-[#f3a847]">
+            <button type="submit" aria-label="Search" className="grid w-12 place-items-center bg-[var(--um-accent-light)] text-[var(--um-dark)] hover:bg-[var(--um-cta-hover)]">
               <Search size={22} />
             </button>
           </form>
 
           <div className="ml-auto flex items-center gap-1 sm:ml-0">
             <Link href="/account" className="hidden flex-col rounded px-2 py-1 text-xs leading-tight hover:outline hover:outline-1 hover:outline-white sm:flex">
-              <span className="text-neutral-300">Hello, sign in</span>
+              <span className="text-white/70">Hello, sign in</span>
               <strong className="text-sm">Account</strong>
             </Link>
             <Link href="/account" aria-label="Account" className="grid h-10 w-10 place-items-center sm:hidden">
@@ -102,7 +102,7 @@ export default function Header() {
                 key={l.href}
                 href={l.href}
                 className={`shrink-0 whitespace-nowrap rounded px-3 py-1.5 text-sm font-medium ${
-                  active ? "bg-white text-[var(--um-dark)]" : "hover:outline hover:outline-1 hover:outline-white"
+                  active ? "bg-[var(--um-accent)] text-[var(--um-cta-text)]" : "hover:outline hover:outline-1 hover:outline-white"
                 }`}
               >
                 {l.label}

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { resizeImage } from "@/lib/resizeImage";
 import Button from "@/components/ui/button";
 import Price from "@/components/ui/Price";
 
@@ -233,24 +234,39 @@ export default function AdminProducts() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function uploadFiles(files: File[]) {
-    if (!files.length || !supabase) return;
+  async function uploadFiles(picked: File[]) {
+    if (!picked.length || !supabase) return;
 
     setError("");
     setMessage("");
     setUploading(true);
 
-    const invalid = files.find(
-      (file) =>
-        !file.type.startsWith("image/") ||
-        file.size > 5 * 1024 * 1024
-    );
-
-    if (invalid) {
-      setError(
-        `${invalid.name} is not valid. Use image files up to 5 MB each.`
-      );
+    const notImage = picked.find((file) => file.type && !file.type.startsWith("image/"));
+    if (notImage) {
+      setError(`${notImage.name} is not a photo. Choose JPG, PNG, WebP or HEIC images.`);
       setUploading(false);
+      return;
+    }
+
+    // Shrink big phone photos before uploading, so any size is accepted.
+    setUploadingFiles(picked.map((file) => ({ name: file.name, progress: "uploading" })));
+    const files: File[] = [];
+    for (const file of picked) {
+      try {
+        files.push(await resizeImage(file));
+      } catch {
+        setError(`${file.name} could not be opened. Save it as JPG (or take a screenshot of it) and try again.`);
+        setUploading(false);
+        setUploadingFiles([]);
+        return;
+      }
+    }
+
+    const tooBig = files.find((file) => file.size > 5 * 1024 * 1024);
+    if (tooBig) {
+      setError(`${tooBig.name} is still bigger than 5 MB after shrinking. Try another photo.`);
+      setUploading(false);
+      setUploadingFiles([]);
       return;
     }
 
@@ -719,14 +735,14 @@ export default function AdminProducts() {
               <div>
                 <h4 className="font-semibold">Product images</h4>
                 <p className="mt-1 text-sm text-neutral-500">
-                  Upload JPG, PNG or WebP images up to 5 MB each.
+                  Upload photos straight from your phone. Big photos are made smaller automatically.
                 </p>
               </div>
 
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
+                accept="image/*"
                 multiple
                 className="hidden"
                 onChange={uploadImages}
@@ -771,7 +787,7 @@ export default function AdminProducts() {
                 Drag and drop images here, or click to browse
               </p>
               <p className="mt-2 text-[11px] text-neutral-400">
-                JPG, PNG, WebP or GIF · up to 5 MB each · multiple images supported
+                Any photo size · shrunk automatically · multiple images supported
               </p>
             </button>
 

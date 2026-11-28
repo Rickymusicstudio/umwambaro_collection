@@ -12,7 +12,7 @@ export default function CartPage() {
   if (!items.length) {
     return (
       <div className="mx-auto max-w-3xl px-2 py-6 sm:px-4">
-        <div className="rounded-lg bg-white p-10 text-center">
+        <div className="rounded-lg bg-[var(--um-card)] p-10 text-center">
           <ShoppingCart className="mx-auto text-neutral-300" size={56} />
           <h1 className="mt-4 text-xl font-bold">Your cart is empty</h1>
           <p className="mt-1 text-neutral-600">Find something you like and add it here.</p>
@@ -30,7 +30,7 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto grid max-w-7xl gap-3 px-2 py-3 pb-28 sm:px-4 sm:py-4 lg:grid-cols-[1fr_320px] lg:pb-4">
-      <section className="rounded-lg bg-white p-3 sm:p-5">
+      <section className="rounded-lg bg-[var(--um-card)] p-3 sm:p-5">
         <h1 className="border-b border-neutral-200 pb-3 text-xl font-bold sm:text-2xl">Shopping cart</h1>
         <ul className="divide-y divide-neutral-200">
           {items.map((item) => {
@@ -68,13 +68,13 @@ export default function CartPage() {
         </p>
       </section>
 
-      <aside className="hidden h-fit rounded-lg bg-white p-4 lg:block">
+      <aside className="hidden h-fit rounded-lg bg-[var(--um-card)] p-4 lg:block">
         <p className="text-lg">Subtotal: <strong>{rwf(subtotal)}</strong></p>
         <p className="mt-1 text-sm text-neutral-600">Delivery fee is added at checkout. Pay when it arrives.</p>
         <div className="mt-4">{checkout}</div>
       </aside>
 
-      <div className="fixed inset-x-0 bottom-[60px] z-30 border-t border-neutral-200 bg-white p-3 sm:bottom-0 lg:hidden">
+      <div className="fixed inset-x-0 bottom-[60px] z-30 border-t border-neutral-200 bg-[var(--um-card)] p-3 sm:bottom-0 lg:hidden">
         <p className="mb-2 text-center text-sm">Subtotal: <strong>{rwf(subtotal)}</strong></p>
         {checkout}
       </div>

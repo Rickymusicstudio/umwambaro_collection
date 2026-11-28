@@ -24,7 +24,7 @@ export default function ProductCard({ product, priority = false }: { product: Pr
   }
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white">
+    <div className="group flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-[var(--um-card)]">
       <Link href={`/shop/${product.slug}`} className="relative block aspect-square bg-neutral-100">
         {image ? (
           <Image
@@ -54,7 +54,7 @@ export default function ProductCard({ product, priority = false }: { product: Pr
           <p className="text-lg font-bold leading-none text-neutral-900">{rwf(product.price)}</p>
           {off > 0 && <p className="mt-0.5 text-xs text-neutral-500 line-through">{rwf(product.comparePrice!)}</p>}
           {soldOut ? (
-            <p className="mt-1 text-xs font-semibold text-[#cc0c39]">Sold out</p>
+            <p className="mt-1 text-xs font-semibold text-[var(--um-danger)]">Sold out</p>
           ) : product.stock <= 3 ? (
             <p className="mt-1 text-xs font-semibold text-[var(--um-strong)]">Only {product.stock} left</p>
           ) : null}
@@ -85,7 +85,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
 export function ProductRow({ title, href, products }: { title: string; href: string; products: Product[] }) {
   if (!products.length) return null;
   return (
-    <section className="rounded-lg bg-white p-3 sm:p-4">
+    <section className="rounded-lg bg-[var(--um-card)] p-3 sm:p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3">
         <h2 className="text-lg font-bold text-neutral-900 sm:text-xl">{title}</h2>
         <Link href={href} className="text-sm font-semibold text-[var(--um-link)] hover:text-[var(--um-strong)] hover:underline">See all</Link>

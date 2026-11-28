@@ -9,7 +9,7 @@ export const contentType = "image/png";
 export default function OpengraphImage() {
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "80px", background: "#0f3b3e", color: "#ffffff", fontFamily: "sans-serif" }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "center", padding: "80px", background: "#000000", color: "#ffffff", fontFamily: "sans-serif" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
           <div style={{ width: "120px", height: "120px", borderRadius: "28px", background: "#165a5e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "88px", fontWeight: 800, color: "#f2a900" }}>U</div>
           <div style={{ display: "flex", flexDirection: "column" }}>

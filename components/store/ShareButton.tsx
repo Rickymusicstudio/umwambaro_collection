@@ -40,11 +40,11 @@ export default function ShareButton({ path, title, text }: { path: string; title
   return (
     <div ref={box} className="relative inline-block">
       <button type="button" onClick={share} aria-haspopup="menu" aria-expanded={open}
-        className="inline-flex items-center gap-1.5 rounded-full border border-[var(--um-line)] bg-white px-3 py-1.5 text-sm font-semibold text-[var(--um-link)] hover:bg-[var(--um-soft)]">
+        className="inline-flex items-center gap-1.5 rounded-full border border-[var(--um-line)] bg-[var(--um-card)] px-3 py-1.5 text-sm font-semibold text-[var(--um-link)] hover:bg-[var(--um-soft)]">
         <Share2 size={16} /> Share
       </button>
       {open && (
-        <div role="menu" className="absolute right-0 z-30 mt-2 w-52 overflow-hidden rounded-lg border border-[var(--um-line)] bg-white py-1 text-sm shadow-lg">
+        <div role="menu" className="absolute right-0 z-30 mt-2 w-52 overflow-hidden rounded-lg border border-[var(--um-line)] bg-[var(--um-card)] py-1 text-sm shadow-lg">
           <a role="menuitem" href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 hover:bg-[var(--um-soft)]" onClick={() => setOpen(false)}>
             <span className="grid h-5 w-5 place-items-center rounded-full bg-[#25d366] text-[10px] font-bold text-white">W</span> WhatsApp
