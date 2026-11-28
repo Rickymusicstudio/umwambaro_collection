@@ -391,9 +391,9 @@ export default function AdminProducts() {
     const price = Number(form.price);
     const comparePrice = form.comparePrice ? Number(form.comparePrice) : null;
     const stock = Number(form.stock);
-    const slug = slugify(form.slug || form.name);
+    const baseSlug = slugify(form.slug || form.name);
 
-    if (!form.name.trim() || !slug || Number.isNaN(price) || price < 0) {
+    if (!form.name.trim() || !baseSlug || Number.isNaN(price) || price < 0) {
       setError("Name, slug and a valid price are required.");
       setSaving(false);
       return;
@@ -410,6 +410,21 @@ export default function AdminProducts() {
       setSaving(false);
       return;
     }
+
+    // Each product needs its own web address (/shop/<slug>). If another product
+    // already uses it (e.g. a second "Polo"), use polo-2, polo-3, …
+    const { data: taken, error: slugError } = await supabase
+      .from("products")
+      .select("id, slug")
+      .like("slug", `${baseSlug}%`);
+    if (slugError) {
+      setError(slugError.message);
+      setSaving(false);
+      return;
+    }
+    const used = new Set((taken ?? []).filter((p) => p.id !== editingId).map((p) => p.slug));
+    let slug = baseSlug;
+    for (let n = 2; used.has(slug); n++) slug = `${baseSlug}-${n}`;
 
     const payload = {
       // the database needs a SKU, so make one when the box is left empty
@@ -453,15 +468,24 @@ export default function AdminProducts() {
     }
 
     if (result.error) {
-      setError(result.error.message);
+      // 23505 = "already exists" in the database
+      const duplicate = result.error.code === "23505";
+      setError(
+        duplicate && result.error.message.includes("sku")
+          ? `Another product already uses the SKU "${payload.sku}". Change the SKU or leave it empty.`
+          : duplicate
+            ? `Another product already uses the web address "${slug}". Change the Slug box and save again.`
+            : result.error.message
+      );
       setSaving(false);
       return;
     }
 
+    const renamed = slug !== baseSlug ? ` Its link is /shop/${slug} because "${baseSlug}" was already used.` : "";
     setMessage(
-      editingId
+      (editingId
         ? "Product updated successfully."
-        : "Product created successfully."
+        : "Product created successfully.") + renamed
     );
     setSaving(false);
     resetForm();
